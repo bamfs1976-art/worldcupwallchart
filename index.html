@@ -3642,21 +3642,7 @@ function renderTodayHero(){
 }
 
 // ═══════════════════════════════════════════════════════
-// GROUP FILTER
-// ═══════════════════════════════════════════════════════
-function buildGroupFilter(){
-  const el=document.getElementById('groupFilter');
-  el.innerHTML=`<button class="filter-chip active" onclick="setGroupFilter('all',this)">All Groups</button>`
-    +Object.keys(G).map(g=>`<button class="filter-chip" onclick="setGroupFilter('${g}',this)">Group ${g}</button>`).join('');
-}
-function setGroupFilter(f,btn){
-  groupFilter=f;
-  document.querySelectorAll('#groupFilter .filter-chip').forEach(c=>c.classList.remove('active'));
-  btn.classList.add('active');
-  document.querySelectorAll('.group-card').forEach(c=>{
-    c.style.display=(f==='all'||c.dataset.group===f)?'':'none';
-  });
-}
+// GROUP FILTER — defined in Enhancement 3 section below with starred group support
 
 // ═══════════════════════════════════════════════════════
 // RENDER GROUPS
@@ -3842,8 +3828,13 @@ function openBracketModal(id,t1,t2,meta){
 function closeModal(){document.getElementById('scoreModal').classList.remove('open');mCtx=null;}
 function clearResult(){
   if(!mCtx)return;
-  if(mCtx.type==='group')delete ST.scores[`${mCtx.g}_${mCtx.fi}`];
-  else delete ST.bScores[mCtx.id];
+  if(mCtx.type==='group'){
+    const k=`${mCtx.g}_${mCtx.fi}`;
+    delete ST.scores[k];
+    delete ST.notes[k];
+  } else {
+    delete ST.bScores[mCtx.id];
+  }
   save();closeModal();renderGroups();renderBracket();renderDashboard();toast('Result cleared','info');
 }
 function saveResult(){
