@@ -2281,6 +2281,365 @@ main { max-width: var(--max-w); margin: 0 auto; padding: var(--sp-6) var(--sp-6)
 }
 
 /* ═══════════════════════════════════════════════════
+   ENHANCEMENT 1 — Quick-score shortcuts
+   ═══════════════════════════════════════════════════ */
+.quick-scores {
+  display: flex;
+  gap: var(--sp-2);
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-bottom: var(--sp-4);
+}
+.qs-chip {
+  background: var(--surf3);
+  border: 1px solid var(--bdr2);
+  color: var(--tx2);
+  border-radius: var(--r-sm);
+  padding: 0 var(--sp-4);
+  height: 36px;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: var(--tx-md);
+  letter-spacing: 1.5px;
+  cursor: pointer;
+  transition: all 0.15s;
+  display: flex; align-items: center;
+}
+.qs-chip:hover { background: var(--gold-lo); border-color: var(--bdr-gold); color: var(--gold); transform: translateY(-1px); }
+.qs-label {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: var(--tx-xs);
+  color: var(--tx3);
+  text-align: center;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: var(--sp-2);
+}
+
+/* ═══════════════════════════════════════════════════
+   ENHANCEMENT 2 — Timezone selector
+   ═══════════════════════════════════════════════════ */
+.tz-select {
+  background: var(--surf1);
+  border: 1px solid var(--bdr);
+  color: var(--tx2);
+  border-radius: var(--r-sm);
+  padding: 0 var(--sp-3);
+  height: 36px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: var(--tx-xs);
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+.tz-select:hover, .tz-select:focus { border-color: var(--bdr-gold); color: var(--gold); outline: none; }
+  display: inline-flex; align-items: center; gap: 4px;
+  background: var(--gold-lo);
+  border: 1px solid var(--bdr-gold);
+  border-radius: 20px;
+  padding: 2px 10px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: var(--tx-xs);
+  color: var(--gold);
+  letter-spacing: 1px;
+  font-weight: 700;
+}
+
+/* ═══════════════════════════════════════════════════
+   ENHANCEMENT 3 — Favourite groups / pin
+   ═══════════════════════════════════════════════════ */
+.group-star {
+  background: none;
+  border: none;
+  font-size: 1rem;
+  cursor: pointer;
+  opacity: 0.3;
+  transition: opacity 0.15s, transform 0.2s var(--ease-spring);
+  padding: 0 var(--sp-1);
+  line-height: 1;
+  flex-shrink: 0;
+}
+.group-star.starred { opacity: 1; }
+.group-star:hover { opacity: 0.8; transform: scale(1.2); }
+.group-card.starred-card { order: -1; border-color: rgba(240,180,41,0.3); }
+
+/* ═══════════════════════════════════════════════════
+   ENHANCEMENT 4 — Group status badge + qualification flash
+   ═══════════════════════════════════════════════════ */
+.group-status-badge {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: var(--tx-xs);
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: 3px;
+}
+.gsb-complete { background: rgba(34,197,94,0.15); color: var(--qualify); }
+.gsb-active { background: var(--danger-bg); color: var(--danger); }
+.gsb-upcoming { background: var(--surf3); color: var(--tx3); }
+
+@keyframes qualify-flash {
+  0%   { background: var(--qualify-bg); }
+  20%  { background: rgba(34,197,94,0.25); }
+  100% { background: var(--qualify-bg); }
+}
+.qualify.flash { animation: qualify-flash 1.2s ease-out; }
+
+.qualified-label {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 0.55rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--qualify);
+  opacity: 0.8;
+}
+
+/* ═══════════════════════════════════════════════════
+   ENHANCEMENT 5 — Bracket round selector (mobile)
+   ═══════════════════════════════════════════════════ */
+.bracket-round-selector {
+  display: none;
+  gap: var(--sp-2);
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  margin-bottom: var(--sp-4);
+  padding-bottom: var(--sp-1);
+  -webkit-overflow-scrolling: touch;
+}
+@media (max-width: 768px) {
+  .bracket-round-selector { display: flex; }
+}
+.brs-btn {
+  background: var(--surf1);
+  border: 1px solid var(--bdr);
+  color: var(--tx3);
+  border-radius: 20px;
+  padding: 0 var(--sp-4);
+  height: 36px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: var(--tx-xs);
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+.brs-btn:hover { border-color: var(--bdr-gold); color: var(--tx); }
+.brs-btn.active { background: var(--gold); color: #000; border-color: var(--gold); }
+
+/* ═══════════════════════════════════════════════════
+   ENHANCEMENT 6 — Undo toast
+   ═══════════════════════════════════════════════════ */
+.undo-toast {
+  position: fixed;
+  bottom: calc(var(--tab-bar-h, 0px) + var(--sp-4));
+  left: 50%;
+  transform: translateX(-50%) translateY(80px);
+  background: var(--surf2);
+  border: 1px solid var(--bdr2);
+  border-radius: var(--r-lg);
+  padding: var(--sp-3) var(--sp-4);
+  display: flex;
+  align-items: center;
+  gap: var(--sp-4);
+  box-shadow: var(--sh-lg);
+  z-index: 900;
+  opacity: 0;
+  transition: transform 0.35s var(--ease-spring), opacity 0.25s;
+  white-space: nowrap;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: var(--tx-base);
+  font-weight: 700;
+  color: var(--tx2);
+  pointer-events: none;
+  min-width: 280px;
+  justify-content: space-between;
+}
+.undo-toast.show {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
+  pointer-events: all;
+}
+.undo-btn {
+  background: var(--gold);
+  border: none;
+  color: #000;
+  border-radius: var(--r-sm);
+  padding: 0 var(--sp-3);
+  height: 32px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: var(--tx-xs);
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: opacity 0.15s;
+  flex-shrink: 0;
+}
+.undo-btn:hover { opacity: 0.85; }
+.undo-progress {
+  position: absolute;
+  bottom: 0; left: 0;
+  height: 3px;
+  background: var(--gold);
+  border-radius: 0 0 var(--r-lg) var(--r-lg);
+  transition: width linear;
+}
+
+/* ═══════════════════════════════════════════════════
+   ENHANCEMENT 7 — Match context panel in modal
+   ═══════════════════════════════════════════════════ */
+.modal-context {
+  background: var(--bg3);
+  border: 1px solid var(--bdr);
+  border-radius: var(--r-sm);
+  padding: var(--sp-3) var(--sp-4);
+  margin-bottom: var(--sp-4);
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: var(--tx-sm);
+  color: var(--tx2);
+  line-height: 1.5;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+}
+.modal-context-icon { font-size: 1.1rem; flex-shrink: 0; }
+.modal-context-text { flex: 1; }
+.ctx-qualify { color: var(--qualify); font-weight: 700; }
+.ctx-danger { color: var(--danger); }
+.ctx-gold { color: var(--gold); font-weight: 700; }
+
+/* ═══════════════════════════════════════════════════
+   ENHANCEMENT 8 — Bracket ripple highlight
+   ═══════════════════════════════════════════════════ */
+@keyframes bracket-ripple {
+  0%   { box-shadow: 0 0 0 0 rgba(240,180,41,0.6); }
+  50%  { box-shadow: 0 0 0 8px rgba(240,180,41,0.1); }
+  100% { box-shadow: 0 0 0 0 rgba(240,180,41,0); }
+}
+.b-match.ripple { animation: bracket-ripple 1s ease-out; }
+.bracket-ripple-note {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: var(--tx-xs);
+  color: var(--gold);
+  letter-spacing: 1px;
+  opacity: 0;
+  transition: opacity 0.5s;
+  margin-left: var(--sp-3);
+}
+.bracket-ripple-note.show { opacity: 1; }
+
+/* ═══════════════════════════════════════════════════
+   ENHANCEMENT 9 — Today's TV Guide bar
+   ═══════════════════════════════════════════════════ */
+.tv-guide-bar {
+  background: var(--surf1);
+  border: 1px solid var(--bdr);
+  border-radius: var(--r-md);
+  padding: var(--sp-4) var(--sp-5);
+  margin-bottom: var(--sp-4);
+  display: flex;
+  gap: var(--sp-5);
+  flex-wrap: wrap;
+  align-items: flex-start;
+}
+.tv-guide-channel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  flex: 1;
+  min-width: 200px;
+}
+.tv-guide-channel-header {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  margin-bottom: var(--sp-1);
+}
+.tv-guide-match {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: var(--sp-2) var(--sp-3);
+  background: var(--bg3);
+  border-radius: var(--r-sm);
+  cursor: pointer;
+  transition: background 0.12s;
+  min-height: 44px;
+}
+.tv-guide-match:hover { background: var(--surf3); }
+.tv-guide-time {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: var(--tx-md);
+  color: var(--gold);
+  min-width: 48px;
+  flex-shrink: 0;
+}
+.tv-guide-teams {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: var(--tx-sm);
+  font-weight: 700;
+  flex: 1;
+}
+.tv-guide-empty {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: var(--tx-sm);
+  color: var(--tx3);
+  font-style: italic;
+}
+
+/* ═══════════════════════════════════════════════════
+   ENHANCEMENT 10 — Match notes
+   ═══════════════════════════════════════════════════ */
+.note-input-wrap {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  margin-bottom: var(--sp-4);
+}
+.note-emoji-row {
+  display: flex;
+  gap: var(--sp-1);
+  flex-wrap: wrap;
+  margin-bottom: var(--sp-2);
+}
+.note-emoji {
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: var(--r-sm);
+  transition: background 0.1s, transform 0.1s;
+  line-height: 1;
+}
+.note-emoji:hover { background: var(--surf3); transform: scale(1.2); }
+.note-inp {
+  flex: 1;
+  height: 40px;
+  background: var(--bg3);
+  border: 1px solid var(--bdr2);
+  border-radius: var(--r-sm);
+  color: var(--tx);
+  padding: 0 var(--sp-3);
+  font-family: 'Barlow', sans-serif;
+  font-size: var(--tx-sm);
+  transition: border-color 0.15s;
+}
+.note-inp:focus { outline: none; border-color: var(--gold); }
+.note-inp::placeholder { color: var(--tx3); }
+.fixture-note-icon {
+  font-size: 0.75rem;
+  cursor: help;
+  position: relative;
+}
+
+/* ═══════════════════════════════════════════════════
    PRINT
    ═══════════════════════════════════════════════════ */
 @media print {
@@ -2552,6 +2911,16 @@ input[type=number] { -moz-appearance: textfield; }
     </div>
     <div class="header-right">
       <div class="live-badge" id="liveBadge" style="display:none">Live Now</div>
+      <select class="tz-select" id="tzSelect" onchange="setTimezone(this.value)" title="Your timezone" aria-label="Select timezone">
+        <option value="0">🕐 UTC</option>
+        <option value="1" selected>🇬🇧 BST +1</option>
+        <option value="2">🌍 CEST +2</option>
+        <option value="3">🌍 +3</option>
+        <option value="-4">🇺🇸 EDT -4</option>
+        <option value="-5">🇺🇸 CDT -5</option>
+        <option value="-6">🇲🇽 MDT -6</option>
+        <option value="-7">🇨🇦 PDT -7</option>
+      </select>
       <button class="icon-btn" onclick="toggleTheme()" title="Themes" aria-label="Change theme">🎨</button>
       <button class="icon-btn" onclick="window.print()" title="Print" aria-label="Print chart">🖨️</button>
       <button class="icon-btn" onclick="showSection('share',null)" title="Share" aria-label="Share">🔗</button>
@@ -2671,6 +3040,13 @@ input[type=number] { -moz-appearance: textfield; }
     <span class="pill blue">32 teams advance · 8 best 3rd-place</span>
   </div>
   <div id="thirdPlacePanel"></div>
+  <div class="bracket-round-selector" id="bracketRoundSel">
+    <button class="brs-btn active" onclick="scrollBracketTo('r32',this)">R32</button>
+    <button class="brs-btn" onclick="scrollBracketTo('r16',this)">R16</button>
+    <button class="brs-btn" onclick="scrollBracketTo('qf',this)">QF</button>
+    <button class="brs-btn" onclick="scrollBracketTo('sf',this)">SF</button>
+    <button class="brs-btn" onclick="scrollBracketTo('final-col',this)">🏆 Final</button>
+  </div>
   <div class="bracket-scroll-hint">← Swipe left to see all rounds →</div>
   <div class="bracket-update-note" id="bracketNote">⚡ Auto-updates from group results — enter group scores to populate R32</div>
   <div class="bracket-wrap"><div class="bracket-frame" id="bracketFrame"></div></div>
@@ -2746,6 +3122,7 @@ input[type=number] { -moz-appearance: textfield; }
       <button class="filter-chip" onclick="setFxFilter('nation','scotland',this)">🏴󠁧󠁢󠁳󠁣󠁴󠁿 Scotland</button>
     </div>
   </div>
+  <div id="tvGuideBar"></div>
   <div id="fixtureList"></div>
 </section>
 
@@ -2855,17 +3232,48 @@ input[type=number] { -moz-appearance: textfield; }
 <div class="overlay" id="scoreModal">
   <div class="modal" id="modalInner">
     <button class="modal-close-x" onclick="closeModal()" aria-label="Close">✕</button>
-    <div class="modal-title">Enter Result</div>
+    <div class="modal-title" id="modalTitle">Enter Result</div>
     <div class="modal-sub" id="modalSub">Match details</div>
     <div class="modal-teams">
       <div class="modal-team"><span class="m-flag" id="mFlag1">🏳️</span><div class="m-name" id="mName1">Team A</div></div>
       <span class="m-vs">VS</span>
       <div class="modal-team"><span class="m-flag" id="mFlag2">🏳️</span><div class="m-name" id="mName2">Team B</div></div>
     </div>
+    <!-- Enhancement 7: match context -->
+    <div class="modal-context" id="modalContext" style="display:none">
+      <span class="modal-context-icon">💡</span>
+      <span class="modal-context-text" id="modalContextText"></span>
+    </div>
+    <!-- Enhancement 1: quick scores -->
+    <div class="qs-label">Quick score</div>
+    <div class="quick-scores">
+      <button class="qs-chip" onclick="setQuickScore(0,0)">0–0</button>
+      <button class="qs-chip" onclick="setQuickScore(1,0)">1–0</button>
+      <button class="qs-chip" onclick="setQuickScore(0,1)">0–1</button>
+      <button class="qs-chip" onclick="setQuickScore(1,1)">1–1</button>
+      <button class="qs-chip" onclick="setQuickScore(2,0)">2–0</button>
+      <button class="qs-chip" onclick="setQuickScore(2,1)">2–1</button>
+      <button class="qs-chip" onclick="setQuickScore(0,2)">0–2</button>
+      <button class="qs-chip" onclick="setQuickScore(3,0)">3–0</button>
+    </div>
     <div class="score-inputs">
-      <input class="big-inp" type="number" id="mS1" min="0" max="30" placeholder="0" aria-label="Home score">
+      <input class="big-inp" type="number" id="mS1" min="0" max="30" placeholder="0" aria-label="Home score" oninput="updateModalContext()">
       <span class="score-dash">—</span>
-      <input class="big-inp" type="number" id="mS2" min="0" max="30" placeholder="0" aria-label="Away score">
+      <input class="big-inp" type="number" id="mS2" min="0" max="30" placeholder="0" aria-label="Away score" oninput="updateModalContext()">
+    </div>
+    <!-- Enhancement 10: match note -->
+    <div class="note-emoji-row" id="noteEmojis">
+      <button class="note-emoji" onclick="addNoteEmoji('🤯')" title="Incredible">🤯</button>
+      <button class="note-emoji" onclick="addNoteEmoji('⭐')" title="Star moment">⭐</button>
+      <button class="note-emoji" onclick="addNoteEmoji('😴')" title="Dull match">😴</button>
+      <button class="note-emoji" onclick="addNoteEmoji('🎯')" title="Clinical">🎯</button>
+      <button class="note-emoji" onclick="addNoteEmoji('😤')" title="Controversial">😤</button>
+      <button class="note-emoji" onclick="addNoteEmoji('🔥')" title="Thriller">🔥</button>
+      <button class="note-emoji" onclick="addNoteEmoji('🤝')" title="Fair result">🤝</button>
+      <button class="note-emoji" onclick="addNoteEmoji('💔')" title="Heartbreak">💔</button>
+    </div>
+    <div class="note-input-wrap">
+      <input class="note-inp" type="text" id="matchNote" maxlength="60" placeholder="Match note… e.g. Bellingham 87' winner">
     </div>
     <div class="modal-actions">
       <button class="btn ghost sm" onclick="closeModal()">Cancel</button>
@@ -2893,6 +3301,13 @@ input[type=number] { -moz-appearance: textfield; }
 <canvas class="confetti-canvas" id="confettiCanvas"></canvas>
 
 <div class="toast" id="toast" role="alert" aria-live="polite">✓</div>
+
+<!-- Enhancement 6: Undo toast -->
+<div class="undo-toast" id="undoToast" role="status">
+  <span id="undoToastMsg">Result saved</span>
+  <button class="undo-btn" onclick="undoLastResult()" aria-label="Undo last result">Undo</button>
+  <div class="undo-progress" id="undoProgress" style="width:100%"></div>
+</div>
 <input type="file" id="importFile" accept=".json" style="display:none" onchange="loadImport(event)">
 
 <script>
@@ -3003,11 +3418,16 @@ ST.leaguePlayers = ST.leaguePlayers||[];
 ST.predictions = ST.predictions||{};
 ST.fairPlay = ST.fairPlay||{};
 ST.theme = ST.theme||'dark';
+ST.notes = ST.notes||{};           // Enhancement 10: match notes
+ST.starredGroups = ST.starredGroups||[]; // Enhancement 3: favourites
+ST.tzOffset = ST.tzOffset!==undefined ? ST.tzOffset : 1; // Enhancement 2: BST default
 
 const save=()=>localStorage.setItem('wc26v4',JSON.stringify(ST));
 
 let mCtx=null, activeTimeline=null, activeTeam=null, groupFilter='all', themeOpen=false, moreOpen=false;
 let bracketDirty=false;
+let lastAction=null; // Enhancement 6: undo support
+let undoTimer=null;
 
 // ═══════════════════════════════════════════════════════
 // COUNTDOWN
@@ -3026,6 +3446,39 @@ function updateCd(){
   el.innerHTML=`<div class="cd-unit"><span class="cd-num">${d}</span><span class="cd-label">Days</span></div><span class="cd-sep">:</span><div class="cd-unit"><span class="cd-num">${String(h).padStart(2,'0')}</span><span class="cd-label">Hrs</span></div><span class="cd-sep">:</span><div class="cd-unit"><span class="cd-num">${String(m).padStart(2,'0')}</span><span class="cd-label">Min</span></div><span class="cd-sep">:</span><div class="cd-unit"><span class="cd-num">${String(s).padStart(2,'0')}</span><span class="cd-label">Sec</span></div>`;
 }
 updateCd(); setInterval(updateCd,1000);
+
+// ═══════════════════════════════════════════════════════
+// ENHANCEMENT 2 — TIMEZONE
+// ═══════════════════════════════════════════════════════
+function setTimezone(val){
+  ST.tzOffset=parseInt(val);save();
+  // Sync both selectors
+  const s=document.getElementById('tzSelect');
+  const sm=document.getElementById('tzSelectMobile');
+  if(s)s.value=String(val);
+  if(sm)sm.value=String(val);
+  renderGroups();renderTodayHero();
+  if(document.getElementById('sec-fixtures').classList.contains('active'))renderFixtureList();
+  renderTVGuide();
+  const labels={'0':'UTC','1':'BST +1','2':'CEST +2','3':'+3','-4':'EDT -4','-5':'CDT -5','-6':'MDT -6','-7':'PDT -7'};
+  toast(`Times: ${labels[String(val)]||'UTC'+val}`,'gold');
+}
+function fmtLocalTime(utcDatetimeStr){
+  // Takes '2026-06-11 21:00' UTC, returns 'HH:MM' in user timezone
+  const utcMs=new Date(utcDatetimeStr.replace(' ','T')+'Z').getTime();
+  const localMs=utcMs+(ST.tzOffset*3600000);
+  const d=new Date(localMs);
+  return String(d.getUTCHours()).padStart(2,'0')+':'+String(d.getUTCMinutes()).padStart(2,'0');
+}
+function tzLabel(){
+  const labels={0:'UTC',1:'BST',2:'CEST',3:'+3','-4':'EDT','-5':'CDT','-6':'MDT','-7':'PDT'};
+  return labels[ST.tzOffset]||`UTC${ST.tzOffset>=0?'+':''}${ST.tzOffset}`;
+}
+// Set the select to saved value on load
+document.addEventListener('DOMContentLoaded',()=>{
+  const sel=document.getElementById('tzSelect');
+  if(sel)sel.value=String(ST.tzOffset);
+});
 
 // ═══════════════════════════════════════════════════════
 // THEME
@@ -3075,7 +3528,7 @@ function showSection(id,btn){
     fairplay:renderFP,
     dashboard:renderDashboard,
     share:updateShare,
-    fixtures:renderFixtureList,
+    fixtures:()=>{renderFixtureList();renderTVGuide();},
   };
   if(renders[id])renders[id]();
   if(moreOpen)toggleMoreMenu();
@@ -3159,7 +3612,7 @@ function renderTodayHero(){
     const[sa,sb]=hasScore?ST.scores[key]:['',''];
     const isNext=i===nextIdx;
     const dateLabel=m.dt.slice(5,10).replace('-','/');
-    const timeLabel=m.dt.slice(11,16)+' UTC';
+    const timeLabel=fmtLocalTime(m.dt)+' '+tzLabel();
 
     return`<div class="today-match-card ${hasScore?'has-score':''} ${isNext?'next-up':''}" onclick="openModal('${m.g}',${m.fi})">
       <div class="tm-badge ${isNext?'next':''}">${isNext?'▶ Next Up':''} ${hasScore?'✓ Full Time':''}M${m.num} · Grp ${m.g}</div>
@@ -3220,8 +3673,46 @@ function renderGroups(){
     card.dataset.group=g;
     if(groupFilter!=='all'&&groupFilter!==g)card.style.display='none';
 
+    // Enhancement 3: starred groups
+    const isStarred=ST.starredGroups.includes(g);
+    if(isStarred)card.classList.add('starred-card');
+
+    // Enhancement 4: group status
+    const matchesPlayed=FX[g].filter((_,fi)=>ST.scores[`${g}_${fi}`]!==undefined).length;
+    const totalMatches=FX[g].length;
+    const groupComplete=matchesPlayed===totalMatches;
+    const groupStarted=matchesPlayed>0;
+    const statusBadge=groupComplete
+      ?`<span class="group-status-badge gsb-complete">✓ Complete</span>`
+      :groupStarted
+        ?`<span class="group-status-badge gsb-active">● In Progress</span>`
+        :`<span class="group-status-badge gsb-upcoming">Upcoming</span>`;
+
+    // Check which teams are mathematically confirmed
+    const confirmedQualify=new Set();
+    const confirmedEliminated=new Set();
+    if(groupComplete){
+      s.slice(0,2).forEach(t=>confirmedQualify.add(t.name));
+      s.slice(2).forEach(t=>confirmedEliminated.add(t.name));
+    } else if(matchesPlayed>=3){
+      // Simplified: if top 2 can't be caught by 3rd/4th
+      const pts3rd=s[2]?.p||0;
+      const remainingMatches=(totalMatches-matchesPlayed);
+      if(s[0].p-pts3rd>3*remainingMatches)confirmedQualify.add(s[0].name);
+      if(s[1].p-pts3rd>3*remainingMatches)confirmedQualify.add(s[1].name);
+    }
+
     // Header
-    let h=`<div class="group-header"><span class="group-letter">Group ${g}</span><span class="group-meta">FIFA Rankings · ${s.filter(t=>t.mp>0).length}/4 active</span></div>`;
+    let h=`<div class="group-header">
+      <div style="display:flex;align-items:center;gap:var(--sp-2)">
+        <span class="group-letter">Group ${g}</span>
+        ${statusBadge}
+      </div>
+      <div style="display:flex;align-items:center;gap:var(--sp-2)">
+        <span class="group-meta">${matchesPlayed}/${totalMatches} played</span>
+        <button class="group-star ${isStarred?'starred':''}" onclick="toggleStar('${g}',this)" title="${isStarred?'Unpin group':'Pin group'}" aria-label="${isStarred?'Unpin':'Pin'} group ${g}">⭐</button>
+      </div>
+    </div>`;
 
     // Standings
     h+=`<table class="standings-tbl"><thead><tr>
@@ -3233,9 +3724,11 @@ function renderGroups(){
       const pc=i===0?'gold':i===1?'silver':i===2?'blue':'';
       const gdCls=t.gd>0?'gd-pos':t.gd<0?'gd-neg':'';
       const fdots=t.form.slice(-5).map(f=>`<div class="fdot ${f}"></div>`).join('');
+      const qualLabel=confirmedQualify.has(t.name)?`<span class="qualified-label">QUALIFIED</span>`:'';
+      const elimLabel=confirmedEliminated.has(t.name)&&groupComplete?`<span class="qualified-label" style="color:var(--danger)">OUT</span>`:'';
       h+=`<tr class="${rowCls}">
         <td><div class="pos-badge ${pc}">${i+1}</div></td>
-        <td class="tl"><div class="team-cell"><span class="flag-em">${t.f}</span><span class="tname">${t.name}</span></div></td>
+        <td class="tl"><div class="team-cell"><span class="flag-em">${t.f}</span><span class="tname">${t.name}</span>${qualLabel}${elimLabel}</div></td>
         <td class="num">${t.mp}</td><td class="num">${t.w}</td><td class="num">${t.d}</td><td class="num">${t.l}</td>
         <td class="num">${t.gf}</td><td class="num">${t.ga}</td>
         <td class="num ${gdCls}">${t.gd>0?'+':''}${t.gd}</td>
@@ -3253,7 +3746,8 @@ function renderGroups(){
       if(hs)played++;
       const[sa,sb]=hs?ST.scores[k]:['',''];
       const datePart=dt.slice(5,10).replace('-','/');
-      const timePart=dt.slice(11,16);
+      const localTime=fmtLocalTime(dt);
+      const noteIcon=ST.notes[k]?`<span class="fixture-note-icon" title="${ST.notes[k]}">${ST.notes[k].charAt(0)}</span>`:'';
       h+=`<div class="fixture-row ${hs?'played':''}" onclick="openModal('${g}',${fi})">
         <div class="fix-team"><span class="flag-em" style="font-size:.85rem">${G[g].f[a]}</span><span>${G[g].t[a]}</span></div>
         <div class="score-box">
@@ -3262,7 +3756,7 @@ function renderGroups(){
           <div class="score-num ${hs?'filled':'tbd'}">${hs?sb:'?'}</div>
         </div>
         <div class="fix-team" style="flex-direction:row-reverse;text-align:right"><span>${G[g].t[b]}</span><span class="flag-em" style="font-size:.85rem">${G[g].f[b]}</span></div>
-        <div class="fix-meta">${datePart}<br>${timePart} UTC<br><span style="font-size:.55rem;color:rgba(240,180,41,.35)">M${num} · ${venue}</span></div>
+        <div class="fix-meta">${datePart}<br>${localTime} ${tzLabel()}<br><span style="font-size:.55rem;color:rgba(240,180,41,.35)">M${num} · ${venue}</span>${noteIcon}</div>
       </div>`;
     });
 
@@ -3316,18 +3810,27 @@ function openModal(g,fi){
   document.getElementById('mFlag2').textContent=G[g].f[b];
   document.getElementById('mName1').textContent=G[g].t[a];
   document.getElementById('mName2').textContent=G[g].t[b];
-  document.getElementById('modalSub').textContent=`Group ${g} · Match ${num} · ${dt.slice(0,10)} ${dt.slice(11,16)} UTC · ${venue}`;
+  const localTime=fmtLocalTime(dt);
+  document.getElementById('modalSub').textContent=`Group ${g} · M${num} · ${dt.slice(0,10)} ${localTime} ${tzLabel()} · ${venue}`;
   const k=`${g}_${fi}`;const sc=ST.scores[k];
+  const hasExisting=sc!==undefined;
+  document.getElementById('modalTitle').textContent=hasExisting?'Edit Result':'Enter Result';
   document.getElementById('mS1').value=sc?sc[0]:'';
   document.getElementById('mS2').value=sc?sc[1]:'';
+  document.getElementById('matchNote').value=ST.notes[k]||'';
   document.getElementById('modalInner').classList.remove('saved');
+  // Reset quick score highlights
+  document.querySelectorAll('.qs-chip').forEach(c=>{c.style.background='';c.style.color='';c.style.borderColor='';});
   document.getElementById('scoreModal').classList.add('open');
+  updateModalContext();
   setTimeout(()=>document.getElementById('mS1').focus(),80);
 }
 function openBracketModal(id,t1,t2,meta){
   mCtx={id,t1,t2,meta,type:'bracket'};
-  document.getElementById('mFlag1').textContent='⚽';document.getElementById('mFlag2').textContent='⚽';
-  document.getElementById('mName1').textContent=t1;document.getElementById('mName2').textContent=t2;
+  document.getElementById('mFlag1').textContent=getFlag(t1);
+  document.getElementById('mFlag2').textContent=getFlag(t2);
+  document.getElementById('mName1').textContent=t1;
+  document.getElementById('mName2').textContent=t2;
   document.getElementById('modalSub').textContent=meta;
   const d=ST.bScores[id]||{};
   document.getElementById('mS1').value=d.s1!==undefined?d.s1:'';
@@ -3348,9 +3851,18 @@ function saveResult(){
   const s1v=document.getElementById('mS1').value, s2v=document.getElementById('mS2').value;
   if(s1v===''||s2v===''){toast('Enter both scores','error');return;}
   const v1=parseInt(s1v),v2=parseInt(s2v);
+  const noteVal=(document.getElementById('matchNote')?.value||'').trim();
 
-  if(mCtx.type==='group')ST.scores[`${mCtx.g}_${mCtx.fi}`]=[v1,v2];
-  else ST.bScores[mCtx.id]={s1:v1,s2:v2,team1:mCtx.t1,team2:mCtx.t2};
+  // Enhancement 6: capture undo state before saving
+  if(mCtx.type==='group'){
+    const k=`${mCtx.g}_${mCtx.fi}`;
+    lastAction={type:'score',key:k,prevVal:ST.scores[k]};
+    ST.scores[k]=[v1,v2];
+    if(noteVal)ST.notes[k]=noteVal;else delete ST.notes[k];
+  } else {
+    lastAction={type:'bscore',key:mCtx.id,prevVal:ST.bScores[mCtx.id]};
+    ST.bScores[mCtx.id]={s1:v1,s2:v2,team1:mCtx.t1,team2:mCtx.t2};
+  }
   save();
 
   // Enhancement 6: success animation
@@ -3360,13 +3872,30 @@ function saveResult(){
   // Confetti for high-scoring matches
   if((v1+v2)>=4)launchConfetti();
 
+  // Build toast message
+  const t1=mCtx.type==='group'?G[mCtx.g].t[FX[mCtx.g][mCtx.fi][0]]:(mCtx.t1||'');
+  const t2=mCtx.type==='group'?G[mCtx.g].t[FX[mCtx.g][mCtx.fi][1]]:(mCtx.t2||'');
+  const savedG=mCtx.g;
+
   // Auto-close after brief celebration
   setTimeout(()=>{
     closeModal();
     renderGroups();renderBracket();renderDashboard();
     bracketDirty=true;
     document.getElementById('bracketDot').classList.add('show');
-    toast(`✓ ${G[mCtx?.g||'']?.t[mCtx?.fi||0]||''} ${v1} – ${v2} saved`,'success');
+    // Enhancement 4: flash newly qualified rows
+    setTimeout(()=>{
+      document.querySelectorAll('.standings-tbl tbody tr.qualify').forEach(row=>{
+        row.classList.add('flash');
+        setTimeout(()=>row.classList.remove('flash'),1400);
+      });
+    },100);
+    // Enhancement 8: ripple bracket
+    if(savedG)rippleBracketSlots(savedG);
+    // Enhancement 6: show undo toast
+    showUndoToast(`${t1} ${v1} – ${v2} ${t2} saved`);
+    // Enhancement 9: refresh TV guide
+    renderTVGuide();
   },700);
 }
 
@@ -3417,20 +3946,34 @@ function resolveTeam(code){
   return{n:code,f:'⬜'};
 }
 
+// Flag lookup by team name — covers all 48 teams + common bracket resolved names
+const FLAG_MAP = (()=>{
+  const m={};
+  Object.keys(G).forEach(g=>G[g].t.forEach((t,i)=>m[t]=G[g].f[i]));
+  // Extra entries for stored bracket team names
+  Object.values(SQUADS).forEach(s=>{ /* already in G */ });
+  return m;
+})();
+function getFlag(name){
+  if(!name||name==='TBD')return'⬜';
+  return FLAG_MAP[name]||FLAG_MAP[Object.keys(FLAG_MAP).find(k=>k.toLowerCase()===name.toLowerCase())]||'🏳️';
+}
+
 function bMatch(id,t1n,t2n,meta,num,isFinal=false){
   const d=ST.bScores[id]||{};
   const s1=d.s1!==undefined?d.s1:'', s2=d.s2!==undefined?d.s2:'';
   const w1=s1!==''&&s2!==''&&s1>s2, w2=s1!==''&&s2!==''&&s2>s1;
   const e1=t1n.replace(/'/g,"\\'"),e2=t2n.replace(/'/g,"\\'");
   const fc=isFinal?'final-match':'';
+  const f1=getFlag(t1n), f2=getFlag(t2n);
   return`<div class="b-match ${fc}" onclick="openBracketModal('${id}','${e1}','${e2}','${meta}')">
     <div class="b-match-num">M${num} · ${meta}</div>
     <div class="b-team ${w1?'win':''} ${w2&&!w1?'lose':''}">
-      <div class="b-tname"><span style="font-size:.85rem">${t1n.startsWith('TBD')||t1n.startsWith('Best')?'⬜':''}</span><span>${t1n}</span></div>
+      <div class="b-tname"><span style="font-size:.85rem">${f1}</span><span>${t1n}</span></div>
       <span class="b-score">${s1!==''?s1:''}</span>
     </div>
     <div class="b-team ${w2?'win':''} ${w1&&!w2?'lose':''}">
-      <div class="b-tname"><span>${t2n}</span></div>
+      <div class="b-tname"><span style="font-size:.85rem">${f2}</span><span>${t2n}</span></div>
       <span class="b-score">${s2!==''?s2:''}</span>
     </div>
   </div>`;
@@ -4136,7 +4679,7 @@ function buildFixtureList() {
         sortKey: utcMs,
         dateStr: dt.slice(0, 10),
         utcTime: dt.slice(11, 16),
-        bstTime: bstDisplay,
+        bstTime: fmtLocalTime(dt),
         t1: G[g].t[a], f1: G[g].f[a],
         t2: G[g].t[b], f2: G[g].f[b],
         group: g, fi,
@@ -4171,7 +4714,7 @@ function buildFixtureList() {
       sortKey: baseMs,
       dateStr: km.d,
       utcTime: '', bstTime: uk.bst,
-      t1, f1: '⬜', t2, f2: '⬜',
+      t1, f1: getFlag(t1), t2, f2: getFlag(t2),
       group: null, fi: null,
       matchNum: km.m, venue: km.v,
       tv: uk.tv,
@@ -4284,7 +4827,7 @@ function renderFixtureList() {
 
       html += `<div class="fl-row ${resultCls} ${nationCls}" onclick="${clickFn}" role="button" tabindex="0" aria-label="${m.t1} vs ${m.t2}">
         <div class="fl-time-col">
-          <span class="fl-bst">${m.bstTime}<span style="font-size:var(--tx-xs);color:var(--tx3);font-family:'Barlow Condensed',sans-serif"> BST</span></span>
+          <span class="fl-bst">${m.bstTime}<span style="font-size:var(--tx-xs);color:var(--tx3);font-family:'Barlow Condensed',sans-serif"> ${tzLabel()}</span></span>
           ${m.utcTime ? `<span class="fl-utc">${m.utcTime} UTC</span>` : ''}
           <span class="tv-badge ${tvCls}" style="margin-top:3px">${tvLabel}</span>
         </div>
@@ -4325,6 +4868,225 @@ function renderFixtureList() {
 }
 
 // ═══════════════════════════════════════════════════════
+// ENHANCEMENT 1 — Quick score shortcuts
+// ═══════════════════════════════════════════════════════
+function setQuickScore(s1,s2){
+  document.getElementById('mS1').value=s1;
+  document.getElementById('mS2').value=s2;
+  updateModalContext();
+  // Visual feedback on chip
+  document.querySelectorAll('.qs-chip').forEach(c=>{
+    c.style.background='';c.style.color='';c.style.borderColor='';
+    if(c.textContent.trim()===`${s1}–${s2}`){
+      c.style.background='var(--gold)';c.style.color='#000';c.style.borderColor='var(--gold)';
+    }
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+// ENHANCEMENT 3 — Favourite groups
+// ═══════════════════════════════════════════════════════
+function toggleStar(g, btn){
+  const idx=ST.starredGroups.indexOf(g);
+  if(idx>-1)ST.starredGroups.splice(idx,1);
+  else ST.starredGroups.push(g);
+  save();
+  // Update filter bar to show My Groups chip
+  buildGroupFilter();
+  renderGroups();
+  toast(idx>-1?`Group ${g} unpinned`:`Group ${g} pinned ⭐`,'gold');
+}
+
+// Update group filter to include starred option
+function buildGroupFilter(){
+  const el=document.getElementById('groupFilter');
+  const hasStarred=ST.starredGroups.length>0;
+  el.innerHTML=`<button class="filter-chip ${groupFilter==='all'?'active':''}" onclick="setGroupFilter('all',this)">All Groups</button>`
+    +(hasStarred?`<button class="filter-chip ${groupFilter==='starred'?'active':''}" onclick="setGroupFilter('starred',this)">⭐ My Groups</button>`:'')
+    +Object.keys(G).map(g=>`<button class="filter-chip ${groupFilter===g?'active':''}" onclick="setGroupFilter('${g}',this)">Group ${g}</button>`).join('');
+}
+function setGroupFilter(f,btn){
+  groupFilter=f;
+  document.querySelectorAll('#groupFilter .filter-chip').forEach(c=>c.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+  document.querySelectorAll('.group-card').forEach(c=>{
+    if(f==='all')c.style.display='';
+    else if(f==='starred')c.style.display=ST.starredGroups.includes(c.dataset.group)?'':'none';
+    else c.style.display=(c.dataset.group===f)?'':'none';
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+// ENHANCEMENT 5 — Bracket round selector
+// ═══════════════════════════════════════════════════════
+function scrollBracketTo(roundClass, btn){
+  const wrap=document.querySelector('.bracket-wrap');
+  const col=document.querySelector(`.bracket-col.${roundClass}`);
+  if(!wrap||!col)return;
+  wrap.scrollTo({left:col.offsetLeft-16,behavior:'smooth'});
+  document.querySelectorAll('.brs-btn').forEach(b=>b.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+  // Highlight columns
+  document.querySelectorAll('.bracket-col').forEach(c=>{
+    c.style.opacity=c.classList.contains(roundClass)?'1':'0.4';
+    c.style.transition='opacity 0.3s';
+  });
+  setTimeout(()=>document.querySelectorAll('.bracket-col').forEach(c=>c.style.opacity=''),2000);
+}
+
+// ═══════════════════════════════════════════════════════
+// ENHANCEMENT 6 — Undo last result
+// ═══════════════════════════════════════════════════════
+function showUndoToast(msg){
+  const t=document.getElementById('undoToast');
+  const m=document.getElementById('undoToastMsg');
+  const p=document.getElementById('undoProgress');
+  if(!t)return;
+  m.textContent=msg;
+  t.classList.add('show');
+  // Progress bar animation (6 seconds)
+  p.style.transition='none';p.style.width='100%';
+  requestAnimationFrame(()=>{
+    p.style.transition='width 6s linear';
+    p.style.width='0%';
+  });
+  if(undoTimer)clearTimeout(undoTimer);
+  undoTimer=setTimeout(()=>{t.classList.remove('show');lastAction=null;},6000);
+}
+function undoLastResult(){
+  if(!lastAction)return;
+  const {type,key,prevVal,scorerIdx,prevScorer}=lastAction;
+  if(type==='score'){
+    if(prevVal===undefined)delete ST.scores[key];
+    else ST.scores[key]=prevVal;
+  } else if(type==='bscore'){
+    if(prevVal===undefined)delete ST.bScores[key];
+    else ST.bScores[key]=prevVal;
+  } else if(type==='scorer'){
+    ST.scorers.splice(scorerIdx,1);
+  }
+  save();lastAction=null;
+  document.getElementById('undoToast').classList.remove('show');
+  if(undoTimer)clearTimeout(undoTimer);
+  renderGroups();renderBracket();renderDashboard();renderScorers();
+  toast('Result undone','info');
+}
+
+// ═══════════════════════════════════════════════════════
+// ENHANCEMENT 7 — Modal context (what this result means)
+// ═══════════════════════════════════════════════════════
+function updateModalContext(){
+  if(!mCtx||mCtx.type!=='group')return;
+  const ctxEl=document.getElementById('modalContext');
+  const ctxText=document.getElementById('modalContextText');
+  if(!ctxEl||!ctxText)return;
+  const s1=parseInt(document.getElementById('mS1').value);
+  const s2=parseInt(document.getElementById('mS2').value);
+  if(isNaN(s1)||isNaN(s2)){ctxEl.style.display='none';return;}
+  // Temporarily apply score to calculate table impact
+  const k=`${mCtx.g}_${mCtx.fi}`;
+  const prev=ST.scores[k];
+  ST.scores[k]=[s1,s2];
+  const s=standings(mCtx.g);
+  if(prev!==undefined)ST.scores[k]=prev;else delete ST.scores[k];
+  // Build message
+  const [a,b]=FX[mCtx.g][mCtx.fi];
+  const t1name=G[mCtx.g].t[a], t2name=G[mCtx.g].t[b];
+  const t1pos=s.findIndex(t=>t.name===t1name)+1;
+  const t2pos=s.findIndex(t=>t.name===t2name)+1;
+  const matchesPlayed=FX[mCtx.g].filter((_,fi)=>ST.scores[`${mCtx.g}_${fi}`]!==undefined).length;
+  const isLastMatch=matchesPlayed===FX[mCtx.g].length-1;
+  let msg='';
+  if(s1>s2){msg=`<span class="ctx-qualify">${t1name} win</span> · ${t1name} ${t1pos<=2?'qualify':'drop to '+t1pos+'th'} · ${t2name} ${t2pos<=2?'safe':'slip to '+t2pos+'th'}`;}
+  else if(s2>s1){msg=`<span class="ctx-qualify">${t2name} win</span> · ${t2name} ${t2pos<=2?'qualify':'drop to '+t2pos+'th'} · ${t1name} ${t1pos<=2?'safe':'slip to '+t1pos+'th'}`;}
+  else{msg=`Draw · ${t1name} ${t1pos<=2?'<span class="ctx-qualify">safe</span>':'slip to '+t1pos+'th'} · ${t2name} ${t2pos<=2?'<span class="ctx-qualify">safe</span>':'slip to '+t2pos+'th'}`;}
+  if(isLastMatch&&matchesPlayed===FX[mCtx.g].length-1){msg+=' <span class="ctx-gold">· Final group match</span>';}
+  ctxEl.style.display='flex';
+  ctxText.innerHTML=msg;
+}
+
+// ═══════════════════════════════════════════════════════
+// ENHANCEMENT 8 — Bracket ripple on result save
+// ═══════════════════════════════════════════════════════
+function rippleBracketSlots(g){
+  // Find R32 slots that reference this group
+  const r32Ids=['r32_0','r32_1','r32_2','r32_3','r32_4','r32_5','r32_6','r32_7',
+                'r32_8','r32_9','r32_10','r32_11','r32_12','r32_13','r32_14','r32_15'];
+  const relatedR32=R32.filter(m=>{
+    const keys=m.t1k+m.t2k;
+    return keys.includes(g)||(m.t1k.includes('3')&&true); // simplified — any slot referencing group
+  });
+  relatedR32.forEach(m=>{
+    const el=document.querySelector(`[onclick*="'${m.id}'"]`);
+    if(el){
+      el.classList.remove('ripple');
+      requestAnimationFrame(()=>{el.classList.add('ripple');setTimeout(()=>el.classList.remove('ripple'),1000);});
+    }
+  });
+  // Show note
+  const note=document.getElementById('bracketNote');
+  if(note){
+    note.innerHTML=`⚡ Group ${g} results updated bracket <span class="bracket-ripple-note show">· R32 slots refreshed</span>`;
+    setTimeout(()=>note.querySelectorAll('.bracket-ripple-note').forEach(n=>n.classList.remove('show')),3000);
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+// ENHANCEMENT 9 — TV Guide bar
+// ═══════════════════════════════════════════════════════
+function renderTVGuide(){
+  const el=document.getElementById('tvGuideBar');
+  if(!el)return;
+  const now=new Date();
+  const todayStr=now.toISOString().slice(0,10);
+  // Collect today's matches
+  const todayMatches=[];
+  Object.keys(G).forEach(g=>{
+    FX[g].forEach(([a,b,num,dt,venue],fi)=>{
+      if(dt.slice(0,10)===todayStr){
+        const uk=UK_TV[num]||{tv:'BBC',bst:'—'};
+        todayMatches.push({g,fi,a,b,num,dt,venue,tv:uk.tv,localTime:fmtLocalTime(dt),nation:uk.nation});
+      }
+    });
+  });
+  if(todayMatches.length===0){
+    // Show next day with matches
+    el.innerHTML='';return;
+  }
+  todayMatches.sort((x,y)=>x.dt.localeCompare(y.dt));
+  const bbc=todayMatches.filter(m=>m.tv==='BBC'||m.tv==='BBC+ITV');
+  const itv=todayMatches.filter(m=>m.tv==='ITV'||m.tv==='BBC+ITV');
+  const tzLbl=tzLabel();
+  function matchRow(m){
+    const note=m.nation?` <span style="color:var(--qualify);font-weight:700">★</span>`:'';
+    return`<div class="tv-guide-match" onclick="openModal('${m.g}',${m.fi})">
+      <span class="tv-guide-time">${m.localTime}</span>
+      <span class="tv-guide-teams">${G[m.g].f[m.a]} ${G[m.g].t[m.a]} <span style="color:var(--tx3);font-weight:400">vs</span> ${G[m.g].t[m.b]} ${G[m.g].f[m.b]}${note}</span>
+    </div>`;
+  }
+  el.innerHTML=`<div class="tv-guide-bar">
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:var(--tx-sm);color:var(--gold);letter-spacing:3px;width:100%;margin-bottom:var(--sp-2)">📺 On TV Today · ${now.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'})} · ${tzLbl}</div>
+    ${bbc.length?`<div class="tv-guide-channel">
+      <div class="tv-guide-channel-header"><span class="tv-badge tv-bbc">BBC</span><span style="font-size:var(--tx-xs);color:var(--tx3)">BBC One / iPlayer</span></div>
+      ${bbc.map(matchRow).join('')}
+    </div>`:''}
+    ${itv.length?`<div class="tv-guide-channel">
+      <div class="tv-guide-channel-header"><span class="tv-badge tv-itv">ITV</span><span style="font-size:var(--tx-xs);color:var(--tx3)">ITV1 / ITVX</span></div>
+      ${itv.map(matchRow).join('')}
+    </div>`:''}
+  </div>`;
+}
+
+// ═══════════════════════════════════════════════════════
+// ENHANCEMENT 10 — Match notes
+// ═══════════════════════════════════════════════════════
+function addNoteEmoji(emoji){
+  const inp=document.getElementById('matchNote');
+  if(inp)inp.value=(inp.value+emoji).slice(0,60);
+  inp.focus();
+}
+
+// ═══════════════════════════════════════════════════════
 // INIT
 // ═══════════════════════════════════════════════════════
 buildGroupFilter();
@@ -4332,6 +5094,15 @@ renderGroups();
 renderBracket();
 renderScorers();
 renderDashboard();
+renderTVGuide(); // Enhancement 9
+
+// Apply saved timezone to selectors
+(()=>{
+  const sel=document.getElementById('tzSelect');
+  const selM=document.getElementById('tzSelectMobile');
+  if(sel)sel.value=String(ST.tzOffset);
+  if(selM)selM.value=String(ST.tzOffset);
+})();
 
 // Apply saved theme properly
 document.querySelectorAll('.theme-opt').forEach(o=>{
@@ -4456,6 +5227,20 @@ syncTabBar('groups');
       <span class="msi-icon">🎨</span>
       <span class="msi-label">Themes</span>
     </button>
+    <div class="more-sheet-item" style="flex-direction:column;align-items:flex-start;gap:4px;padding:var(--sp-3)">
+      <span class="msi-icon" style="font-size:1rem">🌍</span>
+      <span class="msi-label" style="margin-bottom:4px">Timezone</span>
+      <select class="tz-select" style="width:100%;height:36px;font-size:var(--tx-xs)" id="tzSelectMobile" onchange="setTimezone(this.value);document.getElementById('tzSelect').value=this.value" aria-label="Select timezone">
+        <option value="0">UTC</option>
+        <option value="1">BST +1 (UK)</option>
+        <option value="2">CEST +2 (Europe)</option>
+        <option value="3">+3</option>
+        <option value="-4">EDT -4 (US East)</option>
+        <option value="-5">CDT -5 (US Central)</option>
+        <option value="-6">MDT -6 (US Mountain)</option>
+        <option value="-7">PDT -7 (US West)</option>
+      </select>
+    </div>
     <button class="more-sheet-item" onclick="window.print();closeMobileMore()" aria-label="Print">
       <span class="msi-icon">🖨️</span>
       <span class="msi-label">Print</span>
