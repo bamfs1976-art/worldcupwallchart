@@ -3315,17 +3315,17 @@ input[type=number] { -moz-appearance: textfield; }
 // DATA — ALL FROM SPREADSHEET WCup_2026_4_0_en.xlsx
 // ═══════════════════════════════════════════════════════
 const G = {
-  A:{t:['Mexico','South Africa','Rep. of Korea','Play-Off D'],f:['🇲🇽','🇿🇦','🇰🇷','🇪🇺']},
-  B:{t:['Canada','Play-Off A','Qatar','Switzerland'],f:['🇨🇦','🇪🇺','🇶🇦','🇨🇭']},
+  A:{t:['Mexico','South Africa','Rep. of Korea','Czechia'],f:['🇲🇽','🇿🇦','🇰🇷','🇨🇿']},
+  B:{t:['Canada','Bosnia-Herzegovina','Qatar','Switzerland'],f:['🇨🇦','🇧🇦','🇶🇦','🇨🇭']},
   C:{t:['Brazil','Morocco','Haiti','Scotland'],f:['🇧🇷','🇲🇦','🇭🇹','🏴󠁧󠁢󠁳󠁣󠁴󠁿']},
-  D:{t:['USA','Paraguay','Australia','Play-Off C'],f:['🇺🇸','🇵🇾','🇦🇺','🇪🇺']},
+  D:{t:['USA','Paraguay','Australia','Türkiye'],f:['🇺🇸','🇵🇾','🇦🇺','🇹🇷']},
   E:{t:['Germany','Curaçao','Ivory Coast','Ecuador'],f:['🇩🇪','🇨🇼','🇨🇮','🇪🇨']},
-  F:{t:['Netherlands','Japan','Play-Off B','Tunisia'],f:['🇳🇱','🇯🇵','🇪🇺','🇹🇳']},
+  F:{t:['Netherlands','Japan','Sweden','Tunisia'],f:['🇳🇱','🇯🇵','🇸🇪','🇹🇳']},
   G:{t:['Belgium','Egypt','IR Iran','New Zealand'],f:['🇧🇪','🇪🇬','🇮🇷','🇳🇿']},
   H:{t:['Spain','Cape Verde','Saudi Arabia','Uruguay'],f:['🇪🇸','🇨🇻','🇸🇦','🇺🇾']},
-  I:{t:['France','Senegal','Play-Off 2','Norway'],f:['🇫🇷','🇸🇳','🌍','🇳🇴']},
+  I:{t:['France','Senegal','Iraq','Norway'],f:['🇫🇷','🇸🇳','🇮🇶','🇳🇴']},
   J:{t:['Argentina','Algeria','Austria','Jordan'],f:['🇦🇷','🇩🇿','🇦🇹','🇯🇴']},
-  K:{t:['Portugal','Play-Off 1','Uzbekistan','Colombia'],f:['🇵🇹','🌍','🇺🇿','🇨🇴']},
+  K:{t:['Portugal','DR Congo','Uzbekistan','Colombia'],f:['🇵🇹','🇨🇩','🇺🇿','🇨🇴']},
   L:{t:['England','Croatia','Ghana','Panama'],f:['🏴󠁧󠁢󠁥󠁮󠁧󠁿','🇭🇷','🇬🇭','🇵🇦']}
 };
 
@@ -3345,7 +3345,7 @@ const FX = {
   L:[[2,3,21,'2026-06-18 01:00','Toronto'],[0,1,22,'2026-06-17 22:00','Dallas'],[0,2,45,'2026-06-23 22:00','Boston'],[3,1,46,'2026-06-24 01:00','Toronto'],[3,0,67,'2026-06-27 23:00','New York/NJ'],[1,2,68,'2026-06-27 23:00','Philadelphia']]
 };
 
-const FIFA_RANK = {Mexico:15,SouthAfrica:61,'Rep. of Korea':22,'Play-Off D':96,Canada:27,'Play-Off A':93,Qatar:51,Switzerland:17,Brazil:5,Morocco:11,Haiti:84,Scotland:36,USA:14,Paraguay:39,Australia:26,'Play-Off C':95,Germany:9,'Curaçao':82,'Ivory Coast':42,Ecuador:23,Netherlands:7,Japan:18,'Play-Off B':94,Tunisia:40,Belgium:8,Egypt:34,'IR Iran':20,'New Zealand':86,Spain:1,'Cape Verde':68,'Saudi Arabia':60,Uruguay:16,France:3,Senegal:19,'Play-Off 2':92,Norway:29,Argentina:2,Algeria:35,Austria:24,Jordan:66,Portugal:6,'Play-Off 1':91,Uzbekistan:50,Colombia:13,England:4,Croatia:10,Ghana:72,Panama:30};
+const FIFA_RANK = {Mexico:15,SouthAfrica:61,'Rep. of Korea':22,Czechia:37,Canada:27,'Bosnia-Herzegovina':67,Qatar:51,Switzerland:17,Brazil:5,Morocco:11,Haiti:84,Scotland:36,USA:14,Paraguay:39,Australia:26,'Türkiye':28,Germany:9,'Curaçao':82,'Ivory Coast':42,Ecuador:23,Netherlands:7,Japan:18,Sweden:25,Tunisia:40,Belgium:8,Egypt:34,'IR Iran':20,'New Zealand':86,Spain:1,'Cape Verde':68,'Saudi Arabia':60,Uruguay:16,France:3,Senegal:19,Iraq:58,Norway:29,Argentina:2,Algeria:35,Austria:24,Jordan:66,Portugal:6,'DR Congo':56,Uzbekistan:50,Colombia:13,England:4,Croatia:10,Ghana:72,Panama:30};
 function rank(name){return FIFA_RANK[name]||FIFA_RANK[name.replace(/ /g,'')]||99;}
 
 // R32 fixture data from spreadsheet
@@ -3403,7 +3403,13 @@ const SQUADS={
   Portugal:{flag:'🇵🇹',group:'K',coach:'Roberto Martínez',stars:['Cristiano Ronaldo','Rafael Leão','Bruno Fernandes'],p:[{n:'D. Costa',pos:'GK',caps:24,club:'Porto',e:'🧤'},{n:'R. Dias',pos:'DEF',caps:62,club:'Man City',e:'🛡️'},{n:'J. Cancelo',pos:'DEF',caps:58,club:'Barcelona',e:'🛡️'},{n:'J. Palhinha',pos:'MID',caps:34,club:'Bayern Munich',e:'⚙️'},{n:'B. Fernandes',pos:'MID',caps:72,club:'Man United',e:'⚙️'},{n:'C. Ronaldo',pos:'FWD',caps:212,club:'Al-Nassr',e:'⚽'},{n:'R. Leão',pos:'FWD',caps:32,club:'AC Milan',e:'⚽'},{n:'G. Ramos',pos:'FWD',caps:18,club:'PSG',e:'⚽'}]},
   Netherlands:{flag:'🇳🇱',group:'F',coach:'Ronald Koeman',stars:['Virgil van Dijk','Cody Gakpo','Xavi Simons'],p:[{n:'B. Verbruggen',pos:'GK',caps:14,club:'Brighton',e:'🧤'},{n:'V. van Dijk',pos:'DEF',caps:68,club:'Liverpool',e:'🛡️'},{n:'D. Dumfries',pos:'DEF',caps:52,club:'Inter Milan',e:'🛡️'},{n:'F. de Jong',pos:'MID',caps:62,club:'Barcelona',e:'⚙️'},{n:'X. Simons',pos:'MID',caps:22,club:'Leipzig',e:'⚙️'},{n:'C. Gakpo',pos:'FWD',caps:44,club:'Liverpool',e:'⚽'},{n:'M. Depay',pos:'FWD',caps:96,club:'Free',e:'⚽'}]},
   Belgium:{flag:'🇧🇪',group:'G',coach:'Domenico Tedesco',stars:['Kevin De Bruyne','Romelu Lukaku','Lois Openda'],p:[{n:'K. Casteels',pos:'GK',caps:38,club:'Al Qadsiah',e:'🧤'},{n:'J. Vertonghen',pos:'DEF',caps:146,club:'Anderlecht',e:'🛡️'},{n:'K. De Bruyne',pos:'MID',caps:106,club:'Man City',e:'⚙️'},{n:'Y. Tielemans',pos:'MID',caps:74,club:'Aston Villa',e:'⚙️'},{n:'L. Trossard',pos:'MID',caps:34,club:'Arsenal',e:'⚙️'},{n:'R. Lukaku',pos:'FWD',caps:112,club:'Napoli',e:'⚽'},{n:'L. Openda',pos:'FWD',caps:22,club:'Leipzig',e:'⚽'}]},
-  USA:{flag:'🇺🇸',group:'D',coach:'Mauricio Pochettino',stars:['Christian Pulisic','Weston McKennie','Tyler Adams'],p:[{n:'M. Turner',pos:'GK',caps:38,club:'Crystal Palace',e:'🧤'},{n:'T. Ream',pos:'DEF',caps:56,club:'Fulham',e:'🛡️'},{n:'A. Robinson',pos:'DEF',caps:38,club:'Fulham',e:'🛡️'},{n:'T. Adams',pos:'MID',caps:42,club:'Bournemouth',e:'⚙️'},{n:'W. McKennie',pos:'MID',caps:58,club:'Juventus',e:'⚙️'},{n:'C. Pulisic',pos:'FWD',caps:72,club:'AC Milan',e:'⚽'},{n:'G. Reyna',pos:'MID',caps:24,club:'Nottm Forest',e:'⚙️'}]}
+  USA:{flag:'🇺🇸',group:'D',coach:'Mauricio Pochettino',stars:['Christian Pulisic','Weston McKennie','Tyler Adams'],p:[{n:'M. Turner',pos:'GK',caps:38,club:'Crystal Palace',e:'🧤'},{n:'T. Ream',pos:'DEF',caps:56,club:'Fulham',e:'🛡️'},{n:'A. Robinson',pos:'DEF',caps:38,club:'Fulham',e:'🛡️'},{n:'T. Adams',pos:'MID',caps:42,club:'Bournemouth',e:'⚙️'},{n:'W. McKennie',pos:'MID',caps:58,club:'Juventus',e:'⚙️'},{n:'C. Pulisic',pos:'FWD',caps:72,club:'AC Milan',e:'⚽'},{n:'G. Reyna',pos:'MID',caps:24,club:'Nottm Forest',e:'⚙️'}]},
+  Sweden:{flag:'🇸🇪',group:'F',coach:'Jon Dahl Tomasson',stars:['Viktor Gyökeres','Alexander Isak','Dejan Kulusevski'],p:[{n:'R. Olsen',pos:'GK',caps:62,club:'Roma',e:'🧤'},{n:'V. Lindelöf',pos:'DEF',caps:88,club:'Man United',e:'🛡️'},{n:'I. Hien',pos:'DEF',caps:28,club:'Atalanta',e:'🛡️'},{n:'E. Forsberg',pos:'MID',caps:100,club:'Leipzig',e:'⚙️'},{n:'D. Kulusevski',pos:'MID',caps:46,club:'Tottenham',e:'⚙️'},{n:'V. Gyökeres',pos:'FWD',caps:32,club:'Sporting CP',e:'⚽'},{n:'A. Isak',pos:'FWD',caps:38,club:'Newcastle',e:'⚽'}]},
+  'Bosnia-Herzegovina':{flag:'🇧🇦',group:'B',coach:'Sergej Barbarez',stars:['Haris Tabakovic','Amar Dedic','Ermedin Demirović'],p:[{n:'A. Šehić',pos:'GK',caps:58,club:'Kasımpaşa',e:'🧤'},{n:'A. Dedic',pos:'DEF',caps:22,club:'Salzburg',e:'🛡️'},{n:'D. Sunjić',pos:'MID',caps:46,club:'Fortuna D.',e:'⚙️'},{n:'E. Demirović',pos:'FWD',caps:34,club:'Stuttgart',e:'⚽'},{n:'H. Tabakovic',pos:'FWD',caps:26,club:'Hertha BSC',e:'⚽'},{n:'M. Džeko',pos:'FWD',caps:98,club:'Free',e:'⚽'}]},
+  'Türkiye':{flag:'🇹🇷',group:'D',coach:'Vincenzo Montella',stars:['Hakan Çalhanoğlu','Arda Güler','Kenan Yıldız'],p:[{n:'Mert Günok',pos:'GK',caps:28,club:'Beşiktaş',e:'🧤'},{n:'M. Demiral',pos:'DEF',caps:44,club:'Al-Qadsiah',e:'🛡️'},{n:'S. Soyuncu',pos:'DEF',caps:52,club:'Atlético Madrid',e:'🛡️'},{n:'H. Çalhanoğlu',pos:'MID',caps:80,club:'Inter Milan',e:'⚙️'},{n:'A. Güler',pos:'MID',caps:22,club:'Real Madrid',e:'⚙️'},{n:'K. Yıldız',pos:'FWD',caps:18,club:'Juventus',e:'⚽'},{n:'C. Akgün',pos:'FWD',caps:16,club:'Galatasaray',e:'⚽'}]},
+  Czechia:{flag:'🇨🇿',group:'A',coach:'Ivan Hašek',stars:['Tomáš Souček','Patrik Schick','Vladimír Coufal'],p:[{n:'J. Staněk',pos:'GK',caps:22,club:'Fiorentina',e:'🧤'},{n:'V. Coufal',pos:'DEF',caps:42,club:'West Ham',e:'🛡️'},{n:'T. Souček',pos:'MID',caps:68,club:'West Ham',e:'⚙️'},{n:'L. Provod',pos:'MID',caps:26,club:'Slavia Prague',e:'⚙️'},{n:'P. Schick',pos:'FWD',caps:56,club:'Leverkusen',e:'⚽'},{n:'A. Hložek',pos:'FWD',caps:24,club:'Leverkusen',e:'⚽'}]},
+  'DR Congo':{flag:'🇨🇩',group:'K',coach:'Sébastien Desabre',stars:['Chancel Mbemba','Yoane Wissa','Axel Tuanzebe'],p:[{n:'A. Mpasi',pos:'GK',caps:24,club:'AS V. Club',e:'🧤'},{n:'C. Mbemba',pos:'DEF',caps:62,club:'Marseille',e:'🛡️'},{n:'A. Tuanzebe',pos:'DEF',caps:12,club:'Ipswich',e:'🛡️'},{n:'D. Zakaria',pos:'MID',caps:28,club:'Chelsea',e:'⚙️'},{n:'Y. Wissa',pos:'FWD',caps:36,club:'Brentford',e:'⚽'},{n:'F. Batshuayi',pos:'FWD',caps:54,club:'Fenerbahçe',e:'⚽'}]},
+  Iraq:{flag:'🇮🇶',group:'I',coach:'Jesús Casas',stars:['Aymen Hussein','Amjed Attwan','Bashar Resan'],p:[{n:'J. Al-Habsi',pos:'GK',caps:38,club:'Al-Shorta',e:'🧤'},{n:'A. Attwan',pos:'DEF',caps:42,club:'Al-Zawraa',e:'🛡️'},{n:'A. Abbas',pos:'DEF',caps:36,club:'Al-Quwa',e:'🛡️'},{n:'B. Resan',pos:'MID',caps:44,club:'Al-Zawraa',e:'⚙️'},{n:'A. Hussein',pos:'FWD',caps:52,club:'Al-Zawraa',e:'⚽'},{n:'M. Al-Tamari',pos:'FWD',caps:28,club:'Stoke City',e:'⚽'}]}
 };
 
 // ═══════════════════════════════════════════════════════
@@ -4604,12 +4610,12 @@ const UK_TV = {
   71: { tv:'BBC',     bst:'00:30', note:'' },  // Colombia vs Portugal + Play-Off 1 vs Uzbekistan
   72: { tv:'BBC',     bst:'00:30', note:'' },
 
-  // Group L — England & Scotland
+  // Group L — England & Scotland (unchanged)
   21: { tv:'BBC',     bst:'00:00', note:'🏴󠁧󠁢󠁳󠁣󠁴󠁿 Scotland vs Haiti', nation:'scotland' },
   22: { tv:'ITV',     bst:'21:00', note:'🏴󠁧󠁢󠁥󠁮󠁧󠁿 England vs Croatia', nation:'england' },
   45: { tv:'BBC',     bst:'21:00', note:'🏴󠁧󠁢󠁥󠁮󠁧󠁿 England vs Ghana', nation:'england' },
   46: { tv:'ITV',     bst:'23:00', note:'🏴󠁧󠁢󠁳󠁣󠁴󠁿 Scotland vs Morocco', nation:'scotland' },
-  67: { tv:'BBC',     bst:'22:00', note:'🏴󠁧󠁢󠁳󠁣󠁴󠁿 Scotland vs Brazil (shared slot)', nation:'scotland' },
+  67: { tv:'BBC',     bst:'22:00', note:'🏴󠁧󠁢󠁳󠁣󠁴󠁿 Scotland vs Brazil', nation:'scotland' },
   68: { tv:'ITV',     bst:'21:00', note:'🏴󠁧󠁢󠁥󠁮󠁧󠁿 England vs Panama', nation:'england' },
 
   // KNOCKOUT STAGE — approximate channel allocations based on published split
