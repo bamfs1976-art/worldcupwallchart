@@ -719,6 +719,18 @@ main { max-width: var(--max-w); margin: 0 auto; padding: var(--sp-6) var(--sp-6)
 
 .team-cell { display: flex; align-items: center; gap: 6px; white-space: nowrap; }
 .flag-em { font-size: 1rem; flex-shrink: 0; line-height: 1; }
+/* flagcdn.com image flags */
+.flag-img {
+  display: inline-block;
+  vertical-align: middle;
+  border-radius: 2px;
+  flex-shrink: 0;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.4);
+  object-fit: cover;
+}
+.flag-s { width: 20px; height: 15px; }
+.flag-m { width: 28px; height: 21px; }
+.flag-l { width: 40px; height: 30px; }
 .tname {
   font-family: 'Barlow Condensed', sans-serif;
   font-size: var(--tx-base);
@@ -3235,9 +3247,9 @@ input[type=number] { -moz-appearance: textfield; }
     <div class="modal-title" id="modalTitle">Enter Result</div>
     <div class="modal-sub" id="modalSub">Match details</div>
     <div class="modal-teams">
-      <div class="modal-team"><span class="m-flag" id="mFlag1">🏳️</span><div class="m-name" id="mName1">Team A</div></div>
+      <div class="modal-team"><span class="m-flag" id="mFlag1"></span><div class="m-name" id="mName1">Team A</div></div>
       <span class="m-vs">VS</span>
-      <div class="modal-team"><span class="m-flag" id="mFlag2">🏳️</span><div class="m-name" id="mName2">Team B</div></div>
+      <div class="modal-team"><span class="m-flag" id="mFlag2"></span><div class="m-name" id="mName2">Team B</div></div>
     </div>
     <!-- Enhancement 7: match context -->
     <div class="modal-context" id="modalContext" style="display:none">
@@ -3315,19 +3327,19 @@ input[type=number] { -moz-appearance: textfield; }
 // DATA — ALL FROM SPREADSHEET WCup_2026_4_0_en.xlsx
 // ═══════════════════════════════════════════════════════
 const G = {
-  A:{t:['Mexico','South Africa','Rep. of Korea','Czechia'],f:['🇲🇽','🇿🇦','🇰🇷','🇨🇿']},
-  B:{t:['Canada','Bosnia-Herzegovina','Qatar','Switzerland'],f:['🇨🇦','🇧🇦','🇶🇦','🇨🇭']},
-  C:{t:['Brazil','Morocco','Haiti','Scotland'],f:['🇧🇷','🇲🇦','🇭🇹','🏴󠁧󠁢󠁳󠁣󠁴󠁿']},
-  D:{t:['USA','Paraguay','Australia','Türkiye'],f:['🇺🇸','🇵🇾','🇦🇺','🇹🇷']},
-  E:{t:['Germany','Curaçao','Ivory Coast','Ecuador'],f:['🇩🇪','🇨🇼','🇨🇮','🇪🇨']},
-  F:{t:['Netherlands','Japan','Sweden','Tunisia'],f:['🇳🇱','🇯🇵','🇸🇪','🇹🇳']},
-  G:{t:['Belgium','Egypt','IR Iran','New Zealand'],f:['🇧🇪','🇪🇬','🇮🇷','🇳🇿']},
-  H:{t:['Spain','Cape Verde','Saudi Arabia','Uruguay'],f:['🇪🇸','🇨🇻','🇸🇦','🇺🇾']},
-  I:{t:['France','Senegal','Iraq','Norway'],f:['🇫🇷','🇸🇳','🇮🇶','🇳🇴']},
-  J:{t:['Argentina','Algeria','Austria','Jordan'],f:['🇦🇷','🇩🇿','🇦🇹','🇯🇴']},
-  K:{t:['Portugal','DR Congo','Uzbekistan','Colombia'],f:['🇵🇹','🇨🇩','🇺🇿','🇨🇴']},
-  L:{t:['England','Croatia','Ghana','Panama'],f:['🏴󠁧󠁢󠁥󠁮󠁧󠁿','🇭🇷','🇬🇭','🇵🇦']}
-};
+  A:{t:['Mexico','South Africa','Rep. of Korea','Czechia'],f:['mx','za','kr','cz']},
+  B:{t:['Canada','Bosnia-Herzegovina','Qatar','Switzerland'],f:['ca','ba','qa','ch']},
+  C:{t:['Brazil','Morocco','Haiti','Scotland'],f:['br','ma','ht','gb-sct']},
+  D:{t:['USA','Paraguay','Australia','Türkiye'],f:['us','py','au','tr']},
+  E:{t:['Germany','Curaçao','Ivory Coast','Ecuador'],f:['de','cw','ci','ec']},
+  F:{t:['Netherlands','Japan','Sweden','Tunisia'],f:['nl','jp','se','tn']},
+  G:{t:['Belgium','Egypt','IR Iran','New Zealand'],f:['be','eg','ir','nz']},
+  H:{t:['Spain','Cape Verde','Saudi Arabia','Uruguay'],f:['es','cv','sa','uy']},
+  I:{t:['France','Senegal','Iraq','Norway'],f:['fr','sn','iq','no']},
+  J:{t:['Argentina','Algeria','Austria','Jordan'],f:['ar','dz','at','jo']},
+  K:{t:['Portugal','DR Congo','Uzbekistan','Colombia'],f:['pt','cd','uz','co']},
+  L:{t:['England','Croatia','Ghana','Panama'],f:['gb-eng','hr','gh','pa']}
+}
 
 // All 72 group fixtures [t1, t2, matchNum, utcDatetime, venue]
 const FX = {
@@ -3394,22 +3406,22 @@ const ASSIGN_THIRD=[
 ];
 
 const SQUADS={
-  Argentina:{flag:'🇦🇷',group:'J',coach:'Lionel Scaloni',stars:['Lionel Messi','Julián Álvarez','Enzo Fernández'],p:[{n:'E. Martínez',pos:'GK',caps:52,club:'Aston Villa',e:'🧤'},{n:'C. Romero',pos:'DEF',caps:38,club:'Tottenham',e:'🛡️'},{n:'N. Otamendi',pos:'DEF',caps:112,club:'Benfica',e:'🛡️'},{n:'R. de Paul',pos:'MID',caps:71,club:'Atlético Madrid',e:'⚙️'},{n:'E. Fernández',pos:'MID',caps:38,club:'Chelsea',e:'⚙️'},{n:'A. Mac Allister',pos:'MID',caps:32,club:'Liverpool',e:'⚙️'},{n:'L. Messi',pos:'FWD',caps:185,club:'Inter Miami',e:'⚽'},{n:'J. Álvarez',pos:'FWD',caps:46,club:'Atlético Madrid',e:'⚽'},{n:'L. Martínez',pos:'FWD',caps:68,club:'Inter Milan',e:'⚽'}]},
-  France:{flag:'🇫🇷',group:'I',coach:'Didier Deschamps',stars:['Kylian Mbappé','Antoine Griezmann','Aurélien Tchouaméni'],p:[{n:'M. Maignan',pos:'GK',caps:27,club:'AC Milan',e:'🧤'},{n:'W. Saliba',pos:'DEF',caps:24,club:'Arsenal',e:'🛡️'},{n:'D. Upamecano',pos:'DEF',caps:37,club:'Bayern Munich',e:'🛡️'},{n:'A. Tchouaméni',pos:'MID',caps:40,club:'Real Madrid',e:'⚙️'},{n:'A. Griezmann',pos:'MID',caps:133,club:'Atlético Madrid',e:'⚙️'},{n:'K. Mbappé',pos:'FWD',caps:82,club:'Real Madrid',e:'⚽'},{n:'O. Dembélé',pos:'FWD',caps:54,club:'PSG',e:'⚽'},{n:'M. Thuram',pos:'FWD',caps:26,club:'Inter Milan',e:'⚽'}]},
-  England:{flag:'🏴󠁧󠁢󠁥󠁮󠁧󠁿',group:'L',coach:'Thomas Tuchel',stars:['Jude Bellingham','Harry Kane','Bukayo Saka'],p:[{n:'J. Pickford',pos:'GK',caps:72,club:'Everton',e:'🧤'},{n:'J. Stones',pos:'DEF',caps:73,club:'Man City',e:'🛡️'},{n:'T. Alexander-Arnold',pos:'DEF',caps:42,club:'Real Madrid',e:'🛡️'},{n:'D. Rice',pos:'MID',caps:52,club:'Arsenal',e:'⚙️'},{n:'J. Bellingham',pos:'MID',caps:46,club:'Real Madrid',e:'⚙️'},{n:'P. Foden',pos:'MID',caps:44,club:'Man City',e:'⚙️'},{n:'H. Kane',pos:'FWD',caps:97,club:'Bayern Munich',e:'⚽'},{n:'B. Saka',pos:'FWD',caps:46,club:'Arsenal',e:'⚽'},{n:'C. Palmer',pos:'MID',caps:12,club:'Chelsea',e:'⚙️'}]},
-  Brazil:{flag:'🇧🇷',group:'C',coach:'Dorival Júnior',stars:['Vinicius Jr','Rodrygo','Bruno Guimarães'],p:[{n:'Alisson',pos:'GK',caps:72,club:'Liverpool',e:'🧤'},{n:'Marquinhos',pos:'DEF',caps:86,club:'PSG',e:'🛡️'},{n:'G. Magalhães',pos:'DEF',caps:26,club:'Arsenal',e:'🛡️'},{n:'Casemiro',pos:'MID',caps:72,club:'Man United',e:'⚙️'},{n:'B. Guimarães',pos:'MID',caps:42,club:'Newcastle',e:'⚙️'},{n:'Vinicius Jr',pos:'FWD',caps:46,club:'Real Madrid',e:'⚽'},{n:'Rodrygo',pos:'FWD',caps:34,club:'Real Madrid',e:'⚽'},{n:'Raphinha',pos:'FWD',caps:42,club:'Barcelona',e:'⚽'}]},
-  Spain:{flag:'🇪🇸',group:'H',coach:'Luis de la Fuente',stars:['Lamine Yamal','Pedri','Rodri'],p:[{n:'U. Simón',pos:'GK',caps:36,club:'Athletic Club',e:'🧤'},{n:'D. Carvajal',pos:'DEF',caps:74,club:'Real Madrid',e:'🛡️'},{n:'A. Laporte',pos:'DEF',caps:52,club:'Al-Nassr',e:'🛡️'},{n:'Rodri',pos:'MID',caps:48,club:'Man City',e:'⚙️'},{n:'Pedri',pos:'MID',caps:38,club:'Barcelona',e:'⚙️'},{n:'L. Yamal',pos:'FWD',caps:18,club:'Barcelona',e:'⚽'},{n:'N. Williams',pos:'FWD',caps:20,club:'Athletic Club',e:'⚽'},{n:'Á. Morata',pos:'FWD',caps:72,club:'AC Milan',e:'⚽'}]},
-  Germany:{flag:'🇩🇪',group:'E',coach:'Julian Nagelsmann',stars:['Florian Wirtz','Jamal Musiala','Kai Havertz'],p:[{n:'M. Neuer',pos:'GK',caps:121,club:'Bayern Munich',e:'🧤'},{n:'A. Rüdiger',pos:'DEF',caps:82,club:'Real Madrid',e:'🛡️'},{n:'J. Kimmich',pos:'DEF',caps:80,club:'Bayern Munich',e:'🛡️'},{n:'J. Musiala',pos:'MID',caps:42,club:'Bayern Munich',e:'⚙️'},{n:'F. Wirtz',pos:'FWD',caps:28,club:'Leverkusen',e:'⚽'},{n:'K. Havertz',pos:'FWD',caps:58,club:'Arsenal',e:'⚽'},{n:'T. Müller',pos:'FWD',caps:130,club:'Bayern Munich',e:'⚽'}]},
-  Portugal:{flag:'🇵🇹',group:'K',coach:'Roberto Martínez',stars:['Cristiano Ronaldo','Rafael Leão','Bruno Fernandes'],p:[{n:'D. Costa',pos:'GK',caps:24,club:'Porto',e:'🧤'},{n:'R. Dias',pos:'DEF',caps:62,club:'Man City',e:'🛡️'},{n:'J. Cancelo',pos:'DEF',caps:58,club:'Barcelona',e:'🛡️'},{n:'J. Palhinha',pos:'MID',caps:34,club:'Bayern Munich',e:'⚙️'},{n:'B. Fernandes',pos:'MID',caps:72,club:'Man United',e:'⚙️'},{n:'C. Ronaldo',pos:'FWD',caps:212,club:'Al-Nassr',e:'⚽'},{n:'R. Leão',pos:'FWD',caps:32,club:'AC Milan',e:'⚽'},{n:'G. Ramos',pos:'FWD',caps:18,club:'PSG',e:'⚽'}]},
-  Netherlands:{flag:'🇳🇱',group:'F',coach:'Ronald Koeman',stars:['Virgil van Dijk','Cody Gakpo','Xavi Simons'],p:[{n:'B. Verbruggen',pos:'GK',caps:14,club:'Brighton',e:'🧤'},{n:'V. van Dijk',pos:'DEF',caps:68,club:'Liverpool',e:'🛡️'},{n:'D. Dumfries',pos:'DEF',caps:52,club:'Inter Milan',e:'🛡️'},{n:'F. de Jong',pos:'MID',caps:62,club:'Barcelona',e:'⚙️'},{n:'X. Simons',pos:'MID',caps:22,club:'Leipzig',e:'⚙️'},{n:'C. Gakpo',pos:'FWD',caps:44,club:'Liverpool',e:'⚽'},{n:'M. Depay',pos:'FWD',caps:96,club:'Free',e:'⚽'}]},
-  Belgium:{flag:'🇧🇪',group:'G',coach:'Domenico Tedesco',stars:['Kevin De Bruyne','Romelu Lukaku','Lois Openda'],p:[{n:'K. Casteels',pos:'GK',caps:38,club:'Al Qadsiah',e:'🧤'},{n:'J. Vertonghen',pos:'DEF',caps:146,club:'Anderlecht',e:'🛡️'},{n:'K. De Bruyne',pos:'MID',caps:106,club:'Man City',e:'⚙️'},{n:'Y. Tielemans',pos:'MID',caps:74,club:'Aston Villa',e:'⚙️'},{n:'L. Trossard',pos:'MID',caps:34,club:'Arsenal',e:'⚙️'},{n:'R. Lukaku',pos:'FWD',caps:112,club:'Napoli',e:'⚽'},{n:'L. Openda',pos:'FWD',caps:22,club:'Leipzig',e:'⚽'}]},
-  USA:{flag:'🇺🇸',group:'D',coach:'Mauricio Pochettino',stars:['Christian Pulisic','Weston McKennie','Tyler Adams'],p:[{n:'M. Turner',pos:'GK',caps:38,club:'Crystal Palace',e:'🧤'},{n:'T. Ream',pos:'DEF',caps:56,club:'Fulham',e:'🛡️'},{n:'A. Robinson',pos:'DEF',caps:38,club:'Fulham',e:'🛡️'},{n:'T. Adams',pos:'MID',caps:42,club:'Bournemouth',e:'⚙️'},{n:'W. McKennie',pos:'MID',caps:58,club:'Juventus',e:'⚙️'},{n:'C. Pulisic',pos:'FWD',caps:72,club:'AC Milan',e:'⚽'},{n:'G. Reyna',pos:'MID',caps:24,club:'Nottm Forest',e:'⚙️'}]},
-  Sweden:{flag:'🇸🇪',group:'F',coach:'Jon Dahl Tomasson',stars:['Viktor Gyökeres','Alexander Isak','Dejan Kulusevski'],p:[{n:'R. Olsen',pos:'GK',caps:62,club:'Roma',e:'🧤'},{n:'V. Lindelöf',pos:'DEF',caps:88,club:'Man United',e:'🛡️'},{n:'I. Hien',pos:'DEF',caps:28,club:'Atalanta',e:'🛡️'},{n:'E. Forsberg',pos:'MID',caps:100,club:'Leipzig',e:'⚙️'},{n:'D. Kulusevski',pos:'MID',caps:46,club:'Tottenham',e:'⚙️'},{n:'V. Gyökeres',pos:'FWD',caps:32,club:'Sporting CP',e:'⚽'},{n:'A. Isak',pos:'FWD',caps:38,club:'Newcastle',e:'⚽'}]},
-  'Bosnia-Herzegovina':{flag:'🇧🇦',group:'B',coach:'Sergej Barbarez',stars:['Haris Tabakovic','Amar Dedic','Ermedin Demirović'],p:[{n:'A. Šehić',pos:'GK',caps:58,club:'Kasımpaşa',e:'🧤'},{n:'A. Dedic',pos:'DEF',caps:22,club:'Salzburg',e:'🛡️'},{n:'D. Sunjić',pos:'MID',caps:46,club:'Fortuna D.',e:'⚙️'},{n:'E. Demirović',pos:'FWD',caps:34,club:'Stuttgart',e:'⚽'},{n:'H. Tabakovic',pos:'FWD',caps:26,club:'Hertha BSC',e:'⚽'},{n:'M. Džeko',pos:'FWD',caps:98,club:'Free',e:'⚽'}]},
-  'Türkiye':{flag:'🇹🇷',group:'D',coach:'Vincenzo Montella',stars:['Hakan Çalhanoğlu','Arda Güler','Kenan Yıldız'],p:[{n:'Mert Günok',pos:'GK',caps:28,club:'Beşiktaş',e:'🧤'},{n:'M. Demiral',pos:'DEF',caps:44,club:'Al-Qadsiah',e:'🛡️'},{n:'S. Soyuncu',pos:'DEF',caps:52,club:'Atlético Madrid',e:'🛡️'},{n:'H. Çalhanoğlu',pos:'MID',caps:80,club:'Inter Milan',e:'⚙️'},{n:'A. Güler',pos:'MID',caps:22,club:'Real Madrid',e:'⚙️'},{n:'K. Yıldız',pos:'FWD',caps:18,club:'Juventus',e:'⚽'},{n:'C. Akgün',pos:'FWD',caps:16,club:'Galatasaray',e:'⚽'}]},
-  Czechia:{flag:'🇨🇿',group:'A',coach:'Ivan Hašek',stars:['Tomáš Souček','Patrik Schick','Vladimír Coufal'],p:[{n:'J. Staněk',pos:'GK',caps:22,club:'Fiorentina',e:'🧤'},{n:'V. Coufal',pos:'DEF',caps:42,club:'West Ham',e:'🛡️'},{n:'T. Souček',pos:'MID',caps:68,club:'West Ham',e:'⚙️'},{n:'L. Provod',pos:'MID',caps:26,club:'Slavia Prague',e:'⚙️'},{n:'P. Schick',pos:'FWD',caps:56,club:'Leverkusen',e:'⚽'},{n:'A. Hložek',pos:'FWD',caps:24,club:'Leverkusen',e:'⚽'}]},
-  'DR Congo':{flag:'🇨🇩',group:'K',coach:'Sébastien Desabre',stars:['Chancel Mbemba','Yoane Wissa','Axel Tuanzebe'],p:[{n:'A. Mpasi',pos:'GK',caps:24,club:'AS V. Club',e:'🧤'},{n:'C. Mbemba',pos:'DEF',caps:62,club:'Marseille',e:'🛡️'},{n:'A. Tuanzebe',pos:'DEF',caps:12,club:'Ipswich',e:'🛡️'},{n:'D. Zakaria',pos:'MID',caps:28,club:'Chelsea',e:'⚙️'},{n:'Y. Wissa',pos:'FWD',caps:36,club:'Brentford',e:'⚽'},{n:'F. Batshuayi',pos:'FWD',caps:54,club:'Fenerbahçe',e:'⚽'}]},
-  Iraq:{flag:'🇮🇶',group:'I',coach:'Jesús Casas',stars:['Aymen Hussein','Amjed Attwan','Bashar Resan'],p:[{n:'J. Al-Habsi',pos:'GK',caps:38,club:'Al-Shorta',e:'🧤'},{n:'A. Attwan',pos:'DEF',caps:42,club:'Al-Zawraa',e:'🛡️'},{n:'A. Abbas',pos:'DEF',caps:36,club:'Al-Quwa',e:'🛡️'},{n:'B. Resan',pos:'MID',caps:44,club:'Al-Zawraa',e:'⚙️'},{n:'A. Hussein',pos:'FWD',caps:52,club:'Al-Zawraa',e:'⚽'},{n:'M. Al-Tamari',pos:'FWD',caps:28,club:'Stoke City',e:'⚽'}]}
+  Argentina:{flag:'ar',group:'J',coach:'Lionel Scaloni',stars:['Lionel Messi','Julián Álvarez','Enzo Fernández'],p:[{n:'E. Martínez',pos:'GK',caps:52,club:'Aston Villa',e:'🧤'},{n:'C. Romero',pos:'DEF',caps:38,club:'Tottenham',e:'🛡️'},{n:'N. Otamendi',pos:'DEF',caps:112,club:'Benfica',e:'🛡️'},{n:'R. de Paul',pos:'MID',caps:71,club:'Atlético Madrid',e:'⚙️'},{n:'E. Fernández',pos:'MID',caps:38,club:'Chelsea',e:'⚙️'},{n:'A. Mac Allister',pos:'MID',caps:32,club:'Liverpool',e:'⚙️'},{n:'L. Messi',pos:'FWD',caps:185,club:'Inter Miami',e:'⚽'},{n:'J. Álvarez',pos:'FWD',caps:46,club:'Atlético Madrid',e:'⚽'},{n:'L. Martínez',pos:'FWD',caps:68,club:'Inter Milan',e:'⚽'}]},
+  France:{flag:'fr',group:'I',coach:'Didier Deschamps',stars:['Kylian Mbappé','Antoine Griezmann','Aurélien Tchouaméni'],p:[{n:'M. Maignan',pos:'GK',caps:27,club:'AC Milan',e:'🧤'},{n:'W. Saliba',pos:'DEF',caps:24,club:'Arsenal',e:'🛡️'},{n:'D. Upamecano',pos:'DEF',caps:37,club:'Bayern Munich',e:'🛡️'},{n:'A. Tchouaméni',pos:'MID',caps:40,club:'Real Madrid',e:'⚙️'},{n:'A. Griezmann',pos:'MID',caps:133,club:'Atlético Madrid',e:'⚙️'},{n:'K. Mbappé',pos:'FWD',caps:82,club:'Real Madrid',e:'⚽'},{n:'O. Dembélé',pos:'FWD',caps:54,club:'PSG',e:'⚽'},{n:'M. Thuram',pos:'FWD',caps:26,club:'Inter Milan',e:'⚽'}]},
+  England:{flag:'gb-eng',group:'L',coach:'Thomas Tuchel',stars:['Jude Bellingham','Harry Kane','Bukayo Saka'],p:[{n:'J. Pickford',pos:'GK',caps:72,club:'Everton',e:'🧤'},{n:'J. Stones',pos:'DEF',caps:73,club:'Man City',e:'🛡️'},{n:'T. Alexander-Arnold',pos:'DEF',caps:42,club:'Real Madrid',e:'🛡️'},{n:'D. Rice',pos:'MID',caps:52,club:'Arsenal',e:'⚙️'},{n:'J. Bellingham',pos:'MID',caps:46,club:'Real Madrid',e:'⚙️'},{n:'P. Foden',pos:'MID',caps:44,club:'Man City',e:'⚙️'},{n:'H. Kane',pos:'FWD',caps:97,club:'Bayern Munich',e:'⚽'},{n:'B. Saka',pos:'FWD',caps:46,club:'Arsenal',e:'⚽'},{n:'C. Palmer',pos:'MID',caps:12,club:'Chelsea',e:'⚙️'}]},
+  Brazil:{flag:'br',group:'C',coach:'Dorival Júnior',stars:['Vinicius Jr','Rodrygo','Bruno Guimarães'],p:[{n:'Alisson',pos:'GK',caps:72,club:'Liverpool',e:'🧤'},{n:'Marquinhos',pos:'DEF',caps:86,club:'PSG',e:'🛡️'},{n:'G. Magalhães',pos:'DEF',caps:26,club:'Arsenal',e:'🛡️'},{n:'Casemiro',pos:'MID',caps:72,club:'Man United',e:'⚙️'},{n:'B. Guimarães',pos:'MID',caps:42,club:'Newcastle',e:'⚙️'},{n:'Vinicius Jr',pos:'FWD',caps:46,club:'Real Madrid',e:'⚽'},{n:'Rodrygo',pos:'FWD',caps:34,club:'Real Madrid',e:'⚽'},{n:'Raphinha',pos:'FWD',caps:42,club:'Barcelona',e:'⚽'}]},
+  Spain:{flag:'es',group:'H',coach:'Luis de la Fuente',stars:['Lamine Yamal','Pedri','Rodri'],p:[{n:'U. Simón',pos:'GK',caps:36,club:'Athletic Club',e:'🧤'},{n:'D. Carvajal',pos:'DEF',caps:74,club:'Real Madrid',e:'🛡️'},{n:'A. Laporte',pos:'DEF',caps:52,club:'Al-Nassr',e:'🛡️'},{n:'Rodri',pos:'MID',caps:48,club:'Man City',e:'⚙️'},{n:'Pedri',pos:'MID',caps:38,club:'Barcelona',e:'⚙️'},{n:'L. Yamal',pos:'FWD',caps:18,club:'Barcelona',e:'⚽'},{n:'N. Williams',pos:'FWD',caps:20,club:'Athletic Club',e:'⚽'},{n:'Á. Morata',pos:'FWD',caps:72,club:'AC Milan',e:'⚽'}]},
+  Germany:{flag:'de',group:'E',coach:'Julian Nagelsmann',stars:['Florian Wirtz','Jamal Musiala','Kai Havertz'],p:[{n:'M. Neuer',pos:'GK',caps:121,club:'Bayern Munich',e:'🧤'},{n:'A. Rüdiger',pos:'DEF',caps:82,club:'Real Madrid',e:'🛡️'},{n:'J. Kimmich',pos:'DEF',caps:80,club:'Bayern Munich',e:'🛡️'},{n:'J. Musiala',pos:'MID',caps:42,club:'Bayern Munich',e:'⚙️'},{n:'F. Wirtz',pos:'FWD',caps:28,club:'Leverkusen',e:'⚽'},{n:'K. Havertz',pos:'FWD',caps:58,club:'Arsenal',e:'⚽'},{n:'T. Müller',pos:'FWD',caps:130,club:'Bayern Munich',e:'⚽'}]},
+  Portugal:{flag:'pt',group:'K',coach:'Roberto Martínez',stars:['Cristiano Ronaldo','Rafael Leão','Bruno Fernandes'],p:[{n:'D. Costa',pos:'GK',caps:24,club:'Porto',e:'🧤'},{n:'R. Dias',pos:'DEF',caps:62,club:'Man City',e:'🛡️'},{n:'J. Cancelo',pos:'DEF',caps:58,club:'Barcelona',e:'🛡️'},{n:'J. Palhinha',pos:'MID',caps:34,club:'Bayern Munich',e:'⚙️'},{n:'B. Fernandes',pos:'MID',caps:72,club:'Man United',e:'⚙️'},{n:'C. Ronaldo',pos:'FWD',caps:212,club:'Al-Nassr',e:'⚽'},{n:'R. Leão',pos:'FWD',caps:32,club:'AC Milan',e:'⚽'},{n:'G. Ramos',pos:'FWD',caps:18,club:'PSG',e:'⚽'}]},
+  Netherlands:{flag:'nl',group:'F',coach:'Ronald Koeman',stars:['Virgil van Dijk','Cody Gakpo','Xavi Simons'],p:[{n:'B. Verbruggen',pos:'GK',caps:14,club:'Brighton',e:'🧤'},{n:'V. van Dijk',pos:'DEF',caps:68,club:'Liverpool',e:'🛡️'},{n:'D. Dumfries',pos:'DEF',caps:52,club:'Inter Milan',e:'🛡️'},{n:'F. de Jong',pos:'MID',caps:62,club:'Barcelona',e:'⚙️'},{n:'X. Simons',pos:'MID',caps:22,club:'Leipzig',e:'⚙️'},{n:'C. Gakpo',pos:'FWD',caps:44,club:'Liverpool',e:'⚽'},{n:'M. Depay',pos:'FWD',caps:96,club:'Free',e:'⚽'}]},
+  Belgium:{flag:'be',group:'G',coach:'Domenico Tedesco',stars:['Kevin De Bruyne','Romelu Lukaku','Lois Openda'],p:[{n:'K. Casteels',pos:'GK',caps:38,club:'Al Qadsiah',e:'🧤'},{n:'J. Vertonghen',pos:'DEF',caps:146,club:'Anderlecht',e:'🛡️'},{n:'K. De Bruyne',pos:'MID',caps:106,club:'Man City',e:'⚙️'},{n:'Y. Tielemans',pos:'MID',caps:74,club:'Aston Villa',e:'⚙️'},{n:'L. Trossard',pos:'MID',caps:34,club:'Arsenal',e:'⚙️'},{n:'R. Lukaku',pos:'FWD',caps:112,club:'Napoli',e:'⚽'},{n:'L. Openda',pos:'FWD',caps:22,club:'Leipzig',e:'⚽'}]},
+  USA:{flag:'us',group:'D',coach:'Mauricio Pochettino',stars:['Christian Pulisic','Weston McKennie','Tyler Adams'],p:[{n:'M. Turner',pos:'GK',caps:38,club:'Crystal Palace',e:'🧤'},{n:'T. Ream',pos:'DEF',caps:56,club:'Fulham',e:'🛡️'},{n:'A. Robinson',pos:'DEF',caps:38,club:'Fulham',e:'🛡️'},{n:'T. Adams',pos:'MID',caps:42,club:'Bournemouth',e:'⚙️'},{n:'W. McKennie',pos:'MID',caps:58,club:'Juventus',e:'⚙️'},{n:'C. Pulisic',pos:'FWD',caps:72,club:'AC Milan',e:'⚽'},{n:'G. Reyna',pos:'MID',caps:24,club:'Nottm Forest',e:'⚙️'}]},
+  Sweden:{flag:'se',group:'F',coach:'Jon Dahl Tomasson',stars:['Viktor Gyökeres','Alexander Isak','Dejan Kulusevski'],p:[{n:'R. Olsen',pos:'GK',caps:62,club:'Roma',e:'🧤'},{n:'V. Lindelöf',pos:'DEF',caps:88,club:'Man United',e:'🛡️'},{n:'I. Hien',pos:'DEF',caps:28,club:'Atalanta',e:'🛡️'},{n:'E. Forsberg',pos:'MID',caps:100,club:'Leipzig',e:'⚙️'},{n:'D. Kulusevski',pos:'MID',caps:46,club:'Tottenham',e:'⚙️'},{n:'V. Gyökeres',pos:'FWD',caps:32,club:'Sporting CP',e:'⚽'},{n:'A. Isak',pos:'FWD',caps:38,club:'Newcastle',e:'⚽'}]},
+  'Bosnia-Herzegovina':{flag:'ba',group:'B',coach:'Sergej Barbarez',stars:['Haris Tabakovic','Amar Dedic','Ermedin Demirović'],p:[{n:'A. Šehić',pos:'GK',caps:58,club:'Kasımpaşa',e:'🧤'},{n:'A. Dedic',pos:'DEF',caps:22,club:'Salzburg',e:'🛡️'},{n:'D. Sunjić',pos:'MID',caps:46,club:'Fortuna D.',e:'⚙️'},{n:'E. Demirović',pos:'FWD',caps:34,club:'Stuttgart',e:'⚽'},{n:'H. Tabakovic',pos:'FWD',caps:26,club:'Hertha BSC',e:'⚽'},{n:'M. Džeko',pos:'FWD',caps:98,club:'Free',e:'⚽'}]},
+  'Türkiye':{flag:'tr',group:'D',coach:'Vincenzo Montella',stars:['Hakan Çalhanoğlu','Arda Güler','Kenan Yıldız'],p:[{n:'Mert Günok',pos:'GK',caps:28,club:'Beşiktaş',e:'🧤'},{n:'M. Demiral',pos:'DEF',caps:44,club:'Al-Qadsiah',e:'🛡️'},{n:'S. Soyuncu',pos:'DEF',caps:52,club:'Atlético Madrid',e:'🛡️'},{n:'H. Çalhanoğlu',pos:'MID',caps:80,club:'Inter Milan',e:'⚙️'},{n:'A. Güler',pos:'MID',caps:22,club:'Real Madrid',e:'⚙️'},{n:'K. Yıldız',pos:'FWD',caps:18,club:'Juventus',e:'⚽'},{n:'C. Akgün',pos:'FWD',caps:16,club:'Galatasaray',e:'⚽'}]},
+  Czechia:{flag:'cz',group:'A',coach:'Ivan Hašek',stars:['Tomáš Souček','Patrik Schick','Vladimír Coufal'],p:[{n:'J. Staněk',pos:'GK',caps:22,club:'Fiorentina',e:'🧤'},{n:'V. Coufal',pos:'DEF',caps:42,club:'West Ham',e:'🛡️'},{n:'T. Souček',pos:'MID',caps:68,club:'West Ham',e:'⚙️'},{n:'L. Provod',pos:'MID',caps:26,club:'Slavia Prague',e:'⚙️'},{n:'P. Schick',pos:'FWD',caps:56,club:'Leverkusen',e:'⚽'},{n:'A. Hložek',pos:'FWD',caps:24,club:'Leverkusen',e:'⚽'}]},
+  'DR Congo':{flag:'cd',group:'K',coach:'Sébastien Desabre',stars:['Chancel Mbemba','Yoane Wissa','Axel Tuanzebe'],p:[{n:'A. Mpasi',pos:'GK',caps:24,club:'AS V. Club',e:'🧤'},{n:'C. Mbemba',pos:'DEF',caps:62,club:'Marseille',e:'🛡️'},{n:'A. Tuanzebe',pos:'DEF',caps:12,club:'Ipswich',e:'🛡️'},{n:'D. Zakaria',pos:'MID',caps:28,club:'Chelsea',e:'⚙️'},{n:'Y. Wissa',pos:'FWD',caps:36,club:'Brentford',e:'⚽'},{n:'F. Batshuayi',pos:'FWD',caps:54,club:'Fenerbahçe',e:'⚽'}]},
+  Iraq:{flag:'iq',group:'I',coach:'Jesús Casas',stars:['Aymen Hussein','Amjed Attwan','Bashar Resan'],p:[{n:'J. Al-Habsi',pos:'GK',caps:38,club:'Al-Shorta',e:'🧤'},{n:'A. Attwan',pos:'DEF',caps:42,club:'Al-Zawraa',e:'🛡️'},{n:'A. Abbas',pos:'DEF',caps:36,club:'Al-Quwa',e:'🛡️'},{n:'B. Resan',pos:'MID',caps:44,club:'Al-Zawraa',e:'⚙️'},{n:'A. Hussein',pos:'FWD',caps:52,club:'Al-Zawraa',e:'⚽'},{n:'M. Al-Tamari',pos:'FWD',caps:28,club:'Stoke City',e:'⚽'}]}
 };
 
 // ═══════════════════════════════════════════════════════
@@ -3624,7 +3636,7 @@ function renderTodayHero(){
       <div class="tm-badge ${isNext?'next':''}">${isNext?'▶ Next Up':''} ${hasScore?'✓ Full Time':''}M${m.num} · Grp ${m.g}</div>
       <div class="tm-teams">
         <div class="tm-team">
-          <div class="tm-flag">${G[m.g].f[m.a]}</div>
+          <div class="tm-flag">${flag(G[m.g].f[m.a],"l")}</div>
           <div class="tm-name">${G[m.g].t[m.a]}</div>
         </div>
         <div class="tm-score-box">
@@ -3633,7 +3645,7 @@ function renderTodayHero(){
           <div class="tm-score">${hasScore?sb:'–'}</div>
         </div>
         <div class="tm-team">
-          <div class="tm-flag">${G[m.g].f[m.b]}</div>
+          <div class="tm-flag">${flag(G[m.g].f[m.b],"l")}</div>
           <div class="tm-name">${G[m.g].t[m.b]}</div>
         </div>
       </div>
@@ -3720,7 +3732,7 @@ function renderGroups(){
       const elimLabel=confirmedEliminated.has(t.name)&&groupComplete?`<span class="qualified-label" style="color:var(--danger)">OUT</span>`:'';
       h+=`<tr class="${rowCls}">
         <td><div class="pos-badge ${pc}">${i+1}</div></td>
-        <td class="tl"><div class="team-cell"><span class="flag-em">${t.f}</span><span class="tname">${t.name}</span>${qualLabel}${elimLabel}</div></td>
+        <td class="tl"><div class="team-cell">${flag(t.f)}<span class="tname">${t.name}</span>${qualLabel}${elimLabel}</div></td>
         <td class="num">${t.mp}</td><td class="num">${t.w}</td><td class="num">${t.d}</td><td class="num">${t.l}</td>
         <td class="num">${t.gf}</td><td class="num">${t.ga}</td>
         <td class="num ${gdCls}">${t.gd>0?'+':''}${t.gd}</td>
@@ -3741,13 +3753,13 @@ function renderGroups(){
       const localTime=fmtLocalTime(dt);
       const noteIcon=ST.notes[k]?`<span class="fixture-note-icon" title="${ST.notes[k]}">${ST.notes[k].charAt(0)}</span>`:'';
       h+=`<div class="fixture-row ${hs?'played':''}" onclick="openModal('${g}',${fi})">
-        <div class="fix-team"><span class="flag-em" style="font-size:.85rem">${G[g].f[a]}</span><span>${G[g].t[a]}</span></div>
+        <div class="fix-team">${flag(G[g].f[a])}<span>${G[g].t[a]}</span></div>
         <div class="score-box">
           <div class="score-num ${hs?'filled':'tbd'}">${hs?sa:'?'}</div>
           <span class="score-sep">:</span>
           <div class="score-num ${hs?'filled':'tbd'}">${hs?sb:'?'}</div>
         </div>
-        <div class="fix-team" style="flex-direction:row-reverse;text-align:right"><span>${G[g].t[b]}</span><span class="flag-em" style="font-size:.85rem">${G[g].f[b]}</span></div>
+        <div class="fix-team" style="flex-direction:row-reverse;text-align:right"><span>${G[g].t[b]}</span>${flag(G[g].f[b])}</div>
         <div class="fix-meta">${datePart}<br>${localTime} ${tzLabel()}<br><span style="font-size:.55rem;color:rgba(240,180,41,.35)">M${num} · ${venue}</span>${noteIcon}</div>
       </div>`;
     });
@@ -3798,8 +3810,8 @@ function toggleH2H(btn){
 function openModal(g,fi){
   const[a,b,num,dt,venue]=FX[g][fi];
   mCtx={g,fi,type:'group'};
-  document.getElementById('mFlag1').textContent=G[g].f[a];
-  document.getElementById('mFlag2').textContent=G[g].f[b];
+  document.getElementById('mFlag1').innerHTML=flag(G[g].f[a],'l');
+  document.getElementById('mFlag2').innerHTML=flag(G[g].f[b],'l');
   document.getElementById('mName1').textContent=G[g].t[a];
   document.getElementById('mName2').textContent=G[g].t[b];
   const localTime=fmtLocalTime(dt);
@@ -3819,8 +3831,8 @@ function openModal(g,fi){
 }
 function openBracketModal(id,t1,t2,meta){
   mCtx={id,t1,t2,meta,type:'bracket'};
-  document.getElementById('mFlag1').textContent=getFlag(t1);
-  document.getElementById('mFlag2').textContent=getFlag(t2);
+  document.getElementById('mFlag1').innerHTML=flag(getFlag(t1)||'gb','l');
+  document.getElementById('mFlag2').innerHTML=flag(getFlag(t2)||'gb','l');
   document.getElementById('mName1').textContent=t1;
   document.getElementById('mName2').textContent=t2;
   document.getElementById('modalSub').textContent=meta;
@@ -3944,16 +3956,48 @@ function resolveTeam(code){
 }
 
 // Flag lookup by team name — covers all 48 teams + common bracket resolved names
+// FLAG_MAP: team name -> ISO 3166-1 alpha-2 code (for flagcdn.com)
+// Includes both G object teams + common alternative name spellings
+const FLAG_MAP_RAW = {
+  'Mexico':'mx','South Africa':'za','Rep. of Korea':'kr','Czechia':'cz',
+  'Canada':'ca','Bosnia-Herzegovina':'ba','Qatar':'qa','Switzerland':'ch',
+  'Brazil':'br','Morocco':'ma','Haiti':'ht','Scotland':'gb-sct',
+  'USA':'us','Paraguay':'py','Australia':'au','Türkiye':'tr',
+  'Germany':'de','Curaçao':'cw','Ivory Coast':'ci','Ecuador':'ec',
+  'Netherlands':'nl','Japan':'jp','Sweden':'se','Tunisia':'tn',
+  'Belgium':'be','Egypt':'eg','IR Iran':'ir','New Zealand':'nz',
+  'Spain':'es','Cape Verde':'cv','Saudi Arabia':'sa','Uruguay':'uy',
+  'France':'fr','Senegal':'sn','Iraq':'iq','Norway':'no',
+  'Argentina':'ar','Algeria':'dz','Austria':'at','Jordan':'jo',
+  'Portugal':'pt','DR Congo':'cd','Uzbekistan':'uz','Colombia':'co',
+  'England':'gb-eng','Croatia':'hr','Ghana':'gh','Panama':'pa',
+  // Alt spellings
+  'Turkey':'tr','Bosnia':'ba','Ivory Coast':'ci',"Cote d'Ivoire":'ci',
+  'Iran':'ir','South Korea':'kr','Korea Republic':'kr',
+  'United States':'us','Bosnia and Herzegovina':'ba',
+  'Democratic Republic of Congo':'cd','Congo DR':'cd',
+  'Cape Verde':'cv','Cabo Verde':'cv',
+};
 const FLAG_MAP = (()=>{
-  const m={};
-  Object.keys(G).forEach(g=>G[g].t.forEach((t,i)=>m[t]=G[g].f[i]));
-  // Extra entries for stored bracket team names
-  Object.values(SQUADS).forEach(s=>{ /* already in G */ });
+  const m = {...FLAG_MAP_RAW};
+  // Also index by G object entries for lookup consistency
+  Object.keys(G).forEach(g=>G[g].t.forEach((t,i)=>{ if(!m[t]) m[t]=G[g].f[i]; }));
   return m;
 })();
 function getFlag(name){
-  if(!name||name==='TBD')return'⬜';
-  return FLAG_MAP[name]||FLAG_MAP[Object.keys(FLAG_MAP).find(k=>k.toLowerCase()===name.toLowerCase())]||'🏳️';
+  if(!name||name==='TBD')return null;
+  return FLAG_MAP[name]||FLAG_MAP[Object.keys(FLAG_MAP).find(k=>k.toLowerCase()===name.toLowerCase())]||null;
+}
+
+// flag(code, size) — flagcdn.com image flags, crisp on all devices
+// size: 's'=20x15, 'm'=28x21, 'l'=40x30
+function flag(code,size){
+  size=size||'s';
+  if(!code) return '<span style="display:inline-block;width:20px;height:14px;background:rgba(255,255,255,0.1);border-radius:2px;vertical-align:middle"></span>';
+  const dims={s:'20x15',m:'28x21',l:'40x30'};
+  const dims2x={s:'40x30',m:'56x42',l:'80x60'};
+  const w=dims[size].split('x')[0], h=dims[size].split('x')[1];
+  return `<img src="https://flagcdn.com/${dims[size]}/${code}.png" srcset="https://flagcdn.com/${dims2x[size]}/${code}.png 2x" width="${w}" height="${h}" alt="" class="flag-img flag-${size}" loading="lazy" onerror="this.style.display='none'">`;
 }
 
 function bMatch(id,t1n,t2n,meta,num,isFinal=false){
@@ -3966,11 +4010,11 @@ function bMatch(id,t1n,t2n,meta,num,isFinal=false){
   return`<div class="b-match ${fc}" onclick="openBracketModal('${id}','${e1}','${e2}','${meta}')">
     <div class="b-match-num">M${num} · ${meta}</div>
     <div class="b-team ${w1?'win':''} ${w2&&!w1?'lose':''}">
-      <div class="b-tname"><span style="font-size:.85rem">${f1}</span><span>${t1n}</span></div>
+      <div class="b-tname">${flag(f1)}<span>${t1n}</span></div>
       <span class="b-score">${s1!==''?s1:''}</span>
     </div>
     <div class="b-team ${w2?'win':''} ${w1&&!w2?'lose':''}">
-      <div class="b-tname"><span style="font-size:.85rem">${f2}</span><span>${t2n}</span></div>
+      <div class="b-tname">${flag(f2)}<span>${t2n}</span></div>
       <span class="b-score">${s2!==''?s2:''}</span>
     </div>
   </div>`;
@@ -3985,11 +4029,11 @@ function bMatchResolved(id,t1k,t2k,meta,num){
   return`<div class="b-match" onclick="openBracketModal('${id}','${e1}','${e2}','${meta}')">
     <div class="b-match-num">M${num} · ${meta}</div>
     <div class="b-team ${w1?'win':''} ${w2&&!w1?'lose':''}">
-      <div class="b-tname"><span style="font-size:.85rem">${t1.f}</span><span>${t1.n}</span></div>
+      <div class="b-tname">${flag(t1.f)}<span>${t1.n}</span></div>
       <span class="b-score">${s1!==''?s1:''}</span>
     </div>
     <div class="b-team ${w2?'win':''} ${w1&&!w2?'lose':''}">
-      <div class="b-tname"><span style="font-size:.85rem">${t2.f}</span><span>${t2.n}</span></div>
+      <div class="b-tname">${flag(t2.f)}<span>${t2.n}</span></div>
       <span class="b-score">${s2!==''?s2:''}</span>
     </div>
   </div>`;
@@ -4011,7 +4055,7 @@ function renderBracket(){
     const top8=thirds.slice(0,8);
     tp.innerHTML=`<div class="third-panel">
       <div class="third-panel-title">🔵 Best 8 Third-Place Teams (${thirds.length} groups played)</div>
-      <div class="third-grid">${top8.map((t,i)=>`<div class="third-entry"><span class="third-rank">${i+1}</span><span class="flag-em">${t.f}</span><strong>${t.name}</strong><span style="color:var(--tx3);font-size:var(--tx-xs);margin-left:4px">Grp ${t.group} · ${t.p}pts · GD${t.gd>0?'+':''}${t.gd}</span></div>`).join('')}</div>
+      <div class="third-grid">${top8.map((t,i)=>`<div class="third-entry"><span class="third-rank">${i+1}</span>${flag(t.f)}<strong>${t.name}</strong><span style="color:var(--tx3);font-size:var(--tx-xs);margin-left:4px">Grp ${t.group} · ${t.p}pts · GD${t.gd>0?'+':''}${t.gd}</span></div>`).join('')}</div>
       <div style="margin-top:var(--sp-3);font-size:var(--tx-xs);color:var(--tx3);font-family:'Barlow Condensed',sans-serif">Ranked by FIFA algorithm: Pts × 1M + GD × 1K + GF − Fair Play × 0.001 − FIFA Rank × 0.000001</div>
     </div>`;
   } else tp.innerHTML='';
@@ -4237,9 +4281,9 @@ function renderAIResult(g,fi,pred){
   panel.innerHTML=`<div>
     <div style="font-family:'Bebas Neue',sans-serif;font-size:var(--tx-lg);color:var(--ai-c);letter-spacing:2px;margin-bottom:var(--sp-4)">🤖 AI Prediction</div>
     <div style="display:flex;align-items:center;justify-content:center;gap:var(--sp-5);margin-bottom:var(--sp-4)">
-      <div style="text-align:center"><span style="font-size:2rem;display:block;margin-bottom:4px">${G[g].f[a]}</span><div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:var(--tx-base)">${G[g].t[a]}</div><div style="font-size:var(--tx-xs);color:var(--tx3)">Watch: ${pred.watch1||'—'}</div></div>
+      <div style="text-align:center"><span style="display:block;margin-bottom:4px">${flag(G[g].f[a],"m")}</span><div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:var(--tx-base)">${G[g].t[a]}</div><div style="font-size:var(--tx-xs);color:var(--tx3)">Watch: ${pred.watch1||'—'}</div></div>
       <span style="font-family:'Bebas Neue',sans-serif;font-size:1.6rem;color:var(--tx3);opacity:0.4">VS</span>
-      <div style="text-align:center"><span style="font-size:2rem;display:block;margin-bottom:4px">${G[g].f[b]}</span><div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:var(--tx-base)">${G[g].t[b]}</div><div style="font-size:var(--tx-xs);color:var(--tx3)">Watch: ${pred.watch2||'—'}</div></div>
+      <div style="text-align:center"><span style="display:block;margin-bottom:4px">${flag(G[g].f[b],"m")}</span><div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:var(--tx-base)">${G[g].t[b]}</div><div style="font-size:var(--tx-xs);color:var(--tx3)">Watch: ${pred.watch2||'—'}</div></div>
     </div>
     <div class="ai-score-display">${pred.score||'?'}</div>
     <div class="conf-bar-wrap"><div class="conf-label"><span>${G[g].t[a]} Win</span><span>${pred.prob1||0}%</span></div><div class="conf-bar"><div class="conf-fill" style="width:${pred.prob1||0}%"></div></div></div>
@@ -4421,7 +4465,7 @@ function renderDashboard(){
       return`<div class="dash-group-mini" onclick="setGroupFilter('${g}',document.querySelector('#groupFilter .filter-chip:nth-child(${Object.keys(G).indexOf(g)+2})'));showSection('groups',null)">
         <div class="dash-grp-letter">Group ${g}</div>
         <div class="dash-leader">
-          <span class="flag-em">${leader.f}</span>
+          ${flag(leader.f)}
           <span class="dash-leader-name">${leader.name}</span>
           <span class="dash-pts">${leader.p}pt</span>
         </div>
@@ -4831,7 +4875,7 @@ function renderFixtureList() {
         <div class="fl-match-col">
           <div class="fl-teams">
             <div class="fl-team">
-              <span class="flag-em" style="font-size:1rem">${m.f1}</span>
+              ${flag(m.f1)}
               <span class="fl-team-name">${m.t1}</span>
             </div>
             <div class="fl-score-mid">
@@ -4841,7 +4885,7 @@ function renderFixtureList() {
               }
             </div>
             <div class="fl-team" style="flex-direction:row-reverse">
-              <span class="flag-em" style="font-size:1rem">${m.f2}</span>
+              ${flag(m.f2)}
               <span class="fl-team-name" style="text-align:right">${m.t2}</span>
             </div>
           </div>
@@ -5058,7 +5102,7 @@ function renderTVGuide(){
     const note=m.nation?` <span style="color:var(--qualify);font-weight:700">★</span>`:'';
     return`<div class="tv-guide-match" onclick="openModal('${m.g}',${m.fi})">
       <span class="tv-guide-time">${m.localTime}</span>
-      <span class="tv-guide-teams">${G[m.g].f[m.a]} ${G[m.g].t[m.a]} <span style="color:var(--tx3);font-weight:400">vs</span> ${G[m.g].t[m.b]} ${G[m.g].f[m.b]}${note}</span>
+      <span class="tv-guide-teams">${G[m.g].f[m.a]} ${G[m.g].t[m.a]} <span style="color:var(--tx3);font-weight:400">vs</span> ${G[m.g].t[m.b]} ${flag(G[m.g].f[m.b])}${note}</span>
     </div>`;
   }
   el.innerHTML=`<div class="tv-guide-bar">
