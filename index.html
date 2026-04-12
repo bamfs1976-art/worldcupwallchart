@@ -3872,9 +3872,6 @@ const FX = {
 const FIFA_RANK = {Mexico:15,SouthAfrica:61,'Rep. of Korea':22,Czechia:37,Canada:27,'Bosnia-Herzegovina':67,Qatar:51,Switzerland:17,Brazil:5,Morocco:11,Haiti:84,Scotland:36,USA:14,Paraguay:39,Australia:26,'Türkiye':28,Germany:9,'Curaçao':82,'Ivory Coast':42,Ecuador:23,Netherlands:7,Japan:18,Sweden:25,Tunisia:40,Belgium:8,Egypt:34,'IR Iran':20,'New Zealand':86,Spain:1,'Cape Verde':68,'Saudi Arabia':60,Uruguay:16,France:3,Senegal:19,Iraq:58,Norway:29,Argentina:2,Algeria:35,Austria:24,Jordan:66,Portugal:6,'DR Congo':56,Uzbekistan:50,Colombia:13,England:4,Croatia:10,Ghana:72,Panama:30};
 function rank(name){return FIFA_RANK[name]||FIFA_RANK[name.replace(/ /g,'')]||99;}
 
-// Patch SQUADS emoji flags with proper images
-patchSquadFlags();
-
 // R32 fixture data from spreadsheet
 const R32=[
   {id:'r32_0',t1k:'2A',t2k:'2B',v:'Los Angeles',d:'Jun 28',m:73},
@@ -3938,6 +3935,9 @@ const SQUADS={
   'DR Congo':{flag:'🇨🇩',group:'K',coach:'Sébastien Desabre',stars:['Chancel Mbemba','Yoane Wissa','Axel Tuanzebe'],p:[{n:'A. Mpasi',pos:'GK',caps:24,club:'AS V. Club',e:'🧤'},{n:'C. Mbemba',pos:'DEF',caps:62,club:'Marseille',e:'🛡️'},{n:'A. Tuanzebe',pos:'DEF',caps:12,club:'Ipswich',e:'🛡️'},{n:'D. Zakaria',pos:'MID',caps:28,club:'Chelsea',e:'⚙️'},{n:'Y. Wissa',pos:'FWD',caps:36,club:'Brentford',e:'⚽'},{n:'F. Batshuayi',pos:'FWD',caps:54,club:'Fenerbahçe',e:'⚽'}]},
   Iraq:{flag:'🇮🇶',group:'I',coach:'Jesús Casas',stars:['Aymen Hussein','Amjed Attwan','Bashar Resan'],p:[{n:'J. Al-Habsi',pos:'GK',caps:38,club:'Al-Shorta',e:'🧤'},{n:'A. Attwan',pos:'DEF',caps:42,club:'Al-Zawraa',e:'🛡️'},{n:'A. Abbas',pos:'DEF',caps:36,club:'Al-Quwa',e:'🛡️'},{n:'B. Resan',pos:'MID',caps:44,club:'Al-Zawraa',e:'⚙️'},{n:'A. Hussein',pos:'FWD',caps:52,club:'Al-Zawraa',e:'⚽'},{n:'M. Al-Tamari',pos:'FWD',caps:28,club:'Stoke City',e:'⚽'}]}
 };
+
+// Patch SQUADS emoji flags with proper images
+patchSquadFlags();
 
 // ═══════════════════════════════════════════════════════
 // STATE
@@ -6328,7 +6328,7 @@ function renderH2H(t1, t2) {
 
 // Patch openModal to show H2H
 const _origOpenModal = openModal;
-openModal = function(g, fi) {
+window.openModal = function(g, fi) {
   _origOpenModal(g, fi);
   const [a, b] = FX[g][fi];
   const h2h = document.getElementById('h2hPanel');
@@ -6343,10 +6343,10 @@ function announce(msg) {
   if (el) { el.textContent = ''; requestAnimationFrame(() => { el.textContent = msg; }); }
 }
 
-// Patch showSection for screen reader announcements
-const _origShow = showSection;
-showSection = function(id, btn) {
-  _origShow(id, btn);
+// Enhance showSection with SR announcements (extend existing patch at line ~6026)
+const _origShowWithSync = window.showSection;
+window.showSection = function(id, btn) {
+  _origShowWithSync(id, btn);
   const names = {
     groups:'Groups',dashboard:'Dashboard',bracket:'Bracket',goldenboot:'Golden Boot',
     fixtures:'All Fixtures',simulate:'AI Predictor',timeline:'Match Log',
@@ -6359,16 +6359,21 @@ showSection = function(id, btn) {
 // ═══════════════════════════════════════════════════════
 // ENHANCEMENT: Animated save feedback
 // ═══════════════════════════════════════════════════════
-const _origSaveFn = save;
-let _saveN = 0;
-save = function() {
-  _origSaveFn.apply(this, arguments);
-  _saveN++;
-  if (_saveN % 2 === 0) {
-    const fill = document.querySelector('.progress-fill');
-    if (fill) { fill.classList.add('score-saved'); setTimeout(() => fill.classList.remove('score-saved'), 600); }
-  }
-};
+// save is const, so wrap via overriding localStorage.setItem instead
+(function patchSaveFeedback() {
+  const origSetItem = localStorage.setItem.bind(localStorage);
+  let saveN = 0;
+  localStorage.setItem = function(key, value) {
+    origSetItem(key, value);
+    if (key === 'wc26v4') {
+      saveN++;
+      if (saveN % 3 === 0) {
+        const fill = document.querySelector('.progress-fill');
+        if (fill) { fill.classList.add('score-saved'); setTimeout(() => fill.classList.remove('score-saved'), 600); }
+      }
+    }
+  };
+})();
 
 // Restore notifications if previously enabled
 if (ST.notifsEnabled && Notification?.permission === 'granted') {
