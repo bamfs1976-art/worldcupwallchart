@@ -7,9 +7,12 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="WC 2026">
 <meta name="theme-color" content="#07070d">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' https://flagcdn.com data:; connect-src 'self'">
 <title>FIFA World Cup 2026 — Wall Chart</title>
 <meta name="description" content="The ultimate interactive FIFA World Cup 2026 wall chart. All 104 fixtures, live standings, real-time bracket, golden boot tracker and AI predictions.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://flagcdn.com" crossorigin>
+<link rel="dns-prefetch" href="https://flagcdn.com">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@300;400;600;700&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 /* ═══════════════════════════════════════════════════
@@ -718,7 +721,25 @@ main { max-width: var(--max-w); margin: 0 auto; padding: var(--sp-6) var(--sp-6)
 .standings-tbl td.num { font-family: 'Barlow Condensed', sans-serif; font-weight: 600; }
 
 .team-cell { display: flex; align-items: center; gap: 6px; white-space: nowrap; }
-.flag-em { font-size: 1rem; flex-shrink: 0; line-height: 1; }
+.flag-em { flex-shrink: 0; line-height: 1; display: inline-flex; align-items: center; }
+
+/* Flag images — replaces emoji for cross-platform consistency */
+.flag-img {
+  display: inline-block;
+  vertical-align: middle;
+  object-fit: cover;
+  border-radius: 2px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+}
+.flag-em .flag-img { width: 20px; height: 14px; }
+.tm-flag .flag-img { width: 32px; height: 22px; }
+.m-flag .flag-img { width: 48px; height: 34px; }
+.squad-flag .flag-img { width: 56px; height: 40px; }
+.sim-champion-flag .flag-img { width: 56px; height: 40px; }
+.b-tname .flag-img { width: 18px; height: 13px; }
+.fl-uk-nation-flag .flag-img { width: 16px; height: 11px; }
+.team-list-item .flag-img { width: 22px; height: 15px; }
+.scorer-name .flag-img { width: 20px; height: 14px; vertical-align: middle; margin-right: 4px; }
 .tname {
   font-family: 'Barlow Condensed', sans-serif;
   font-size: var(--tx-base);
@@ -1976,7 +1997,7 @@ main { max-width: var(--max-w); margin: 0 auto; padding: var(--sp-6) var(--sp-6)
   /* ── TODAY HERO ── */
   .today-hero { padding: var(--sp-4); border-radius: var(--r-md); }
   .today-match-card { min-width: 180px; padding: var(--sp-3) var(--sp-4); }
-  .tm-flag { font-size: 1.5rem; }
+  .tm-flag .flag-img { width: 26px; height: 18px; }
   .tm-score { font-size: 1.5rem; }
 
   /* ── GROUP GRID: single column ── */
@@ -2033,7 +2054,7 @@ main { max-width: var(--max-w); margin: 0 auto; padding: var(--sp-6) var(--sp-6)
   }
   .big-inp { width: 64px; height: 64px; font-size: 2rem; }
   .modal-teams { gap: var(--sp-4); }
-  .m-flag { font-size: 2.2rem; }
+  .m-flag .flag-img { width: 38px; height: 27px; }
 
   /* ── SCORE ENTRY INPUTS in fixture rows ── */
   .score-box { min-width: 56px; }
@@ -3054,9 +3075,238 @@ main { max-width: var(--max-w); margin: 0 auto; padding: var(--sp-6) var(--sp-6)
 input[type=number]::-webkit-inner-spin-button,
 input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; }
 input[type=number] { -moz-appearance: textfield; }
+
+/* ═══════════════════════════════════════════════════
+   PRINT STYLESHEET — wall chart printing support
+   ═══════════════════════════════════════════════════ */
+@media print {
+  * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; color-adjust: exact !important; }
+  body { background: #fff !important; color: #111 !important; font-size: 10pt; }
+
+  /* Hide interactive/non-printable elements */
+  header, .mobile-tab-bar, .overlay, .toast-container, .countdown-wrap,
+  .tab-bar, button, input, select, .qs-chips, .filter-bar, .fl-filter-group,
+  .fixture-summary-bar, .group-star, .group-status-badge,
+  .form-dots, .fdot, .counter-btn, .btn, .note-emoji-row,
+  #importFile, .footer-links, .bottom-nav { display: none !important; }
+
+  /* Show active tab content */
+  .tab-panel { display: block !important; page-break-inside: avoid; }
+
+  /* Groups grid: 3 columns for print */
+  .groups-grid { grid-template-columns: repeat(3, 1fr) !important; gap: 8pt !important; }
+  .group-card { border: 1px solid #ccc !important; background: #fff !important; page-break-inside: avoid; }
+  .group-header { background: #1a1a2e !important; color: #fff !important; }
+  .group-letter { color: #d4a017 !important; }
+
+  /* Standings table */
+  .standings-tbl { font-size: 8pt; }
+  .standings-tbl th, .standings-tbl td { padding: 2pt 4pt !important; }
+  .pts-cell { color: #111 !important; font-weight: 900; }
+
+  /* Bracket: allow horizontal flow */
+  .bracket-scroll { overflow: visible !important; }
+  .bracket-frame { min-width: 0 !important; transform: scale(0.7); transform-origin: top left; }
+
+  /* Flags print correctly */
+  .flag-img { box-shadow: none !important; border: 0.5pt solid #ccc; }
+
+  /* Fixture list */
+  .fl-row { border: 0.5pt solid #ddd !important; background: #fff !important; }
+  .fl-team-name { color: #111 !important; }
+
+  /* Page margins */
+  @page { margin: 1cm; size: A3 landscape; }
+
+  /* Section breaks */
+  .section-title { page-break-before: always; }
+  .section-title:first-of-type { page-break-before: avoid; }
+}
+
+/* ═══════════════════════════════════════════════════
+   ENHANCEMENT: Animated tab transitions
+   ═══════════════════════════════════════════════════ */
+.section {
+  animation: none;
+}
+.section.active {
+  animation: fadeSlideIn 0.3s var(--ease-out) forwards;
+}
+@keyframes fadeSlideIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Score save pulse */
+@keyframes scorePulse {
+  0% { box-shadow: 0 0 0 0 rgba(240,180,41,0.5); }
+  70% { box-shadow: 0 0 0 10px rgba(240,180,41,0); }
+  100% { box-shadow: 0 0 0 0 rgba(240,180,41,0); }
+}
+.score-saved { animation: scorePulse 0.6s ease-out; }
+
+/* ═══════════════════════════════════════════════════
+   ENHANCEMENT: Notification bell
+   ═══════════════════════════════════════════════════ */
+.notif-bell {
+  position: relative;
+  cursor: pointer;
+  background: none;
+  border: none;
+  color: var(--tx2);
+  font-size: 1.2rem;
+  padding: var(--sp-2);
+  border-radius: var(--r-sm);
+  transition: color 0.2s;
+}
+.notif-bell:hover { color: var(--gold); }
+.notif-bell.active { color: var(--gold); }
+.notif-dot {
+  position: absolute;
+  top: 4px; right: 4px;
+  width: 8px; height: 8px;
+  background: var(--danger);
+  border-radius: 50%;
+  display: none;
+}
+.notif-bell.has-notif .notif-dot { display: block; }
+
+/* ═══════════════════════════════════════════════════
+   ENHANCEMENT: Head-to-head panel
+   ═══════════════════════════════════════════════════ */
+.h2h-panel {
+  background: var(--surf1);
+  border: 1px solid var(--bdr);
+  border-radius: var(--r-md);
+  padding: var(--sp-4);
+  margin-top: var(--sp-3);
+}
+.h2h-title {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: var(--tx-xs);
+  color: var(--tx3);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin-bottom: var(--sp-2);
+}
+.h2h-row {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: 4px 0;
+  font-size: var(--tx-sm);
+  color: var(--tx2);
+}
+.h2h-year { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; color: var(--tx3); min-width: 36px; }
+.h2h-result { font-weight: 700; color: var(--gold); min-width: 40px; text-align: center; }
+.h2h-comp { font-size: var(--tx-xs); color: var(--tx3); }
+.h2h-empty { font-size: var(--tx-xs); color: var(--tx3); font-style: italic; }
+
+/* ═══════════════════════════════════════════════════
+   ENHANCEMENT: Prediction share codes
+   ═══════════════════════════════════════════════════ */
+.pred-code-box {
+  background: var(--bg3);
+  border: 1px solid var(--bdr);
+  border-radius: var(--r-md);
+  padding: var(--sp-4);
+  margin-top: var(--sp-4);
+}
+.pred-code-input {
+  width: 100%;
+  background: var(--surf1);
+  border: 1px solid var(--bdr);
+  border-radius: var(--r-sm);
+  padding: var(--sp-3);
+  color: var(--tx);
+  font-family: monospace;
+  font-size: var(--tx-xs);
+  word-break: break-all;
+  resize: none;
+}
+.pred-code-input:focus { outline: 2px solid var(--gold); border-color: var(--gold); }
+
+/* ═══════════════════════════════════════════════════
+   ENHANCEMENT: Export buttons
+   ═══════════════════════════════════════════════════ */
+.export-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: var(--sp-3);
+  margin-top: var(--sp-4);
+}
+.export-card {
+  background: var(--surf1);
+  border: 1px solid var(--bdr);
+  border-radius: var(--r-md);
+  padding: var(--sp-4);
+  cursor: pointer;
+  transition: border-color 0.2s, transform 0.15s;
+  text-align: center;
+}
+.export-card:hover { border-color: var(--gold); transform: translateY(-2px); }
+.export-card:active { transform: translateY(0); }
+.export-icon { font-size: 1.5rem; margin-bottom: var(--sp-2); display: block; }
+.export-title { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: var(--tx-sm); }
+.export-desc { font-size: var(--tx-xs); color: var(--tx3); margin-top: 2px; }
+
+/* ═══════════════════════════════════════════════════
+   ENHANCEMENT: Bracket touch improvements
+   ═══════════════════════════════════════════════════ */
+.b-team {
+  transition: background 0.15s, transform 0.1s;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+.b-team:active {
+  transform: scale(0.97);
+  background: var(--gold-lo);
+}
+.b-match {
+  transition: box-shadow 0.2s, border-color 0.2s;
+}
+.b-match:active {
+  box-shadow: var(--sh-gold);
+}
+
+/* ═══════════════════════════════════════════════════
+   ENHANCEMENT: Accessibility — skip link, focus
+   ═══════════════════════════════════════════════════ */
+.skip-link {
+  position: absolute;
+  top: -100px;
+  left: var(--sp-4);
+  background: var(--gold);
+  color: #000;
+  padding: var(--sp-3) var(--sp-5);
+  border-radius: var(--r-sm);
+  font-weight: 700;
+  z-index: 9999;
+  transition: top 0.2s;
+}
+.skip-link:focus {
+  top: var(--sp-3);
+}
+
+/* Live region for screen readers */
+.sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip: rect(0,0,0,0);
+  white-space: nowrap;
+  border: 0;
+}
 </style>
+<!-- PWA Manifest (inline via data URI) -->
+<link rel="manifest" href="data:application/json;charset=utf-8,%7B%22name%22%3A%22FIFA%20World%20Cup%202026%20Wall%20Chart%22%2C%22short_name%22%3A%22WC%202026%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%2307070d%22%2C%22theme_color%22%3A%22%23F0B429%22%2C%22description%22%3A%22Interactive%20FIFA%20World%20Cup%202026%20wall%20chart%20with%20all%20104%20fixtures%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%2C%253Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%20100%20100%27%253E%253Ctext%20y%3D%270.9em%27%20font-size%3D%2790%27%253E%25E2%259A%25BD%253C%2Ftext%253E%253C%2Fsvg%253E%22%2C%22sizes%22%3A%22any%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%7D%5D%7D">
 </head>
 <body>
+<!-- Accessibility: skip to main content link -->
+<a href="#sec-groups" class="skip-link">Skip to main content</a>
+<!-- Screen reader live region for dynamic updates -->
+<div id="srLive" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>
 
 <!-- ═══════════════════════════════════════════════
      HEADER
@@ -3428,6 +3678,19 @@ input[type=number] { -moz-appearance: textfield; }
     <div class="share-card" onclick="window.print()"><span class="share-icon">🖨️</span><div class="share-title">Print / PDF</div><div class="share-desc">A3 printable chart</div></div>
     <div class="share-card" onclick="exportData()"><span class="share-icon">💾</span><div class="share-title">Export Data</div><div class="share-desc">Download as JSON</div></div>
     <div class="share-card" onclick="document.getElementById('importFile').click()"><span class="share-icon">📂</span><div class="share-title">Import Data</div><div class="share-desc">Load saved results</div></div>
+    <div class="share-card" onclick="shareNative()"><span class="share-icon">📤</span><div class="share-title">Share</div><div class="share-desc">Share via device</div></div>
+    <div class="share-card" onclick="exportCSV()"><span class="share-icon">📊</span><div class="share-title">Export CSV</div><div class="share-desc">Standings & fixtures</div></div>
+    <div class="share-card" onclick="exportPredCode()"><span class="share-icon">🔢</span><div class="share-title">Prediction Code</div><div class="share-desc">Share your predictions</div></div>
+    <div class="share-card" onclick="setupNotifications()"><span class="share-icon">🔔</span><div class="share-title">Notifications</div><div class="share-desc">Match reminders</div></div>
+  </div>
+  <!-- Prediction code import area -->
+  <div class="pred-code-box" id="predCodeArea" style="display:none">
+    <div class="h2h-title">Prediction Sharing</div>
+    <textarea class="pred-code-input" id="predCodeOutput" rows="3" readonly aria-label="Your prediction code"></textarea>
+    <div style="display:flex;gap:var(--sp-2);margin-top:var(--sp-3)">
+      <button class="btn sm" onclick="copyPredCode()">📋 Copy Code</button>
+      <button class="btn sm" onclick="promptImportPredCode()">📥 Import Code</button>
+    </div>
   </div>
   <!-- Enhancement 10: proper share card -->
   <div style="margin-top:var(--sp-6)">
@@ -3551,6 +3814,45 @@ const G = {
   L:{t:['England','Croatia','Ghana','Panama'],f:['🏴󠁧󠁢󠁥󠁮󠁧󠁿','🇭🇷','🇬🇭','🇵🇦']}
 };
 
+// ═══════════════════════════════════════════════════════
+// FLAG IMAGES — proper <img> flags for cross-platform rendering
+// Replaces emoji flags which don't render on Windows
+// ═══════════════════════════════════════════════════════
+const FLAG_CODES = {
+  'Mexico':'mx','South Africa':'za','Rep. of Korea':'kr','Czechia':'cz',
+  'Canada':'ca','Bosnia-Herzegovina':'ba','Qatar':'qa','Switzerland':'ch',
+  'Brazil':'br','Morocco':'ma','Haiti':'ht','Scotland':'gb-sct',
+  'USA':'us','Paraguay':'py','Australia':'au','Türkiye':'tr',
+  'Germany':'de','Curaçao':'cw','Ivory Coast':'ci','Ecuador':'ec',
+  'Netherlands':'nl','Japan':'jp','Sweden':'se','Tunisia':'tn',
+  'Belgium':'be','Egypt':'eg','IR Iran':'ir','New Zealand':'nz',
+  'Spain':'es','Cape Verde':'cv','Saudi Arabia':'sa','Uruguay':'uy',
+  'France':'fr','Senegal':'sn','Iraq':'iq','Norway':'no',
+  'Argentina':'ar','Algeria':'dz','Austria':'at','Jordan':'jo',
+  'Portugal':'pt','DR Congo':'cd','Uzbekistan':'uz','Colombia':'co',
+  'England':'gb-eng','Croatia':'hr','Ghana':'gh','Panama':'pa'
+};
+
+function flagHTML(name, w) {
+  const code = FLAG_CODES[name];
+  if (!code) return '<span class="flag-img" style="width:20px;height:14px;background:var(--surf3);border-radius:2px;display:inline-block" aria-hidden="true"></span>';
+  const s = w || 40;
+  return `<img src="https://flagcdn.com/w${s}/${code}.png" srcset="https://flagcdn.com/w${Math.min(s*2,160)}/${code}.png 2x" width="${s}" height="${Math.round(s*0.7)}" alt="${name} flag" class="flag-img" loading="lazy">`;
+}
+
+// Patch G.f arrays: replace emoji with proper image HTML
+Object.keys(G).forEach(g => {
+  G[g].f = G[g].t.map(name => flagHTML(name));
+});
+
+// Patch SQUADS flags after they are defined (deferred to after SQUADS const)
+function patchSquadFlags() {
+  if (typeof SQUADS === 'undefined') return;
+  Object.keys(SQUADS).forEach(t => {
+    if (FLAG_CODES[t]) SQUADS[t].flag = flagHTML(t);
+  });
+}
+
 // All 72 group fixtures [t1, t2, matchNum, utcDatetime, venue]
 const FX = {
   A:[[0,1,1,'2026-06-11 21:00','Mexico City'],[2,3,2,'2026-06-12 04:00','Guadalajara'],[3,1,25,'2026-06-18 18:00','Atlanta'],[0,2,28,'2026-06-19 03:00','Guadalajara'],[3,0,53,'2026-06-25 03:00','Mexico City'],[1,2,54,'2026-06-25 03:00','Monterrey']],
@@ -3569,6 +3871,9 @@ const FX = {
 
 const FIFA_RANK = {Mexico:15,SouthAfrica:61,'Rep. of Korea':22,Czechia:37,Canada:27,'Bosnia-Herzegovina':67,Qatar:51,Switzerland:17,Brazil:5,Morocco:11,Haiti:84,Scotland:36,USA:14,Paraguay:39,Australia:26,'Türkiye':28,Germany:9,'Curaçao':82,'Ivory Coast':42,Ecuador:23,Netherlands:7,Japan:18,Sweden:25,Tunisia:40,Belgium:8,Egypt:34,'IR Iran':20,'New Zealand':86,Spain:1,'Cape Verde':68,'Saudi Arabia':60,Uruguay:16,France:3,Senegal:19,Iraq:58,Norway:29,Argentina:2,Algeria:35,Austria:24,Jordan:66,Portugal:6,'DR Congo':56,Uzbekistan:50,Colombia:13,England:4,Croatia:10,Ghana:72,Panama:30};
 function rank(name){return FIFA_RANK[name]||FIFA_RANK[name.replace(/ /g,'')]||99;}
+
+// Patch SQUADS emoji flags with proper images
+patchSquadFlags();
 
 // R32 fixture data from spreadsheet
 const R32=[
@@ -4022,8 +4327,8 @@ function toggleH2H(btn){
 function openModal(g,fi){
   const[a,b,num,dt,venue]=FX[g][fi];
   mCtx={g,fi,type:'group'};
-  document.getElementById('mFlag1').textContent=G[g].f[a];
-  document.getElementById('mFlag2').textContent=G[g].f[b];
+  document.getElementById('mFlag1').innerHTML=G[g].f[a];
+  document.getElementById('mFlag2').innerHTML=G[g].f[b];
   document.getElementById('mName1').textContent=G[g].t[a];
   document.getElementById('mName2').textContent=G[g].t[b];
   const localTime=fmtLocalTime(dt);
@@ -4043,8 +4348,8 @@ function openModal(g,fi){
 }
 function openBracketModal(id,t1,t2,meta){
   mCtx={id,t1,t2,meta,type:'bracket'};
-  document.getElementById('mFlag1').textContent=getFlag(t1);
-  document.getElementById('mFlag2').textContent=getFlag(t2);
+  document.getElementById('mFlag1').innerHTML=getFlag(t1);
+  document.getElementById('mFlag2').innerHTML=getFlag(t2);
   document.getElementById('mName1').textContent=t1;
   document.getElementById('mName2').textContent=t2;
   document.getElementById('modalSub').textContent=meta;
@@ -4160,24 +4465,27 @@ function launchConfetti(){
 // ═══════════════════════════════════════════════════════
 function resolveTeam(code){
   const gr=allGroupResults();
-  if(!code)return{n:'TBD',f:'⬜'};
-  if(code.startsWith('1')){const g=code[1];const t=gr[g]?.first;return t?{n:t.name,f:t.f}:{n:`1st ${g}`,f:'⬜'};}
-  if(code.startsWith('2')){const g=code[1];const t=gr[g]?.second;return t?{n:t.name,f:t.f}:{n:`2nd ${g}`,f:'⬜'};}
-  if(code.startsWith('3'))return{n:'Best 3rd',f:'🔵'};
-  return{n:code,f:'⬜'};
+  const blank='<span class="flag-img" style="width:20px;height:14px;background:var(--surf3);border-radius:2px;display:inline-block" aria-hidden="true"></span>';
+  if(!code)return{n:'TBD',f:blank};
+  if(code.startsWith('1')){const g=code[1];const t=gr[g]?.first;return t?{n:t.name,f:t.f}:{n:`1st ${g}`,f:blank};}
+  if(code.startsWith('2')){const g=code[1];const t=gr[g]?.second;return t?{n:t.name,f:t.f}:{n:`2nd ${g}`,f:blank};}
+  if(code.startsWith('3'))return{n:'Best 3rd',f:'<span class="flag-img" style="width:20px;height:14px;background:var(--third-c);border-radius:2px;display:inline-block" aria-hidden="true"></span>'};
+  return{n:code,f:blank};
 }
 
 // Flag lookup by team name — covers all 48 teams + common bracket resolved names
 const FLAG_MAP = (()=>{
   const m={};
   Object.keys(G).forEach(g=>G[g].t.forEach((t,i)=>m[t]=G[g].f[i]));
-  // Extra entries for stored bracket team names
   Object.values(SQUADS).forEach(s=>{ /* already in G */ });
   return m;
 })();
 function getFlag(name){
-  if(!name||name==='TBD')return'⬜';
-  return FLAG_MAP[name]||FLAG_MAP[Object.keys(FLAG_MAP).find(k=>k.toLowerCase()===name.toLowerCase())]||'🏳️';
+  if(!name||name==='TBD')return '<span class="flag-img" style="width:20px;height:14px;background:var(--surf3);border-radius:2px;display:inline-block" aria-hidden="true"></span>';
+  if(FLAG_CODES[name]) return flagHTML(name);
+  const key = Object.keys(FLAG_CODES).find(k=>k.toLowerCase()===name.toLowerCase());
+  if(key) return flagHTML(key);
+  return FLAG_MAP[name]||FLAG_MAP[Object.keys(FLAG_MAP).find(k=>k.toLowerCase()===name.toLowerCase())]||flagHTML(name);
 }
 
 function bMatch(id,t1n,t2n,meta,num,isFinal=false){
@@ -4293,7 +4601,8 @@ function renderBracket(){
 function addScorer(){
   const name=document.getElementById('inpName').value.trim();
   const team=document.getElementById('inpTeam').value.trim();
-  const flag=document.getElementById('inpFlag').value.trim()||'🏴';
+  const flagInput=document.getElementById('inpFlag').value.trim();
+  const flag=FLAG_CODES[team]?flagHTML(team,20):(flagInput||'🏴');
   if(!name||!team){toast('Enter player name and country','error');return;}
   if(ST.scorers.find(s=>s.name===name&&s.team===team)){toast('Player already added','error');return;}
   ST.scorers.push({name,team,flag,goals:0,assists:0});save();
@@ -5497,10 +5806,11 @@ function simAllGroupResults(){
 }
 
 function simResolve(code, gr){
-  if(!code) return { n:'TBD', f:'⬜' };
-  if(code.startsWith('1')){ const g=code[1]; const t=gr[g]?.first;  return t ? {n:t.name,f:t.f} : {n:'1st '+g,f:'⬜'}; }
-  if(code.startsWith('2')){ const g=code[1]; const t=gr[g]?.second; return t ? {n:t.name,f:t.f} : {n:'2nd '+g,f:'⬜'}; }
-  return { n:code, f:'⬜' };
+  const _b='<span class="flag-img" style="width:20px;height:14px;background:var(--surf3);border-radius:2px;display:inline-block" aria-hidden="true"></span>';
+  if(!code) return { n:'TBD', f:_b };
+  if(code.startsWith('1')){ const g=code[1]; const t=gr[g]?.first;  return t ? {n:t.name,f:t.f} : {n:'1st '+g,f:_b}; }
+  if(code.startsWith('2')){ const g=code[1]; const t=gr[g]?.second; return t ? {n:t.name,f:t.f} : {n:'2nd '+g,f:_b}; }
+  return { n:code, f:_b };
 }
 
 function pickWinner(t1, t2){
@@ -5522,8 +5832,9 @@ function runSimulation(){
   function nextRound(prev, meta){
     const out = [];
     for(let i = 0; i < prev.length; i += 2){
-      const w1 = prev[i].winner     || {n:'TBD',f:'⬜'};
-      const w2 = prev[i+1]?.winner  || {n:'TBD',f:'⬜'};
+      const _b='<span class="flag-img" style="width:20px;height:14px;background:var(--surf3);border-radius:2px;display:inline-block" aria-hidden="true"></span>';
+      const w1 = prev[i].winner     || {n:'TBD',f:_b};
+      const w2 = prev[i+1]?.winner  || {n:'TBD',f:_b};
       const m  = meta[out.length]   || {m:0,v:'TBD',d:'TBD'};
       out.push({ t1:w1, t2:w2, winner: pickWinner(w1,w2), m:m.m, v:m.v, d:m.d });
     }
@@ -5534,11 +5845,12 @@ function runSimulation(){
   const qf  = nextRound(r16, QF);
   const sf  = nextRound(qf,  SF);
 
-  const fin1 = sf[0]?.winner || {n:'TBD',f:'⬜'};
-  const fin2 = sf[1]?.winner || {n:'TBD',f:'⬜'};
+  const _blk='<span class="flag-img" style="width:20px;height:14px;background:var(--surf3);border-radius:2px;display:inline-block" aria-hidden="true"></span>';
+  const fin1 = sf[0]?.winner || {n:'TBD',f:_blk};
+  const fin2 = sf[1]?.winner || {n:'TBD',f:_blk};
   const champion   = pickWinner(fin1, fin2);
-  const third1 = sf[0] ? (sf[0].winner === sf[0].t1 ? sf[0].t2 : sf[0].t1) : {n:'TBD',f:'⬜'};
-  const third2 = sf[1] ? (sf[1].winner === sf[1].t1 ? sf[1].t2 : sf[1].t1) : {n:'TBD',f:'⬜'};
+  const third1 = sf[0] ? (sf[0].winner === sf[0].t1 ? sf[0].t2 : sf[0].t1) : {n:'TBD',f:_blk};
+  const third2 = sf[1] ? (sf[1].winner === sf[1].t1 ? sf[1].t2 : sf[1].t1) : {n:'TBD',f:_blk};
   const thirdPlace = pickWinner(third1, third2);
 
   function koSection(title, matches){
@@ -5749,6 +6061,319 @@ document.addEventListener('DOMContentLoaded',()=>{
 
 // Initial tab bar sync
 syncTabBar('groups');
+
+// ═══════════════════════════════════════════════════════
+// KEYBOARD SHORTCUTS — power user navigation
+// ═══════════════════════════════════════════════════════
+document.addEventListener('keydown', e => {
+  // Don't fire when typing in inputs
+  if (e.target.matches('input, select, textarea')) return;
+  const key = e.key.toLowerCase();
+  const tabs = {
+    '1': 'groups', '2': 'bracket', '3': 'boot', '4': 'fixtures',
+    '5': 'predict', '6': 'league', '7': 'squads', '8': 'fairplay',
+    '9': 'sim', '0': 'dashboard'
+  };
+  if (tabs[key] && !e.ctrlKey && !e.metaKey && !e.altKey) {
+    const tabBtn = document.querySelector(`[onclick*="switchTab('${tabs[key]}"]`);
+    if (tabBtn) { tabBtn.click(); e.preventDefault(); }
+  }
+  // Ctrl+P for print
+  if (key === 'p' && (e.ctrlKey || e.metaKey)) {
+    // Let browser handle natively with our print stylesheet
+  }
+  // ? for keyboard shortcut help
+  if (key === '?' && !e.ctrlKey && !e.metaKey) {
+    toast('Keys 1-9: switch tabs · 0: dashboard · T: toggle theme · Ctrl+P: print', 'info', 5000);
+    e.preventDefault();
+  }
+  // T for theme toggle
+  if (key === 't' && !e.ctrlKey && !e.metaKey && !e.altKey) {
+    const themes = ['dark','light','retro','neon'];
+    const cur = themes.indexOf(ST.theme);
+    setTheme(themes[(cur + 1) % themes.length]);
+    e.preventDefault();
+  }
+});
+
+// ═══════════════════════════════════════════════════════
+// ENHANCEMENT: PWA — Service Worker registration
+// ═══════════════════════════════════════════════════════
+if ('serviceWorker' in navigator) {
+  const swCode = `
+    const CACHE = 'wc2026-v2';
+    const ASSETS = ['./', './index.html'];
+    self.addEventListener('install', e => e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)).then(() => self.skipWaiting())));
+    self.addEventListener('activate', e => e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k !== CACHE).map(k => caches.delete(k)))).then(() => self.clients.claim())));
+    self.addEventListener('fetch', e => {
+      if (e.request.method !== 'GET') return;
+      e.respondWith(
+        caches.match(e.request).then(r => r || fetch(e.request).then(res => {
+          if (res.ok && e.request.url.includes('flagcdn.com')) {
+            const clone = res.clone();
+            caches.open(CACHE).then(c => c.put(e.request, clone));
+          }
+          return res;
+        }).catch(() => caches.match('./index.html'))
+      ));
+    });
+  `;
+  const swBlob = new Blob([swCode], { type: 'application/javascript' });
+  const swUrl = URL.createObjectURL(swBlob);
+  navigator.serviceWorker.register(swUrl, { scope: '.' }).catch(() => {});
+}
+
+// ═══════════════════════════════════════════════════════
+// ENHANCEMENT: Social sharing (Web Share API)
+// ═══════════════════════════════════════════════════════
+function shareNative() {
+  const played = Object.keys(ST.scores).length;
+  const shareData = {
+    title: 'FIFA World Cup 2026 — My Wall Chart',
+    text: `I've tracked ${played}/72 group matches on my World Cup 2026 wall chart!`,
+    url: window.location.href
+  };
+  if (navigator.share) {
+    navigator.share(shareData).catch(() => {});
+  } else {
+    navigator.clipboard.writeText(`${shareData.text}\n${shareData.url}`)
+      .then(() => toast('Copied to clipboard!', 'success'))
+      .catch(() => toast('Share not supported in this browser', 'info'));
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+// ENHANCEMENT: Prediction sharing codes (base64)
+// ═══════════════════════════════════════════════════════
+function encodePredictions() {
+  const entries = [];
+  Object.keys(G).forEach(g => {
+    FX[g].forEach(([a, b, num, dt, venue], fi) => {
+      const sc = ST.scores[`${g}_${fi}`];
+      if (sc !== undefined) entries.push(`${g}${fi}:${sc[0]}-${sc[1]}`);
+    });
+  });
+  Object.keys(ST.predictions || {}).forEach(k => {
+    const p = ST.predictions[k];
+    if (p && p[0] !== null && p[1] !== null) entries.push(`P${k}:${p[0]}-${p[1]}`);
+  });
+  return btoa(entries.join('|'));
+}
+
+function decodePredictions(code) {
+  try {
+    const raw = atob(code);
+    const entries = raw.split('|');
+    let imported = 0;
+    entries.forEach(e => {
+      const [key, score] = e.split(':');
+      if (!key || !score) return;
+      const [h, a] = score.split('-').map(Number);
+      if (isNaN(h) || isNaN(a)) return;
+      if (key.startsWith('P')) {
+        const pk = key.slice(1);
+        if (!ST.predictions[pk]) ST.predictions[pk] = [null, null];
+        ST.predictions[pk] = [h, a];
+        imported++;
+      } else {
+        const g = key[0], fi = parseInt(key.slice(1));
+        if (G[g] && FX[g][fi] !== undefined) {
+          ST.scores[`${g}_${fi}`] = [h, a];
+          imported++;
+        }
+      }
+    });
+    save(); renderGroups(); renderBracket();
+    toast(`Imported ${imported} results from shared code`, 'success');
+  } catch (e) {
+    toast('Invalid prediction code', 'error');
+  }
+}
+
+function exportPredCode() {
+  const code = encodePredictions();
+  if (!code || code === btoa('')) { toast('No results to share yet', 'info'); return; }
+  const area = document.getElementById('predCodeArea');
+  const output = document.getElementById('predCodeOutput');
+  area.style.display = 'block';
+  output.value = code;
+  output.select();
+  toast('Prediction code generated!', 'success');
+}
+
+function copyPredCode() {
+  const output = document.getElementById('predCodeOutput');
+  navigator.clipboard.writeText(output.value)
+    .then(() => toast('Code copied!', 'success'))
+    .catch(() => { output.select(); document.execCommand('copy'); toast('Copied!', 'success'); });
+}
+
+function promptImportPredCode() {
+  const code = prompt('Paste a prediction code to import:');
+  if (code && code.trim()) decodePredictions(code.trim());
+}
+
+// ═══════════════════════════════════════════════════════
+// ENHANCEMENT: Match notifications (Notification API)
+// ═══════════════════════════════════════════════════════
+let notifTimers = [];
+function setupNotifications() {
+  if (!('Notification' in window)) { toast('Notifications not supported', 'info'); return; }
+  if (Notification.permission === 'denied') { toast('Notifications blocked — enable in browser settings', 'error'); return; }
+  if (Notification.permission === 'default') {
+    Notification.requestPermission().then(p => { if (p === 'granted') scheduleNotifs(); else toast('Permission denied', 'info'); });
+  } else { scheduleNotifs(); }
+}
+
+function scheduleNotifs() {
+  notifTimers.forEach(t => clearTimeout(t));
+  notifTimers = [];
+  const now = Date.now(), REMIND = 15 * 60 * 1000;
+  let count = 0;
+  Object.keys(G).forEach(g => {
+    FX[g].forEach(([a, b, num, dt, venue]) => {
+      const ko = new Date(dt.replace(' ', 'T') + 'Z').getTime();
+      const at = ko - REMIND;
+      if (at > now && at < now + 7 * 86400000) {
+        notifTimers.push(setTimeout(() => {
+          new Notification('Match Starting Soon!', {
+            body: `${G[g].t[a]} vs ${G[g].t[b]} — 15 min to kickoff\nGroup ${g} · M${num} · ${venue}`,
+            tag: `wc-m${num}`
+          });
+        }, at - now));
+        count++;
+      }
+    });
+  });
+  toast(count > 0 ? `${count} match reminders set` : 'No upcoming matches this week', 'success');
+}
+
+// ═══════════════════════════════════════════════════════
+// ENHANCEMENT: CSV Export
+// ═══════════════════════════════════════════════════════
+function exportCSV() {
+  let csv = 'Group,Pos,Team,MP,W,D,L,GF,GA,GD,Pts,FIFA Rank\n';
+  Object.keys(G).forEach(g => {
+    const s = standings(g);
+    s.forEach((t, i) => { csv += `${g},${i+1},"${t.name}",${t.mp},${t.w},${t.d},${t.l},${t.gf},${t.ga},${t.gd},${t.p},${t.rank}\n`; });
+  });
+  csv += '\nMatch,Group,Home,Away,Home Goals,Away Goals,Date,Venue\n';
+  Object.keys(G).forEach(g => {
+    FX[g].forEach(([a, b, num, dt, venue], fi) => {
+      const sc = ST.scores[`${g}_${fi}`];
+      csv += `M${num},${g},"${G[g].t[a]}","${G[g].t[b]}",${sc?sc[0]:''},${sc?sc[1]:''},${dt.slice(0,10)},"${venue}"\n`;
+    });
+  });
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = 'world-cup-2026-results.csv';
+  link.click();
+  URL.revokeObjectURL(link.href);
+  toast('CSV downloaded', 'success');
+}
+
+// ═══════════════════════════════════════════════════════
+// ENHANCEMENT: Head-to-head history
+// ═══════════════════════════════════════════════════════
+const H2H = {
+  'Mexico|South Africa':[{y:'2010',r:'1-1',c:'WC Group'},{y:'2024',r:'2-0',c:'Friendly'}],
+  'Brazil|Morocco':[{y:'2023',r:'1-2',c:'Friendly'}],
+  'Brazil|Scotland':[{y:'1998',r:'2-1',c:'WC Group'},{y:'1982',r:'4-1',c:'WC Group'}],
+  'USA|Australia':[{y:'2023',r:'1-0',c:'Friendly'}],
+  'Germany|Ivory Coast':[{y:'2006',r:'2-1',c:'WC Group'}],
+  'Netherlands|Japan':[{y:'2022',r:'3-1',c:'WC R16'}],
+  'Belgium|Egypt':[{y:'2018',r:'3-0',c:'Friendly'},{y:'2024',r:'0-2',c:'Friendly'}],
+  'Spain|Uruguay':[{y:'2022',r:'2-0',c:'Friendly'}],
+  'Spain|Saudi Arabia':[{y:'2022',r:'1-2',c:'WC Group'}],
+  'France|Senegal':[{y:'2002',r:'0-1',c:'WC Group'}],
+  'Argentina|Algeria':[{y:'2014',r:'2-1',c:'WC Group'},{y:'1982',r:'0-1',c:'WC Group'}],
+  'Portugal|Colombia':[{y:'2024',r:'1-1',c:'Friendly'}],
+  'England|Croatia':[{y:'2021',r:'1-0',c:'Euro Group'},{y:'2018',r:'1-2',c:'WC SF'}],
+  'England|Ghana':[{y:'2022',r:'3-0',c:'Friendly'}],
+  'England|Panama':[{y:'2018',r:'6-1',c:'WC Group'}],
+  'Croatia|Ghana':[{y:'2014',r:'1-0',c:'WC Group'}],
+  'Mexico|Rep. of Korea':[{y:'2018',r:'1-2',c:'WC Group'}],
+  'France|Norway':[{y:'2024',r:'3-0',c:'Friendly'}],
+  'Argentina|Austria':[{y:'2024',r:'2-0',c:'Friendly'}],
+  'Netherlands|Sweden':[{y:'2017',r:'2-0',c:'WCQ'}],
+  'Japan|Tunisia':[{y:'2022',r:'0-1',c:'Friendly'}],
+  'Belgium|New Zealand':[{y:'2024',r:'3-0',c:'Friendly'}],
+  'USA|Paraguay':[{y:'2023',r:'1-0',c:'Friendly'}],
+  'Germany|Ecuador':[{y:'2024',r:'0-0',c:'Friendly'}],
+  'Mexico|Czechia':[{y:'2024',r:'0-0',c:'Friendly'}]
+};
+
+function renderH2H(t1, t2) {
+  const recs = H2H[`${t1}|${t2}`] || H2H[`${t2}|${t1}`] || [];
+  if (!recs.length) return '<div class="h2h-panel"><div class="h2h-title">Head-to-Head</div><div class="h2h-empty">No recent meeting data available</div></div>';
+  return `<div class="h2h-panel"><div class="h2h-title">Head-to-Head History</div>${
+    recs.map(r => `<div class="h2h-row"><span class="h2h-year">${r.y}</span><span class="h2h-result">${r.r}</span><span class="h2h-comp">${r.c}</span></div>`).join('')
+  }</div>`;
+}
+
+// Inject H2H panel into modal
+(function patchModalH2H() {
+  const modalInner = document.getElementById('modalInner');
+  if (modalInner && !document.getElementById('h2hPanel')) {
+    const div = document.createElement('div');
+    div.id = 'h2hPanel';
+    div.style.marginTop = 'var(--sp-3)';
+    // Insert before the close area
+    const noteSection = modalInner.querySelector('.note-emoji-row')?.parentElement;
+    if (noteSection) noteSection.after(div);
+    else modalInner.appendChild(div);
+  }
+})();
+
+// Patch openModal to show H2H
+const _origOpenModal = openModal;
+openModal = function(g, fi) {
+  _origOpenModal(g, fi);
+  const [a, b] = FX[g][fi];
+  const h2h = document.getElementById('h2hPanel');
+  if (h2h) h2h.innerHTML = renderH2H(G[g].t[a], G[g].t[b]);
+};
+
+// ═══════════════════════════════════════════════════════
+// ENHANCEMENT: Accessibility — live announcements
+// ═══════════════════════════════════════════════════════
+function announce(msg) {
+  const el = document.getElementById('srLive');
+  if (el) { el.textContent = ''; requestAnimationFrame(() => { el.textContent = msg; }); }
+}
+
+// Patch showSection for screen reader announcements
+const _origShow = showSection;
+showSection = function(id, btn) {
+  _origShow(id, btn);
+  const names = {
+    groups:'Groups',dashboard:'Dashboard',bracket:'Bracket',goldenboot:'Golden Boot',
+    fixtures:'All Fixtures',simulate:'AI Predictor',timeline:'Match Log',
+    predictions:'Predictor',league:'Prediction League',squads:'Squads',
+    fairplay:'Fair Play',share:'Share & Export'
+  };
+  announce(`${names[id]||id} tab`);
+};
+
+// ═══════════════════════════════════════════════════════
+// ENHANCEMENT: Animated save feedback
+// ═══════════════════════════════════════════════════════
+const _origSaveFn = save;
+let _saveN = 0;
+save = function() {
+  _origSaveFn.apply(this, arguments);
+  _saveN++;
+  if (_saveN % 2 === 0) {
+    const fill = document.querySelector('.progress-fill');
+    if (fill) { fill.classList.add('score-saved'); setTimeout(() => fill.classList.remove('score-saved'), 600); }
+  }
+};
+
+// Restore notifications if previously enabled
+if (ST.notifsEnabled && Notification?.permission === 'granted') {
+  setTimeout(scheduleNotifs, 2000);
+}
 </script>
 
 <!-- ═══════════════════════════════════════════════════
