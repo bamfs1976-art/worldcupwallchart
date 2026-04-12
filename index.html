@@ -5353,7 +5353,7 @@ function renderSimTabs(){
   if(!el) return;
   el.innerHTML = Object.keys(G).map(g => {
     const done = FX[g].every((_,fi) => { const p=ST.simPreds[g+'_'+fi]; return p&&p[0]!==null&&p[1]!==null; });
-    return '<button class="sim-tab '+(g===currentSimGroup?'active':'')+'" id="simTab_'+g+'" onclick="switchSimGroup(''+g+'')" role="tab">'
+    return '<button class="sim-tab '+(g===currentSimGroup?'active':'')+'" id="simTab_'+g+'" onclick="switchSimGroup(\'' + g + '\')" role="tab">'
       +'Grp '+g+'<span class="sim-tab-dot '+(done?'show':'')+'"></span></button>';
   }).join('');
 }
@@ -5369,77 +5369,69 @@ function renderSimGroupContent(g){
   if(!el) return;
 
   const fixHTML = FX[g].map(([a,b,num,dt,venue],fi) => {
-    const k = g+'_'+fi;
+    const k = `${g}_${fi}`;
     const p = ST.simPreds[k];
     const v1 = p&&p[0]!==null ? p[0] : '';
     const v2 = p&&p[1]!==null ? p[1] : '';
     const done = v1!==''&&v2!=='';
-    const localTime = fmtLocalTime(dt);
-    return '<div class="sim-fix-row '+(done?'done':'')+'" id="simRow_'+k+'">'
-      +'<div class="sim-team"><span class="flag-em">'+G[g].f[a]+'</span><span>'+G[g].t[a]+'</span></div>'
-      +'<div class="sim-score-entry">'
-        +'<input class="sim-inp '+(done?'filled':'')+'" type="number" min="0" max="20" value="'+v1+'" placeholder="?" id="si_'+k+'_0" onchange="saveSimPred(''+g+'','+fi+',0,this.value)" aria-label="'+G[g].t[a]+' score">'
-        +'<span class="sim-inp-sep">–</span>'
-        +'<input class="sim-inp '+(done?'filled':'')+'" type="number" min="0" max="20" value="'+v2+'" placeholder="?" id="si_'+k+'_1" onchange="saveSimPred(''+g+'','+fi+',1,this.value)" aria-label="'+G[g].t[b]+' score">'
-      +'</div>'
-      +'<div class="sim-team away"><span>'+G[g].t[b]+'</span><span class="flag-em">'+G[g].f[b]+'</span></div>'
-      +'</div>';
+    return `<div class="sim-fix-row ${done?'done':''}" id="simRow_${k}">
+      <div class="sim-team"><span class="flag-em">${G[g].f[a]}</span><span>${G[g].t[a]}</span></div>
+      <div class="sim-score-entry">
+        <input class="sim-inp ${done?'filled':''}" type="number" min="0" max="20" value="${v1}" placeholder="?" id="si_${k}_0"
+          onchange="saveSimPred('${g}',${fi},0,this.value)" aria-label="${G[g].t[a]} score">
+        <span class="sim-inp-sep">–</span>
+        <input class="sim-inp ${done?'filled':''}" type="number" min="0" max="20" value="${v2}" placeholder="?" id="si_${k}_1"
+          onchange="saveSimPred('${g}',${fi},1,this.value)" aria-label="${G[g].t[b]} score">
+      </div>
+      <div class="sim-team away"><span>${G[g].t[b]}</span><span class="flag-em">${G[g].f[b]}</span></div>
+    </div>`;
   }).join('');
 
-  const s = simStandings(g);
-  const standHTML = '<div class="sim-standings-preview">'
-    +'<div style="font-family:'Barlow Condensed',sans-serif;font-size:var(--tx-xs);color:var(--tx3);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:6px;font-weight:700">Predicted Standings</div>'
-    + s.map((t,i) =>
-      '<div class="sim-standings-row" style="'+(i<2?'color:var(--qualify)':i===2?'color:var(--third-c)':'color:var(--tx3)')+'">'
-      +'<span style="font-family:'Bebas Neue',sans-serif;font-size:var(--tx-md);min-width:16px">'+(i+1)+'</span>'
-      +'<span class="flag-em">'+t.f+'</span>'
-      +'<span style="font-weight:700;flex:1">'+t.name+'</span>'
-      +'<span style="font-family:'Bebas Neue',sans-serif;font-size:var(--tx-md);color:var(--gold)">'+t.p+'</span>'
-      +'<span style="color:var(--tx3);font-size:var(--tx-xs);margin-left:3px">pts</span>'
-      +'</div>'
-    ).join('')
-    +'</div>';
+  const filled = FX[g].filter((_,fi) => { const p=ST.simPreds[`${g}_${fi}`]; return p&&p[0]!==null&&p[1]!==null; }).length;
+  el.innerHTML = `<div class="group-card">
+    <div class="group-header">
+      <span class="group-letter">Group ${g}</span>
+      <span class="group-meta">${filled}/${FX[g].length} predicted</span>
+    </div>
+    ${fixHTML}
+    ${simStandingsHTML(g)}
+  </div>`;
+}
 
-  const filled = FX[g].filter((_,fi) => { const p=ST.simPreds[g+'_'+fi]; return p&&p[0]!==null&&p[1]!==null; }).length;
-  el.innerHTML = '<div class="group-card">'
-    +'<div class="group-header">'
-      +'<span class="group-letter">Group '+g+'</span>'
-      +'<span class="group-meta">'+filled+'/'+FX[g].length+' predicted</span>'
-    +'</div>'
-    + fixHTML
-    + standHTML
-    +'</div>';
+function simStandingsHTML(g){
+  const s = simStandings(g);
+  const rows = s.map((t,i) => {
+    const col = i<2?'color:var(--qualify)':i===2?'color:var(--third-c)':'color:var(--tx3)';
+    return `<div class="sim-standings-row" style="${col}">
+      <span style="font-family:'Bebas Neue',sans-serif;font-size:var(--tx-md);min-width:16px">${i+1}</span>
+      <span class="flag-em">${t.f}</span>
+      <span style="font-weight:700;flex:1">${t.name}</span>
+      <span style="font-family:'Bebas Neue',sans-serif;font-size:var(--tx-md);color:var(--gold)">${t.p}</span>
+      <span style="color:var(--tx3);font-size:var(--tx-xs);margin-left:3px">pts</span>
+    </div>`;
+  }).join('');
+  return `<div class="sim-standings-preview">
+    <div style="font-family:'Barlow Condensed',sans-serif;font-size:var(--tx-xs);color:var(--tx3);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:6px;font-weight:700">Predicted Standings</div>
+    ${rows}
+  </div>`;
 }
 
 function saveSimPred(g, fi, slot, val){
-  const k = g+'_'+fi;
+  const k = `${g}_${fi}`;
   if(!ST.simPreds[k]) ST.simPreds[k] = [null, null];
   ST.simPreds[k][slot] = val==='' ? null : parseInt(val)||0;
   const p = ST.simPreds[k];
   if(p[0]===null && p[1]===null) delete ST.simPreds[k];
   save();
   simUpdateProgress();
-  // Update row styling
   const done = p && p[0]!==null && p[1]!==null;
-  const row = document.getElementById('simRow_'+k);
+  const row = document.getElementById(`simRow_${k}`);
   if(row) row.classList.toggle('done', done);
-  ['0','1'].forEach(s => { const inp=document.getElementById('si_'+k+'_'+s); if(inp)inp.classList.toggle('filled',done); });
+  ['0','1'].forEach(s => { const inp=document.getElementById(`si_${k}_${s}`); if(inp) inp.classList.toggle('filled',done); });
   // Refresh standings preview
   if(g === currentSimGroup){
     const sv = document.querySelector('.sim-standings-preview');
-    if(sv){
-      const ns = simStandings(g);
-      sv.innerHTML = '<div style="font-family:'Barlow Condensed',sans-serif;font-size:var(--tx-xs);color:var(--tx3);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:6px;font-weight:700">Predicted Standings</div>'
-        + ns.map((t,i) =>
-          '<div class="sim-standings-row" style="'+(i<2?'color:var(--qualify)':i===2?'color:var(--third-c)':'color:var(--tx3)')+'">'
-          +'<span style="font-family:'Bebas Neue',sans-serif;font-size:var(--tx-md);min-width:16px">'+(i+1)+'</span>'
-          +'<span class="flag-em">'+t.f+'</span>'
-          +'<span style="font-weight:700;flex:1">'+t.name+'</span>'
-          +'<span style="font-family:'Bebas Neue',sans-serif;font-size:var(--tx-md);color:var(--gold)">'+t.p+'</span>'
-          +'<span style="color:var(--tx3);font-size:var(--tx-xs);margin-left:3px">pts</span>'
-          +'</div>'
-        ).join('');
-    }
+    if(sv) sv.outerHTML = simStandingsHTML(g);
   }
 }
 
@@ -5542,13 +5534,13 @@ function runSimulation(){
       +'<div class="sim-ko-team right '+(champion?.n===fin2.n?'win':champion?'lose':'')+'">'
       +'<span>'+fin2.n+'</span><span class="flag-em">'+fin2.f+'</span></div>'
     +'</div>'
-    +(champion ? '<div class="sim-champion-card">'
-      +'<div class="sim-champion-trophy">🏆</div>'
-      +'<div class="sim-champion-label">Your Predicted World Champion</div>'
-      +'<div class="sim-champion-flag">'+champion.f+'</div>'
-      +'<div class="sim-champion-name">'+champion.n+'</div>'
-      +'<div style="margin-top:var(--sp-3);font-family:'Barlow Condensed',sans-serif;font-size:var(--tx-sm);color:var(--tx3)">Based on your predicted group stage scores · FIFA rankings used as knockout tiebreaker</div>'
-      +'</div>' : '');
+    +(champion ? `<div class="sim-champion-card">
+      <div class="sim-champion-trophy">🏆</div>
+      <div class="sim-champion-label">Your Predicted World Champion</div>
+      <div class="sim-champion-flag">${champion.f}</div>
+      <div class="sim-champion-name">${champion.n}</div>
+      <div style="margin-top:var(--sp-3);font-family:'Barlow Condensed',sans-serif;font-size:var(--tx-sm);color:var(--tx3)">Based on your predicted group stage scores · FIFA rankings used as knockout tiebreaker</div>
+    </div>` : '');
 }
 
 // Score calculation — predicted vs actual
