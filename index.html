@@ -5317,31 +5317,37 @@ let currentSimGroup = 'A';
 function simUpdateProgress(){
   let filled = 0;
   Object.keys(G).forEach(g => FX[g].forEach((_,fi) => {
-    const p = ST.simPreds[g+'_'+fi];
-    if(p !== undefined && p[0] !== null && p[1] !== null) filled++;
+    const p = ST.simPreds[`${g}_${fi}`];
+    if(p && p[0] !== null && p[1] !== null) filled++;
   }));
-  const pct = Math.round((filled/72)*100);
-  const $id = id => document.getElementById(id);
-  if($id('simFilled')) $id('simFilled').textContent = filled;
-  if($id('simPct'))    $id('simPct').textContent = pct+'%';
-  if($id('simPctLabel')) $id('simPctLabel').textContent = filled+' / 72';
-  if($id('simProgFill')) $id('simProgFill').style.width = pct+'%';
-  const rb = $id('simRunBtn');
-  if(rb){ rb.style.opacity = filled>0?'1':'0.4'; rb.style.pointerEvents = filled>0?'all':'none'; rb.textContent = '🔮 Simulate ('+filled+'/72)'; }
-  // Tab completion dots
+  const pct = Math.round((filled / 72) * 100);
+  const el = id => document.getElementById(id);
+  if(el('simFilled'))    el('simFilled').textContent    = filled;
+  if(el('simPct'))       el('simPct').textContent       = pct + '%';
+  if(el('simPctLabel'))  el('simPctLabel').textContent  = filled + ' / 72';
+  if(el('simProgFill'))  el('simProgFill').style.width  = pct + '%';
+  const rb = el('simRunBtn');
+  if(rb){
+    rb.style.opacity      = filled > 0 ? '1' : '0.4';
+    rb.style.pointerEvents= filled > 0 ? 'all' : 'none';
+    rb.textContent        = '🔮 Simulate (' + filled + '/72)';
+  }
   Object.keys(G).forEach(g => {
-    const done = FX[g].every((_,fi) => { const p=ST.simPreds[g+'_'+fi]; return p&&p[0]!==null&&p[1]!==null; });
-    const dot = document.querySelector('#simTab_'+g+' .sim-tab-dot');
-    if(dot) dot.classList.toggle('show', done);
+    const done = FX[g].every((_,fi) => {
+      const p = ST.simPreds[`${g}_${fi}`];
+      return p && p[0] !== null && p[1] !== null;
+    });
+    const dot = document.getElementById('simTabDot_' + g);
+    if(dot) dot.className = 'sim-tab-dot' + (done ? ' show' : '');
   });
 }
 
 function simShowView(view){
   ['Predict','Simulate','Score'].forEach(v => {
-    const el = document.getElementById('simView'+v);
-    if(el) el.style.display = v.toLowerCase()===view ? '' : 'none';
-    const btn = document.getElementById('simBtn'+v);
-    if(btn) btn.className = v.toLowerCase()===view ? 'btn sm' : 'btn secondary sm';
+    const el  = document.getElementById('simView' + v);
+    const btn = document.getElementById('simBtn' + v);
+    if(el)  el.style.display = (v.toLowerCase() === view) ? '' : 'none';
+    if(btn) btn.className    = (v.toLowerCase() === view) ? 'btn sm' : 'btn secondary sm';
   });
   if(view === 'simulate') runSimulation();
   if(view === 'score')    renderSimScore();
@@ -5352,57 +5358,27 @@ function renderSimTabs(){
   const el = document.getElementById('simGroupTabs');
   if(!el) return;
   el.innerHTML = Object.keys(G).map(g => {
-    const done = FX[g].every((_,fi) => { const p=ST.simPreds[g+'_'+fi]; return p&&p[0]!==null&&p[1]!==null; });
-    return '<button class="sim-tab '+(g===currentSimGroup?'active':'')+'" id="simTab_'+g+'" onclick="switchSimGroup(\'' + g + '\')" role="tab">'
-      +'Grp '+g+'<span class="sim-tab-dot '+(done?'show':'')+'"></span></button>';
+    const done = FX[g].every((_,fi) => {
+      const p = ST.simPreds[`${g}_${fi}`];
+      return p && p[0] !== null && p[1] !== null;
+    });
+    const activeClass = g === currentSimGroup ? ' active' : '';
+    const dotClass    = done ? ' show' : '';
+    return `<button class="sim-tab${activeClass}" id="simTab_${g}" onclick="switchSimGroup(event)" data-g="${g}" role="tab"><span>Grp ${g}</span><span class="sim-tab-dot${dotClass}" id="simTabDot_${g}"></span></button>`;
   }).join('');
 }
 
-function switchSimGroup(g){
-  currentSimGroup = g;
+function switchSimGroup(e){
+  currentSimGroup = e.currentTarget.dataset.g;
   renderSimTabs();
-  renderSimGroupContent(g);
-}
-
-function renderSimGroupContent(g){
-  const el = document.getElementById('simGroupContent');
-  if(!el) return;
-
-  const fixHTML = FX[g].map(([a,b,num,dt,venue],fi) => {
-    const k = `${g}_${fi}`;
-    const p = ST.simPreds[k];
-    const v1 = p&&p[0]!==null ? p[0] : '';
-    const v2 = p&&p[1]!==null ? p[1] : '';
-    const done = v1!==''&&v2!=='';
-    return `<div class="sim-fix-row ${done?'done':''}" id="simRow_${k}">
-      <div class="sim-team"><span class="flag-em">${G[g].f[a]}</span><span>${G[g].t[a]}</span></div>
-      <div class="sim-score-entry">
-        <input class="sim-inp ${done?'filled':''}" type="number" min="0" max="20" value="${v1}" placeholder="?" id="si_${k}_0"
-          onchange="saveSimPred('${g}',${fi},0,this.value)" aria-label="${G[g].t[a]} score">
-        <span class="sim-inp-sep">–</span>
-        <input class="sim-inp ${done?'filled':''}" type="number" min="0" max="20" value="${v2}" placeholder="?" id="si_${k}_1"
-          onchange="saveSimPred('${g}',${fi},1,this.value)" aria-label="${G[g].t[b]} score">
-      </div>
-      <div class="sim-team away"><span>${G[g].t[b]}</span><span class="flag-em">${G[g].f[b]}</span></div>
-    </div>`;
-  }).join('');
-
-  const filled = FX[g].filter((_,fi) => { const p=ST.simPreds[`${g}_${fi}`]; return p&&p[0]!==null&&p[1]!==null; }).length;
-  el.innerHTML = `<div class="group-card">
-    <div class="group-header">
-      <span class="group-letter">Group ${g}</span>
-      <span class="group-meta">${filled}/${FX[g].length} predicted</span>
-    </div>
-    ${fixHTML}
-    ${simStandingsHTML(g)}
-  </div>`;
+  renderSimGroupContent(currentSimGroup);
 }
 
 function simStandingsHTML(g){
   const s = simStandings(g);
-  const rows = s.map((t,i) => {
-    const col = i<2?'color:var(--qualify)':i===2?'color:var(--third-c)':'color:var(--tx3)';
-    return `<div class="sim-standings-row" style="${col}">
+  const rows = s.map((t, i) => {
+    const col = i < 2 ? 'var(--qualify)' : i === 2 ? 'var(--third-c)' : 'var(--tx3)';
+    return `<div class="sim-standings-row" style="color:${col}">
       <span style="font-family:'Bebas Neue',sans-serif;font-size:var(--tx-md);min-width:16px">${i+1}</span>
       <span class="flag-em">${t.f}</span>
       <span style="font-weight:700;flex:1">${t.name}</span>
@@ -5416,109 +5392,182 @@ function simStandingsHTML(g){
   </div>`;
 }
 
-function saveSimPred(g, fi, slot, val){
-  const k = `${g}_${fi}`;
+function renderSimGroupContent(g){
+  const el = document.getElementById('simGroupContent');
+  if(!el) return;
+  const filled = FX[g].filter((_,fi) => {
+    const p = ST.simPreds[`${g}_${fi}`];
+    return p && p[0] !== null && p[1] !== null;
+  }).length;
+
+  const fixRows = FX[g].map(([a, b, num, dt], fi) => {
+    const k    = `${g}_${fi}`;
+    const p    = ST.simPreds[k];
+    const v1   = (p && p[0] !== null) ? p[0] : '';
+    const v2   = (p && p[1] !== null) ? p[1] : '';
+    const done = v1 !== '' && v2 !== '';
+    return `<div class="sim-fix-row ${done ? 'done' : ''}" id="simRow_${k}">
+      <div class="sim-team">
+        <span class="flag-em">${G[g].f[a]}</span>
+        <span>${G[g].t[a]}</span>
+      </div>
+      <div class="sim-score-entry">
+        <input class="sim-inp ${done ? 'filled' : ''}" type="number" min="0" max="20"
+          value="${v1}" placeholder="?" id="si_${k}_0"
+          data-g="${g}" data-fi="${fi}" data-slot="0"
+          onchange="saveSimPred(this)"
+          aria-label="${G[g].t[a]} score">
+        <span class="sim-inp-sep">–</span>
+        <input class="sim-inp ${done ? 'filled' : ''}" type="number" min="0" max="20"
+          value="${v2}" placeholder="?" id="si_${k}_1"
+          data-g="${g}" data-fi="${fi}" data-slot="1"
+          onchange="saveSimPred(this)"
+          aria-label="${G[g].t[b]} score">
+      </div>
+      <div class="sim-team away">
+        <span>${G[g].t[b]}</span>
+        <span class="flag-em">${G[g].f[b]}</span>
+      </div>
+    </div>`;
+  }).join('');
+
+  el.innerHTML = `<div class="group-card">
+    <div class="group-header">
+      <span class="group-letter">Group ${g}</span>
+      <span class="group-meta">${filled}/${FX[g].length} predicted</span>
+    </div>
+    ${fixRows}
+    ${simStandingsHTML(g)}
+  </div>`;
+}
+
+function saveSimPred(inp){
+  const g    = inp.dataset.g;
+  const fi   = parseInt(inp.dataset.fi);
+  const slot = parseInt(inp.dataset.slot);
+  const val  = inp.value;
+  const k    = `${g}_${fi}`;
   if(!ST.simPreds[k]) ST.simPreds[k] = [null, null];
-  ST.simPreds[k][slot] = val==='' ? null : parseInt(val)||0;
-  const p = ST.simPreds[k];
-  if(p[0]===null && p[1]===null) delete ST.simPreds[k];
+  ST.simPreds[k][slot] = (val === '') ? null : (parseInt(val) || 0);
+  if(ST.simPreds[k][0] === null && ST.simPreds[k][1] === null) delete ST.simPreds[k];
   save();
   simUpdateProgress();
-  const done = p && p[0]!==null && p[1]!==null;
-  const row = document.getElementById(`simRow_${k}`);
+  const p    = ST.simPreds[k];
+  const done = !!(p && p[0] !== null && p[1] !== null);
+  const row  = document.getElementById('simRow_' + k);
   if(row) row.classList.toggle('done', done);
-  ['0','1'].forEach(s => { const inp=document.getElementById(`si_${k}_${s}`); if(inp) inp.classList.toggle('filled',done); });
-  // Refresh standings preview
+  const i0 = document.getElementById('si_' + k + '_0');
+  const i1 = document.getElementById('si_' + k + '_1');
+  if(i0) i0.classList.toggle('filled', done);
+  if(i1) i1.classList.toggle('filled', done);
   if(g === currentSimGroup){
     const sv = document.querySelector('.sim-standings-preview');
     if(sv) sv.outerHTML = simStandingsHTML(g);
   }
 }
 
-// Simulate standings from ST.simPreds (not ST.scores)
 function simStandings(g){
-  const t = G[g].t.map((name,i) => ({name, f:G[g].f[i], p:0, w:0, d:0, l:0, gf:0, ga:0, gd:0, mp:0, rank:rank(name)}));
-  FX[g].forEach(([a,b],fi) => {
-    const p = ST.simPreds[g+'_'+fi];
-    if(!p || p[0]===null || p[1]===null) return;
-    const sa=p[0], sb=p[1];
-    t[a].mp++; t[b].mp++; t[a].gf+=sa; t[a].ga+=sb; t[b].gf+=sb; t[b].ga+=sa;
-    if(sa>sb){t[a].p+=3;t[a].w++;t[b].l++;}
-    else if(sb>sa){t[b].p+=3;t[b].w++;t[a].l++;}
-    else{t[a].p++;t[b].p++;t[a].d++;t[b].d++;}
+  const t = G[g].t.map((name, i) => ({
+    name, f: G[g].f[i],
+    p:0, w:0, d:0, l:0, gf:0, ga:0, gd:0, mp:0,
+    rank: rank(name)
+  }));
+  FX[g].forEach(([a, b], fi) => {
+    const p = ST.simPreds[`${g}_${fi}`];
+    if(!p || p[0] === null || p[1] === null) return;
+    const sa = p[0], sb = p[1];
+    t[a].mp++; t[b].mp++;
+    t[a].gf += sa; t[a].ga += sb;
+    t[b].gf += sb; t[b].ga += sa;
+    if(sa > sb)     { t[a].p += 3; t[a].w++; t[b].l++; }
+    else if(sb > sa){ t[b].p += 3; t[b].w++; t[a].l++; }
+    else            { t[a].p++;    t[b].p++;  t[a].d++; t[b].d++; }
   });
-  t.forEach(x => x.gd=x.gf-x.ga);
-  return t.sort((a,b) => b.p-a.p||b.gd-a.gd||b.gf-a.gf||a.rank-b.rank);
+  t.forEach(x => x.gd = x.gf - x.ga);
+  return t.sort((a, b) => b.p - a.p || b.gd - a.gd || b.gf - a.gf || a.rank - b.rank);
 }
 
 function simAllGroupResults(){
   const r = {};
-  Object.keys(G).forEach(g => { const s=simStandings(g); r[g]={first:s[0],second:s[1],third:s[2]}; });
+  Object.keys(G).forEach(g => {
+    const s = simStandings(g);
+    r[g] = { first: s[0], second: s[1], third: s[2] };
+  });
   return r;
 }
 
 function simResolve(code, gr){
-  if(!code) return {n:'TBD', f:'⬜'};
-  if(code.startsWith('1')){ const g=code[1]; const t=gr[g]?.first; return t?{n:t.name,f:t.f}:{n:'1st '+g,f:'⬜'}; }
-  if(code.startsWith('2')){ const g=code[1]; const t=gr[g]?.second; return t?{n:t.name,f:t.f}:{n:'2nd '+g,f:'⬜'}; }
-  return {n:code, f:'⬜'};
+  if(!code) return { n:'TBD', f:'⬜' };
+  if(code.startsWith('1')){ const g=code[1]; const t=gr[g]?.first;  return t ? {n:t.name,f:t.f} : {n:'1st '+g,f:'⬜'}; }
+  if(code.startsWith('2')){ const g=code[1]; const t=gr[g]?.second; return t ? {n:t.name,f:t.f} : {n:'2nd '+g,f:'⬜'}; }
+  return { n:code, f:'⬜' };
 }
 
 function pickWinner(t1, t2){
-  if(t1.n==='TBD'||t2.n==='TBD') return null;
-  const r1=rank(t1.n)||99, r2=rank(t2.n)||99;
-  return r1<=r2 ? t1 : t2;
+  if(!t1 || !t2 || t1.n==='TBD' || t2.n==='TBD') return null;
+  return rank(t1.n) <= rank(t2.n) ? t1 : t2;
 }
 
 function runSimulation(){
   const el = document.getElementById('simResults');
   if(!el) return;
-
   const gr = simAllGroupResults();
 
-  // Resolve all R32 pairings
   const r32 = R32.map(m => {
     const t1 = simResolve(m.t1k, gr);
     const t2 = simResolve(m.t2k, gr);
-    return {...m, t1, t2, winner: pickWinner(t1,t2)};
+    return { ...m, t1, t2, winner: pickWinner(t1, t2) };
   });
 
-  // Build subsequent rounds by pairing consecutive winners
-  function buildRound(prev, meta){
-    return prev.reduce((acc, _m, i, arr) => {
-      if(i%2!==0) return acc;
-      const w1 = arr[i].winner   || {n:'TBD',f:'⬜'};
-      const w2 = arr[i+1]?.winner || {n:'TBD',f:'⬜'};
-      const m  = meta[acc.length] || {m:0,v:'TBD',d:'TBD'};
-      acc.push({t1:w1, t2:w2, winner:pickWinner(w1,w2), m:m.m, v:m.v, d:m.d});
-      return acc;
-    }, []);
+  function nextRound(prev, meta){
+    const out = [];
+    for(let i = 0; i < prev.length; i += 2){
+      const w1 = prev[i].winner     || {n:'TBD',f:'⬜'};
+      const w2 = prev[i+1]?.winner  || {n:'TBD',f:'⬜'};
+      const m  = meta[out.length]   || {m:0,v:'TBD',d:'TBD'};
+      out.push({ t1:w1, t2:w2, winner: pickWinner(w1,w2), m:m.m, v:m.v, d:m.d });
+    }
+    return out;
   }
 
-  const r16 = buildRound(r32, R16);
-  const qf  = buildRound(r16, QF);
-  const sf  = buildRound(qf, SF);
+  const r16 = nextRound(r32, R16);
+  const qf  = nextRound(r16, QF);
+  const sf  = nextRound(qf,  SF);
 
   const fin1 = sf[0]?.winner || {n:'TBD',f:'⬜'};
   const fin2 = sf[1]?.winner || {n:'TBD',f:'⬜'};
-  const champion = pickWinner(fin1, fin2);
-  const third1 = sf[0] ? (sf[0].winner===sf[0].t1 ? sf[0].t2 : sf[0].t1) : {n:'TBD',f:'⬜'};
-  const third2 = sf[1] ? (sf[1].winner===sf[1].t1 ? sf[1].t2 : sf[1].t1) : {n:'TBD',f:'⬜'};
+  const champion   = pickWinner(fin1, fin2);
+  const third1 = sf[0] ? (sf[0].winner === sf[0].t1 ? sf[0].t2 : sf[0].t1) : {n:'TBD',f:'⬜'};
+  const third2 = sf[1] ? (sf[1].winner === sf[1].t1 ? sf[1].t2 : sf[1].t1) : {n:'TBD',f:'⬜'};
   const thirdPlace = pickWinner(third1, third2);
 
   function koSection(title, matches){
-    return '<div class="sim-ko-section"><div class="sim-ko-title">'+title+'</div>'
-      + matches.map(m =>
-          '<div class="sim-ko-row">'
-          +'<div class="sim-ko-team '+(m.winner?.n===m.t1.n?'win':m.winner?'lose':'')+'">'
-          +'<span class="flag-em">'+m.t1.f+'</span><span>'+m.t1.n+'</span></div>'
-          +'<div class="sim-ko-mid"><div class="sim-ko-vstext">vs</div><div class="sim-ko-venue">M'+m.m+' · '+m.v+'</div><div class="sim-ko-venue">'+m.d+'</div></div>'
-          +'<div class="sim-ko-team right '+(m.winner?.n===m.t2.n?'win':m.winner?'lose':'')+'">'
-          +'<span>'+m.t2.n+'</span><span class="flag-em">'+m.t2.f+'</span></div>'
-          +'</div>'
-        ).join('')
-      +'</div>';
+    const rows = matches.map(({t1,t2,winner,m,v,d}) => `
+      <div class="sim-ko-row">
+        <div class="sim-ko-team ${winner?.n===t1.n?'win':winner?'lose':''}">
+          <span class="flag-em">${t1.f}</span><span>${t1.n}</span>
+        </div>
+        <div class="sim-ko-mid">
+          <div class="sim-ko-vstext">M${m} · ${v}</div>
+          <div class="sim-ko-venue">${d}</div>
+        </div>
+        <div class="sim-ko-team right ${winner?.n===t2.n?'win':winner?'lose':''}">
+          <span>${t2.n}</span><span class="flag-em">${t2.f}</span>
+        </div>
+      </div>`).join('');
+    return `<div class="sim-ko-section"><div class="sim-ko-title">${title}</div>${rows}</div>`;
   }
+
+  const championCard = champion ? `
+    <div class="sim-champion-card">
+      <div class="sim-champion-trophy">🏆</div>
+      <div class="sim-champion-label">Your Predicted World Champion</div>
+      <div class="sim-champion-flag">${champion.f}</div>
+      <div class="sim-champion-name">${champion.n}</div>
+      <div style="margin-top:var(--sp-3);font-family:'Barlow Condensed',sans-serif;font-size:var(--tx-sm);color:var(--tx3)">
+        Based on your predicted group stage scores · FIFA ranking used as knockout tiebreaker
+      </div>
+    </div>` : '';
 
   el.innerHTML =
     koSection('⚡ Round of 32', r32) +
@@ -5526,75 +5575,88 @@ function runSimulation(){
     koSection('🔷 Quarter-Finals', qf) +
     koSection('🔶 Semi-Finals', sf) +
     koSection('🥉 3rd Place · Miami · Jul 18', [{t1:third1,t2:third2,winner:thirdPlace,m:103,v:'Miami',d:'Jul 18'}]) +
-    '<div class="sim-ko-title">🏆 Final · MetLife Stadium NJ · Jul 19</div>'
-    +'<div class="sim-ko-row" style="border:2px solid var(--gold);border-radius:var(--r-lg)">'
-      +'<div class="sim-ko-team '+(champion?.n===fin1.n?'win':champion?'lose':'')+'">'
-      +'<span class="flag-em">'+fin1.f+'</span><span>'+fin1.n+'</span></div>'
-      +'<div class="sim-ko-mid"><div class="sim-ko-vstext">FINAL</div><div class="sim-ko-venue">M104 · MetLife NJ</div></div>'
-      +'<div class="sim-ko-team right '+(champion?.n===fin2.n?'win':champion?'lose':'')+'">'
-      +'<span>'+fin2.n+'</span><span class="flag-em">'+fin2.f+'</span></div>'
-    +'</div>'
-    +(champion ? `<div class="sim-champion-card">
-      <div class="sim-champion-trophy">🏆</div>
-      <div class="sim-champion-label">Your Predicted World Champion</div>
-      <div class="sim-champion-flag">${champion.f}</div>
-      <div class="sim-champion-name">${champion.n}</div>
-      <div style="margin-top:var(--sp-3);font-family:'Barlow Condensed',sans-serif;font-size:var(--tx-sm);color:var(--tx3)">Based on your predicted group stage scores · FIFA rankings used as knockout tiebreaker</div>
-    </div>` : '');
+    `<div class="sim-ko-section">
+      <div class="sim-ko-title">🏆 Final · MetLife Stadium NJ · Jul 19</div>
+      <div class="sim-ko-row" style="border:2px solid var(--gold);border-radius:var(--r-lg)">
+        <div class="sim-ko-team ${champion?.n===fin1.n?'win':champion?'lose':''}">
+          <span class="flag-em">${fin1.f}</span><span>${fin1.n}</span>
+        </div>
+        <div class="sim-ko-mid">
+          <div class="sim-ko-vstext">M104 · MetLife NJ</div>
+          <div class="sim-ko-venue">Jul 19, 2026</div>
+        </div>
+        <div class="sim-ko-team right ${champion?.n===fin2.n?'win':champion?'lose':''}">
+          <span>${fin2.n}</span><span class="flag-em">${fin2.f}</span>
+        </div>
+      </div>
+    </div>` +
+    championCard;
 }
 
-// Score calculation — predicted vs actual
 function renderSimScore(){
   const tilesEl = document.getElementById('simScoreTiles');
   const rowsEl  = document.getElementById('simScoreRows');
-  if(!tilesEl||!rowsEl) return;
+  if(!tilesEl || !rowsEl) return;
 
-  let totalPts=0, exact=0, correct=0, wrong=0, pending=0;
+  let totalPts = 0, exact = 0, correct = 0, wrong = 0, pending = 0;
   const rows = [];
 
   Object.keys(G).forEach(g => {
-    FX[g].forEach(([a,b,num],fi) => {
-      const k = g+'_'+fi;
+    FX[g].forEach(([a, b], fi) => {
+      const k      = `${g}_${fi}`;
       const pred   = ST.simPreds[k];
       const actual = ST.scores[k];
-      if(!pred||pred[0]===null||pred[1]===null){ pending++; return; }
+      if(!pred || pred[0] === null || pred[1] === null){ pending++; return; }
       if(!actual){ pending++; return; }
-      const [ps1,ps2]=pred, [as1,as2]=actual;
-      let pts=0, cls='sim-pts0';
-      if(ps1===as1&&ps2===as2){       pts=3; exact++;   cls='sim-pts3'; }
-      else if((ps1>ps2&&as1>as2)||(ps1<ps2&&as1<as2)||(ps1===ps2&&as1===as2)){ pts=1; correct++; cls='sim-pts1'; }
-      else{ wrong++; }
-      totalPts+=pts;
-      rows.push('<div class="sim-result-row">'
-        +'<div><div class="sim-result-match"><span class="flag-em">'+G[g].f[a]+'</span> '+G[g].t[a]+' vs '+G[g].t[b]+' <span class="flag-em">'+G[g].f[b]+'</span></div>'
-        +'<div class="sim-result-pred">Predicted: '+ps1+'–'+ps2+'</div></div>'
-        +'<div class="sim-result-actual">'+as1+'–'+as2+'</div>'
-        +'<div class="sim-result-pts '+cls+'">'+(pts>0?'+':'')+pts+'</div>'
-        +'</div>');
+      const [ps1, ps2] = pred;
+      const [as1, as2] = actual;
+      let pts = 0, cls = 'sim-pts0';
+      if(ps1 === as1 && ps2 === as2){
+        pts = 3; exact++; cls = 'sim-pts3';
+      } else if((ps1 > ps2 && as1 > as2) || (ps1 < ps2 && as1 < as2) || (ps1 === ps2 && as1 === as2)){
+        pts = 1; correct++; cls = 'sim-pts1';
+      } else {
+        wrong++;
+      }
+      totalPts += pts;
+      rows.push(`<div class="sim-result-row">
+        <div>
+          <div class="sim-result-match">
+            <span class="flag-em">${G[g].f[a]}</span> ${G[g].t[a]} vs ${G[g].t[b]} <span class="flag-em">${G[g].f[b]}</span>
+          </div>
+          <div class="sim-result-pred">Your prediction: ${ps1}–${ps2}</div>
+        </div>
+        <div class="sim-result-actual">${as1}–${as2}</div>
+        <div class="sim-result-pts ${cls}">${pts > 0 ? '+' : ''}${pts}</div>
+      </div>`);
     });
   });
 
   const played = rows.length;
-  const pct = played>0 ? Math.round((totalPts/(played*3))*100) : 0;
+  const pct    = played > 0 ? Math.round((totalPts / (played * 3)) * 100) : 0;
+
   tilesEl.innerHTML = [
-    [totalPts,'Points'],
-    [pct+'%','Accuracy'],
-    [exact,'Exact Scores (3pts)'],
-    [correct,'Correct Results (1pt)'],
-    [wrong,'Wrong'],
-    [pending,'Pending'],
-  ].map(([v,l]) =>
-    '<div class="sim-score-tile"><div class="sim-score-tile-val">'+v+'</div><div class="sim-score-tile-lbl">'+l+'</div></div>'
-  ).join('');
+    [totalPts,   'Total Points'],
+    [pct + '%',  'Accuracy'],
+    [exact,      'Exact Scores (3pts)'],
+    [correct,    'Correct Results (1pt)'],
+    [wrong,      'Wrong'],
+    [pending,    'Pending'],
+  ].map(([v, l]) => `<div class="sim-score-tile"><div class="sim-score-tile-val">${v}</div><div class="sim-score-tile-lbl">${l}</div></div>`).join('');
 
   rowsEl.innerHTML = rows.length
     ? rows.join('')
-    : '<div class="empty-state"><div class="empty-icon">⏳</div><div class="empty-title">No Results Yet</div><div class="empty-sub">Enter actual results in the Groups tab to start scoring</div></div>';
+    : `<div class="empty-state">
+        <div class="empty-icon">⏳</div>
+        <div class="empty-title">No Results Yet</div>
+        <div class="empty-sub">Enter actual results in the Groups tab to start scoring</div>
+      </div>`;
 }
 
 function clearSimPreds(){
   if(!confirm('Clear all your tournament predictions?')) return;
-  ST.simPreds = {}; save();
+  ST.simPreds = {};
+  save();
   simUpdateProgress();
   renderSimTabs();
   renderSimGroupContent(currentSimGroup);
@@ -5608,6 +5670,7 @@ function initSimulator(){
   simUpdateProgress();
   simShowView('predict');
 }
+
 
 // ═══════════════════════════════════════════════════════
 // ═══════════════════════════════════════════════════════
