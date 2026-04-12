@@ -152,52 +152,28 @@ button, input, select { font-family: inherit; }
 }
 
 /* ═══════════════════════════════════════════════════
-   SPECTACULAR HEADER — animated, atmospheric
+   ATMOSPHERIC HEADER
    ═══════════════════════════════════════════════════ */
 header {
+  background: var(--bg2);
+  border-bottom: 1px solid var(--bdr-gold);
   position: sticky;
   top: 0;
   z-index: 300;
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  border-bottom: 1px solid var(--bdr-gold);
-  background: linear-gradient(180deg,
-    rgba(7,7,13,0.97) 0%,
-    rgba(13,13,22,0.95) 100%);
-  box-shadow: 0 1px 0 var(--bdr-gold),
-              0 8px 40px rgba(0,0,0,0.8),
-              0 0 120px rgba(240,180,41,0.04);
-  overflow: hidden;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  /* Enhancement 5: radial gold glow */
+  box-shadow: var(--sh-lg), inset 0 -1px 0 var(--bdr-gold);
 }
 
-/* Animated stadium arc behind header */
+/* Atmospheric gradient behind header */
 header::before {
   content: '';
   position: absolute;
-  bottom: -60px; left: 50%;
-  transform: translateX(-50%);
-  width: 140%; height: 120px;
-  background: radial-gradient(ellipse at 50% 100%,
-    rgba(240,180,41,0.07) 0%,
-    rgba(240,180,41,0.02) 40%,
-    transparent 70%);
+  top: -40px; right: -40px;
+  width: 300px; height: 200px;
+  background: radial-gradient(ellipse, rgba(240,180,41,0.08) 0%, transparent 70%);
   pointer-events: none;
-}
-/* Gold shimmer line */
-header::after {
-  content: '';
-  position: absolute;
-  bottom: 0; left: -100%;
-  width: 60%; height: 1px;
-  background: linear-gradient(90deg,
-    transparent 0%,
-    rgba(240,180,41,0.6) 50%,
-    transparent 100%);
-  animation: shimmer-line 4s ease-in-out infinite;
-}
-@keyframes shimmer-line {
-  0%   { left: -60%; }
-  100% { left: 160%; }
 }
 
 .header-inner {
@@ -214,39 +190,33 @@ header::after {
 .logo-area { display: flex; align-items: center; gap: var(--sp-3); flex-shrink: 0; }
 
 .wc-badge {
-  width: 48px; height: 48px;
-  background: linear-gradient(145deg, var(--gold-hi), var(--gold), #d4940a);
+  width: 44px; height: 44px;
+  background: linear-gradient(135deg, var(--gold-hi), var(--gold));
   border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
   font-family: 'Bebas Neue', sans-serif;
   font-size: 8px; color: #000;
   text-align: center; line-height: 1.2; letter-spacing: 0.3px;
-  box-shadow: 0 0 0 2px rgba(240,180,41,0.4),
-              0 0 30px rgba(240,180,41,0.4),
-              inset 0 1px 0 rgba(255,255,255,0.3);
+  box-shadow: 0 0 0 2px rgba(240,180,41,0.3), var(--sh-gold);
   flex-shrink: 0;
-  animation: badge-pulse 3s ease-in-out infinite;
+  animation: badge-pulse 4s ease-in-out infinite;
 }
 @keyframes badge-pulse {
-  0%,100% { box-shadow: 0 0 0 2px rgba(240,180,41,0.4), 0 0 30px rgba(240,180,41,0.3); }
-  50%      { box-shadow: 0 0 0 5px rgba(240,180,41,0.15), 0 0 50px rgba(240,180,41,0.5); }
+  0%,100% { box-shadow: 0 0 0 2px rgba(240,180,41,0.3), 0 0 20px rgba(240,180,41,0.2); }
+  50%      { box-shadow: 0 0 0 4px rgba(240,180,41,0.15), 0 0 36px rgba(240,180,41,0.35); }
 }
 
 .title-block h1 {
   font-family: 'Bebas Neue', sans-serif;
   font-size: var(--tx-xl);
-  background: linear-gradient(135deg,
-    #fff 0%,
-    var(--gold-hi) 30%,
-    var(--gold) 60%,
-    rgba(240,180,41,0.7) 100%);
+  /* Enhancement: gradient text */
+  background: linear-gradient(135deg, var(--gold-hi) 0%, var(--gold) 60%, rgba(240,180,41,0.7) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
   letter-spacing: 3px;
   line-height: 1;
   white-space: nowrap;
-  filter: drop-shadow(0 0 12px rgba(240,180,41,0.3));
 }
 .title-block p {
   font-family: 'Barlow Condensed', sans-serif;
@@ -613,15 +583,6 @@ main { max-width: var(--max-w); margin: 0 auto; padding: var(--sp-6) var(--sp-6)
 }
 
 /* ═══════════════════════════════════════════════════
-   GROUPS GRID — staggered reveal animations
-   ═══════════════════════════════════════════════════ */
-.groups-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
-  gap: var(--sp-5);
-}
-
-/* ═══════════════════════════════════════════════════
    FILTER BAR
    ═══════════════════════════════════════════════════ */
 .filter-bar {
@@ -665,391 +626,29 @@ main { max-width: var(--max-w); margin: 0 auto; padding: var(--sp-6) var(--sp-6)
 .ldot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
 
 /* ═══════════════════════════════════════════════════
-   SPECTACULAR GROUP CARDS
+   GROUPS GRID — staggered reveal animations
    ═══════════════════════════════════════════════════ */
-.group-card {
-  background: linear-gradient(160deg, var(--surf1) 0%, var(--surf2) 100%);
-  border: 1px solid var(--bdr);
-  border-radius: var(--r-md);
-  overflow: hidden;
-  opacity: 0;
-  animation: card-in 0.4s var(--ease-out) forwards;
-  transition: transform 0.2s var(--ease-out), box-shadow 0.2s, border-color 0.2s;
-  position: relative;
-}
-.group-card::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, var(--gold), transparent);
-  opacity: 0;
-  transition: opacity 0.3s;
-}
-.group-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 40px rgba(0,0,0,0.4), 0 0 0 1px var(--bdr-gold);
-  border-color: var(--bdr-gold);
-}
-.group-card:hover::before { opacity: 1; }
-.group-card.starred-card {
-  order: -1;
-  border-color: rgba(240,180,41,0.4);
-  background: linear-gradient(160deg, rgba(240,180,41,0.04) 0%, var(--surf2) 100%);
-}
-
-.group-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: var(--sp-3) var(--sp-4);
-  background: linear-gradient(90deg,
-    rgba(240,180,41,0.1) 0%,
-    rgba(240,180,41,0.04) 40%,
-    transparent 100%);
-  border-bottom: 1px solid var(--bdr);
-  position: relative;
-}
-
-.group-letter {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 1.5rem;
-  color: var(--gold);
-  letter-spacing: 3px;
-  text-shadow: 0 0 20px rgba(240,180,41,0.4);
-}
-
-/* ═══════════════════════════════════════════════════
-   LIVE TICKER — new feature
-   ═══════════════════════════════════════════════════ */
-.live-ticker {
-  background: linear-gradient(90deg, #0a0a14 0%, var(--surf1) 100%);
-  border-bottom: 1px solid var(--bdr);
-  height: 36px;
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  position: sticky;
-  top: calc(var(--nav-h) + var(--tab-h));
-  z-index: 180;
-}
-.ticker-label {
-  background: var(--danger);
-  color: #fff;
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: var(--tx-xs);
-  letter-spacing: 2px;
-  padding: 0 var(--sp-3);
-  height: 100%;
-  display: flex; align-items: center;
-  flex-shrink: 0;
-  white-space: nowrap;
-}
-.ticker-scroll {
-  flex: 1;
-  overflow: hidden;
-  position: relative;
-}
-.ticker-inner {
-  display: flex;
-  gap: var(--sp-8);
-  animation: ticker-scroll 30s linear infinite;
-  white-space: nowrap;
-}
-.ticker-inner:hover { animation-play-state: paused; }
-@keyframes ticker-scroll {
-  0%   { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
-}
-.ticker-item {
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: var(--tx-sm);
-  font-weight: 700;
-  color: var(--tx2);
-  display: flex; align-items: center; gap: var(--sp-2);
-  flex-shrink: 0;
-  cursor: pointer;
-  padding: 0 var(--sp-2);
-  transition: color 0.15s;
-}
-.ticker-item:hover { color: var(--gold); }
-.ticker-score {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: var(--tx-md);
-  color: var(--gold);
-  letter-spacing: 2px;
-}
-.ticker-sep {
-  color: var(--tx3);
-  opacity: 0.4;
-}
-
-/* ═══════════════════════════════════════════════════
-   TOURNAMENT TIMELINE — new feature
-   ═══════════════════════════════════════════════════ */
-.tournament-timeline {
-  margin-bottom: var(--sp-6);
-}
-.tl-phases {
-  display: flex;
-  align-items: center;
-  gap: 0;
-  position: relative;
-  padding: var(--sp-4) 0;
-}
-.tl-phase {
-  flex: 1;
-  text-align: center;
-  position: relative;
-}
-.tl-phase::after {
-  content: '';
-  position: absolute;
-  top: 50%; right: 0;
-  transform: translateY(-50%);
-  width: 100%;
-  height: 2px;
-  background: var(--bdr);
-  z-index: 0;
-}
-.tl-phase:last-child::after { display: none; }
-.tl-phase-dot {
-  width: 32px; height: 32px;
-  border-radius: 50%;
-  background: var(--surf3);
-  border: 2px solid var(--bdr);
-  display: flex; align-items: center; justify-content: center;
-  font-size: var(--tx-sm);
-  margin: 0 auto var(--sp-2);
-  position: relative;
-  z-index: 1;
-  transition: all 0.3s;
-}
-.tl-phase.active .tl-phase-dot {
-  background: var(--gold);
-  border-color: var(--gold);
-  color: #000;
-  box-shadow: 0 0 16px rgba(240,180,41,0.5);
-  animation: badge-pulse 2s ease-in-out infinite;
-}
-.tl-phase.complete .tl-phase-dot {
-  background: var(--qualify);
-  border-color: var(--qualify);
-  color: #000;
-}
-.tl-phase.complete::after { background: var(--qualify); }
-.tl-phase-label {
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: var(--tx-xs);
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  color: var(--tx3);
-}
-.tl-phase.active .tl-phase-label { color: var(--gold); }
-.tl-phase.complete .tl-phase-label { color: var(--qualify); }
-.tl-phase-date {
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: var(--tx-xs);
-  color: var(--tx3);
-  margin-top: 2px;
-}
-
-/* ═══════════════════════════════════════════════════
-   MATCH SCOREBOARD CARDS — spectacular upgrade
-   ═══════════════════════════════════════════════════ */
-.today-match-card {
-  flex-shrink: 0;
-  background: linear-gradient(160deg, var(--surf2) 0%, var(--surf3) 100%);
-  border: 1px solid var(--bdr);
-  border-radius: var(--r-md);
-  padding: var(--sp-4) var(--sp-4);
-  min-width: 220px;
-  cursor: pointer;
-  transition: all 0.2s var(--ease-out);
-  position: relative;
-  overflow: hidden;
-}
-.today-match-card::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(135deg,
-    rgba(240,180,41,0.05) 0%,
-    transparent 60%);
-  pointer-events: none;
-}
-.today-match-card:hover {
-  border-color: var(--bdr-gold);
-  transform: translateY(-3px) scale(1.02);
-  box-shadow: 0 8px 24px rgba(0,0,0,0.4), var(--sh-gold);
-}
-.today-match-card.has-score {
-  border-color: rgba(34,197,94,0.4);
-  background: linear-gradient(160deg, rgba(34,197,94,0.06) 0%, var(--surf3) 100%);
-}
-.today-match-card.next-up {
-  border-color: var(--bdr-gold);
-  box-shadow: var(--sh-gold), 0 0 0 1px var(--bdr-gold);
-}
-.tm-score {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 2rem;
-  color: var(--gold);
-  min-width: 28px;
-  text-align: center;
-  line-height: 1;
-  text-shadow: 0 0 16px rgba(240,180,41,0.4);
-}
-
-/* ═══════════════════════════════════════════════════
-   GROUP HERO BANNER — spectacular top-of-groups
-   ═══════════════════════════════════════════════════ */
-.groups-hero {
-  background: linear-gradient(135deg,
-    rgba(240,180,41,0.08) 0%,
-    transparent 50%,
-    rgba(59,130,246,0.04) 100%);
-  border: 1px solid var(--bdr-gold);
-  border-radius: var(--r-lg);
-  padding: var(--sp-5) var(--sp-6);
-  margin-bottom: var(--sp-5);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--sp-6);
-  flex-wrap: wrap;
-  position: relative;
-  overflow: hidden;
-}
-.groups-hero::before {
-  content: '';
-  position: absolute;
-  top: -30px; right: -30px;
-  width: 160px; height: 160px;
-  background: radial-gradient(circle, rgba(240,180,41,0.1) 0%, transparent 70%);
-  pointer-events: none;
-}
-.groups-hero-stat {
-  text-align: center;
-}
-.groups-hero-val {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 2.4rem;
-  color: var(--gold);
-  line-height: 1;
-  text-shadow: 0 0 20px rgba(240,180,41,0.3);
-}
-.groups-hero-lbl {
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: var(--tx-xs);
-  text-transform: uppercase;
-  letter-spacing: 2px;
-  color: var(--tx3);
-  font-weight: 700;
-  margin-top: 3px;
-}
-.groups-progress-bar {
-  flex: 1;
-  min-width: 200px;
-}
-.gp-track {
-  height: 8px;
-  background: var(--bdr);
-  border-radius: 4px;
-  overflow: hidden;
-  margin-top: var(--sp-2);
-}
-.gp-fill {
-  height: 100%;
-  background: linear-gradient(90deg, var(--gold), var(--qualify));
-  border-radius: 4px;
-  transition: width 1s var(--ease-out);
-}
-
-/* ═══════════════════════════════════════════════════
-   NATIONS COMPARE — new feature
-   ═══════════════════════════════════════════════════ */
-.compare-selector {
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
-  gap: var(--sp-4);
-  align-items: end;
-  margin-bottom: var(--sp-5);
-}
-.compare-panel {
-  background: var(--surf1);
-  border: 1px solid var(--bdr);
-  border-radius: var(--r-md);
-  padding: var(--sp-5);
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--sp-4);
-}
-.compare-nation {
-  text-align: center;
-  padding: var(--sp-4);
-  background: var(--bg3);
-  border-radius: var(--r-md);
-  border: 1px solid var(--bdr);
-}
-.compare-flag { margin-bottom: var(--sp-3); }
-.compare-name {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: var(--tx-lg);
-  color: var(--gold);
-  letter-spacing: 2px;
-  margin-bottom: var(--sp-2);
-}
-.compare-stat-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: var(--sp-2) var(--sp-3);
-  border-bottom: 1px solid var(--bdr);
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: var(--tx-sm);
-}
-.compare-stat-row:last-child { border-bottom: none; }
-.compare-stat-label { color: var(--tx3); }
-.compare-stat-val {
-  font-weight: 700;
-  color: var(--tx);
-}
-.compare-stat-val.better { color: var(--qualify); }
-.compare-stat-val.worse { color: var(--danger); }
-.compare-vs {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 2rem;
-  color: var(--tx3);
-  text-align: center;
-  align-self: center;
-}
-
-/* ═══════════════════════════════════════════════════
-   SECTION HERO BANNER — upgraded section headers
-   ═══════════════════════════════════════════════════ */
-.section-title {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: clamp(1.8rem, 4vw, 2.8rem);
-  color: var(--gold);
-  letter-spacing: 4px;
-  line-height: 1;
-  text-shadow: 0 0 30px rgba(240,180,41,0.25);
-}
-
-/* Scoreboard number animation */
-@keyframes score-pop {
-  0%   { transform: scale(1); }
-  40%  { transform: scale(1.3); color: #fff; }
-  100% { transform: scale(1); }
-}
-.score-num.animate { animation: score-pop 0.3s var(--ease-spring); }
+.groups-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
   gap: var(--sp-5);
 }
-/* Enhancement 1: stagger delays for group card reveal */
+.group-card {
+  background: var(--surf1);
+  border: 1px solid var(--bdr);
+  border-radius: var(--r-md);
+  overflow: hidden;
+  /* Enhancement 1: staggered reveal */
+  opacity: 0;
+  animation: card-in 0.4s var(--ease-out) forwards;
+  transition: transform 0.2s var(--ease-out), box-shadow 0.2s;
+}
+.group-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--sh-md);
+  border-color: var(--bdr2);
+}
+/* Enhancement 1: stagger delays */
 .group-card:nth-child(1)  { animation-delay: 0.03s; }
 .group-card:nth-child(2)  { animation-delay: 0.06s; }
 .group-card:nth-child(3)  { animation-delay: 0.09s; }
@@ -1065,6 +664,27 @@ main { max-width: var(--max-w); margin: 0 auto; padding: var(--sp-6) var(--sp-6)
 @keyframes card-in {
   from { opacity: 0; transform: translateY(14px); }
   to   { opacity: 1; transform: translateY(0); }
+}
+
+.group-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--sp-3) var(--sp-4);
+  background: linear-gradient(90deg, rgba(240,180,41,0.08) 0%, transparent 100%);
+  border-bottom: 1px solid var(--bdr);
+}
+.group-letter {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.4rem;
+  color: var(--gold);
+  letter-spacing: 2px;
+}
+.group-meta {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: var(--tx-xs);
+  color: var(--tx3);
+  letter-spacing: 1px;
 }
 
 /* Standings table — Enhancement 1: consistent scale */
@@ -1099,18 +719,6 @@ main { max-width: var(--max-w); margin: 0 auto; padding: var(--sp-6) var(--sp-6)
 
 .team-cell { display: flex; align-items: center; gap: 6px; white-space: nowrap; }
 .flag-em { font-size: 1rem; flex-shrink: 0; line-height: 1; }
-/* flagcdn.com image flags */
-.flag-img {
-  display: inline-block;
-  vertical-align: middle;
-  border-radius: 2px;
-  flex-shrink: 0;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.4);
-  object-fit: cover;
-}
-.flag-s { width: 20px; height: 15px; }
-.flag-m { width: 28px; height: 21px; }
-.flag-l { width: 40px; height: 30px; }
 .tname {
   font-family: 'Barlow Condensed', sans-serif;
   font-size: var(--tx-base);
@@ -3032,88 +2640,44 @@ main { max-width: var(--max-w); margin: 0 auto; padding: var(--sp-6) var(--sp-6)
 }
 
 /* ═══════════════════════════════════════════════════
+   PRINT
+   ═══════════════════════════════════════════════════ */
+
+/* ═══════════════════════════════════════════════════
    TOURNAMENT PREDICTOR
    ═══════════════════════════════════════════════════ */
-.predictor-tabs {
-  display: flex;
-  gap: 2px;
+.sim-group-tabs {
+  display: flex; gap: 2px;
   background: var(--bg3);
   border: 1px solid var(--bdr);
   border-radius: var(--r-md);
   padding: var(--sp-1);
-  margin-bottom: var(--sp-5);
+  margin-bottom: var(--sp-4);
   flex-wrap: wrap;
 }
-.pred-tab {
-  flex: 1;
-  min-width: 60px;
-  background: transparent;
-  border: none;
+.sim-tab {
+  flex: 1; min-width: 44px;
+  background: transparent; border: none;
   color: var(--tx3);
-  padding: var(--sp-2) var(--sp-3);
+  padding: var(--sp-2) var(--sp-2);
   border-radius: var(--r-sm);
   font-family: 'Bebas Neue', sans-serif;
-  font-size: var(--tx-sm);
-  letter-spacing: 1.5px;
-  cursor: pointer;
-  transition: all 0.15s;
-  white-space: nowrap;
-  text-align: center;
+  font-size: var(--tx-sm); letter-spacing: 1.5px;
+  cursor: pointer; transition: all 0.15s;
+  white-space: nowrap; text-align: center;
   position: relative;
 }
-.pred-tab:hover { color: var(--tx); background: var(--surf1); }
-.pred-tab.active { background: var(--gold); color: #000; }
-.pred-tab .pred-tab-done {
-  position: absolute;
-  top: 3px; right: 4px;
-  width: 6px; height: 6px;
-  background: var(--qualify);
-  border-radius: 50%;
+.sim-tab:hover { color: var(--tx); background: var(--surf1); }
+.sim-tab.active { background: var(--gold); color: #000; }
+.sim-tab-dot {
+  position: absolute; top: 3px; right: 3px;
+  width: 5px; height: 5px;
+  background: var(--qualify); border-radius: 50%;
   display: none;
 }
-.pred-tab .pred-tab-done.show { display: block; }
+.sim-tab-dot.show { display: block; }
 
-/* Group prediction grid */
-.pred-group-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--sp-5);
-}
-@media(max-width: 900px) { .pred-group-grid { grid-template-columns: 1fr; } }
-
-.pred-group-card {
-  background: var(--surf1);
-  border: 1px solid var(--bdr);
-  border-radius: var(--r-md);
-  overflow: hidden;
-  transition: border-color 0.2s;
-}
-.pred-group-card.complete { border-color: rgba(34,197,94,0.4); }
-
-.pred-group-header {
-  background: linear-gradient(90deg, rgba(240,180,41,0.1), transparent);
-  border-bottom: 1px solid var(--bdr);
-  padding: var(--sp-3) var(--sp-4);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-.pred-group-letter {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 1.3rem;
-  color: var(--gold);
-  letter-spacing: 2px;
-}
-.pred-group-count {
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: var(--tx-xs);
-  color: var(--tx3);
-  font-weight: 700;
-  letter-spacing: 1px;
-}
-
-/* Individual fixture prediction row */
-.pred-fix-row {
+.sim-fix-row {
   display: grid;
   grid-template-columns: 1fr auto 1fr;
   align-items: center;
@@ -3121,245 +2685,128 @@ main { max-width: var(--max-w); margin: 0 auto; padding: var(--sp-6) var(--sp-6)
   padding: var(--sp-3) var(--sp-4);
   border-bottom: 1px solid rgba(255,255,255,0.04);
   transition: background 0.1s;
+  min-height: 52px;
 }
-.pred-fix-row:last-child { border-bottom: none; }
-.pred-fix-row:hover { background: rgba(255,255,255,0.02); }
-.pred-fix-row.has-pred { background: rgba(240,180,41,0.03); }
+.sim-fix-row:last-child { border-bottom: none; }
+.sim-fix-row:hover { background: rgba(255,255,255,0.025); }
+.sim-fix-row.done { background: rgba(240,180,41,0.04); }
 
-.pred-team {
-  display: flex;
-  align-items: center;
-  gap: var(--sp-2);
+.sim-team {
+  display: flex; align-items: center; gap: var(--sp-2);
   font-family: 'Barlow Condensed', sans-serif;
-  font-size: var(--tx-sm);
-  font-weight: 700;
+  font-size: var(--tx-sm); font-weight: 700;
   overflow: hidden;
 }
-.pred-team.away { flex-direction: row-reverse; text-align: right; }
-.pred-team-name {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  max-width: 80px;
-}
+.sim-team.away { flex-direction: row-reverse; text-align: right; }
+.sim-team span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 80px; }
 
-.pred-score-entry {
-  display: flex;
-  align-items: center;
-  gap: var(--sp-1);
-  flex-shrink: 0;
-}
-.pred-score-inp {
-  width: 38px;
-  height: 38px;
-  background: var(--bg3);
-  border: 1px solid var(--bdr2);
-  color: var(--gold);
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 1.3rem;
-  text-align: center;
-  border-radius: var(--r-sm);
-  transition: border-color 0.15s, box-shadow 0.15s;
+.sim-score-entry { display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
+.sim-inp {
+  width: 40px; height: 40px;
+  background: var(--bg3); border: 1px solid var(--bdr2);
+  color: var(--gold); font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.3rem; text-align: center;
+  border-radius: var(--r-sm); transition: border-color 0.15s, box-shadow 0.15s;
   -moz-appearance: textfield;
 }
-.pred-score-inp::-webkit-inner-spin-button,
-.pred-score-inp::-webkit-outer-spin-button { -webkit-appearance: none; }
-.pred-score-inp:focus {
-  outline: none;
-  border-color: var(--gold);
-  box-shadow: 0 0 0 3px rgba(240,180,41,0.15);
-}
-.pred-score-inp.filled { border-color: rgba(240,180,41,0.4); }
-.pred-score-dash {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: var(--tx-md);
-  color: var(--tx3);
-  opacity: 0.4;
-}
+.sim-inp::-webkit-inner-spin-button,
+.sim-inp::-webkit-outer-spin-button { -webkit-appearance: none; }
+.sim-inp:focus { outline: none; border-color: var(--gold); box-shadow: 0 0 0 3px rgba(240,180,41,0.15); }
+.sim-inp.filled { border-color: rgba(240,180,41,0.4); }
+.sim-inp-sep { font-family: 'Bebas Neue', sans-serif; font-size: var(--tx-md); color: var(--tx3); opacity: 0.4; }
 
-/* Simulate results panel */
-.sim-phase-header {
-  background: linear-gradient(90deg, rgba(240,180,41,0.1), transparent);
-  border: 1px solid var(--bdr-gold);
-  border-radius: var(--r-md);
-  padding: var(--sp-4) var(--sp-5);
-  margin-bottom: var(--sp-4);
-  display: flex;
-  align-items: center;
-  gap: var(--sp-4);
-  flex-wrap: wrap;
-}
-.sim-phase-title {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: var(--tx-lg);
-  color: var(--gold);
-  letter-spacing: 2px;
-}
-.sim-phase-sub {
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: var(--tx-sm);
-  color: var(--tx3);
-}
-.sim-bracket-row {
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
-  align-items: center;
-  gap: var(--sp-4);
+.sim-standings-preview {
   padding: var(--sp-3) var(--sp-4);
-  background: var(--surf1);
-  border: 1px solid var(--bdr);
-  border-radius: var(--r-sm);
-  margin-bottom: var(--sp-2);
-  transition: border-color 0.15s;
+  border-top: 1px solid var(--bdr);
+  background: rgba(0,0,0,0.15);
 }
-.sim-bracket-row.winner-decided { border-color: rgba(240,180,41,0.3); }
-.sim-team-cell {
-  display: flex;
-  align-items: center;
-  gap: var(--sp-2);
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: var(--tx-base);
-  font-weight: 700;
+.sim-standings-row {
+  display: flex; align-items: center; gap: var(--sp-2);
+  padding: 3px 0;
+  font-family: 'Barlow Condensed', sans-serif; font-size: var(--tx-sm);
 }
-.sim-team-cell.right { flex-direction: row-reverse; text-align: right; }
-.sim-team-cell.winner { color: var(--gold); }
-.sim-team-cell.loser { opacity: 0.4; }
-.sim-score {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 1.3rem;
-  color: var(--gold);
-  text-align: center;
-  min-width: 48px;
-  letter-spacing: 3px;
-}
-.sim-score.tbd {
-  font-size: var(--tx-xs);
-  color: var(--tx3);
-  letter-spacing: 1px;
-  font-family: 'Barlow Condensed', sans-serif;
-}
-.sim-venue {
-  font-size: var(--tx-xs);
-  color: var(--tx3);
-  text-align: center;
-  font-family: 'Barlow Condensed', sans-serif;
-  letter-spacing: 0.5px;
-}
-.sim-section-divider {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: var(--tx-md);
-  color: var(--gold);
-  letter-spacing: 3px;
-  padding: var(--sp-4) 0 var(--sp-3);
-  display: flex;
-  align-items: center;
-  gap: var(--sp-3);
-}
-.sim-section-divider::after {
-  content: '';
-  flex: 1;
-  height: 1px;
-  background: var(--bdr-gold);
-}
-.sim-winner-card {
-  background: linear-gradient(135deg,
-    rgba(240,180,41,0.15) 0%,
-    rgba(240,180,41,0.05) 100%);
-  border: 2px solid var(--gold);
-  border-radius: var(--r-lg);
-  padding: var(--sp-8);
-  text-align: center;
-  margin-top: var(--sp-5);
-  position: relative;
-  overflow: hidden;
-}
-.sim-winner-card::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(ellipse at 50% 0%,
-    rgba(240,180,41,0.1) 0%, transparent 60%);
-  pointer-events: none;
-}
-.sim-winner-trophy { font-size: 4rem; margin-bottom: var(--sp-3); filter: drop-shadow(0 0 20px rgba(240,180,41,0.6)); animation: trophy-float 3s ease-in-out infinite; }
-.sim-winner-label { font-family: 'Barlow Condensed', sans-serif; font-size: var(--tx-sm); color: var(--tx3); letter-spacing: 3px; text-transform: uppercase; margin-bottom: var(--sp-2); }
-.sim-winner-name { font-family: 'Bebas Neue', sans-serif; font-size: 3rem; color: var(--gold); letter-spacing: 4px; text-shadow: 0 0 30px rgba(240,180,41,0.5); }
-.sim-winner-flag { margin: var(--sp-3) auto var(--sp-2); display: flex; justify-content: center; }
 
-/* Scoring summary */
-.score-summary-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-  gap: var(--sp-4);
+.sim-progress-bar {
+  background: var(--surf1); border: 1px solid var(--bdr);
+  border-radius: var(--r-md); padding: var(--sp-4) var(--sp-5);
   margin-bottom: var(--sp-5);
+  display: flex; align-items: center; gap: var(--sp-5); flex-wrap: wrap;
 }
-.score-summary-tile {
-  background: var(--surf1);
-  border: 1px solid var(--bdr);
-  border-radius: var(--r-md);
-  padding: var(--sp-5);
-  text-align: center;
+.sim-prog-stat { text-align: center; }
+.sim-prog-val { font-family: 'Bebas Neue', sans-serif; font-size: 1.6rem; color: var(--gold); line-height: 1; }
+.sim-prog-lbl { font-family: 'Barlow Condensed', sans-serif; font-size: var(--tx-xs); color: var(--tx3); text-transform: uppercase; letter-spacing: 1px; font-weight: 700; }
+.sim-prog-track-wrap { flex: 1; min-width: 180px; }
+.sim-prog-track { height: 6px; background: var(--bdr); border-radius: 3px; overflow: hidden; margin-top: var(--sp-2); }
+.sim-prog-fill { height: 100%; background: linear-gradient(90deg, var(--gold), var(--qualify)); border-radius: 3px; transition: width 0.5s var(--ease-out); }
+
+.sim-view-btns { display: flex; gap: var(--sp-2); margin-bottom: var(--sp-5); flex-wrap: wrap; }
+
+.sim-ko-section { margin-bottom: var(--sp-4); }
+.sim-ko-title {
+  font-family: 'Bebas Neue', sans-serif; font-size: var(--tx-md);
+  color: var(--gold); letter-spacing: 3px;
+  padding: var(--sp-3) 0 var(--sp-2);
+  display: flex; align-items: center; gap: var(--sp-3);
 }
-.score-summary-val {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 2.5rem;
-  color: var(--gold);
-  line-height: 1;
+.sim-ko-title::after { content: ''; flex: 1; height: 1px; background: var(--bdr-gold); }
+
+.sim-ko-row {
+  display: grid; grid-template-columns: 1fr auto 1fr;
+  align-items: center; gap: var(--sp-3);
+  padding: var(--sp-3) var(--sp-4);
+  background: var(--surf1); border: 1px solid var(--bdr);
+  border-radius: var(--r-sm); margin-bottom: var(--sp-2);
 }
-.score-summary-lbl {
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: var(--tx-xs);
-  color: var(--tx3);
-  text-transform: uppercase;
-  letter-spacing: 1.5px;
-  margin-top: var(--sp-1);
-  font-weight: 700;
+.sim-ko-team {
+  display: flex; align-items: center; gap: var(--sp-2);
+  font-family: 'Barlow Condensed', sans-serif; font-size: var(--tx-base); font-weight: 700;
 }
-.score-row {
-  display: grid;
-  grid-template-columns: 1fr auto auto;
-  align-items: center;
-  gap: var(--sp-4);
+.sim-ko-team.right { flex-direction: row-reverse; }
+.sim-ko-team.win { color: var(--gold); }
+.sim-ko-team.lose { opacity: 0.35; }
+.sim-ko-mid { text-align: center; }
+.sim-ko-vstext { font-family: 'Barlow Condensed', sans-serif; font-size: var(--tx-xs); color: var(--tx3); }
+.sim-ko-venue { font-size: var(--tx-xs); color: var(--tx3); font-family: 'Barlow Condensed', sans-serif; }
+
+.sim-champion-card {
+  background: linear-gradient(135deg, rgba(240,180,41,0.12), rgba(240,180,41,0.04));
+  border: 2px solid var(--gold); border-radius: var(--r-lg);
+  padding: var(--sp-8); text-align: center; margin-top: var(--sp-5);
+}
+.sim-champion-trophy { font-size: 3.5rem; margin-bottom: var(--sp-3); filter: drop-shadow(0 0 20px rgba(240,180,41,0.6)); animation: trophy-float 3s ease-in-out infinite; }
+.sim-champion-label { font-family: 'Barlow Condensed', sans-serif; font-size: var(--tx-xs); color: var(--tx3); letter-spacing: 3px; text-transform: uppercase; margin-bottom: var(--sp-2); }
+.sim-champion-name { font-family: 'Bebas Neue', sans-serif; font-size: 2.6rem; color: var(--gold); letter-spacing: 4px; text-shadow: 0 0 24px rgba(240,180,41,0.5); }
+.sim-champion-flag { font-size: 3rem; margin: var(--sp-2) 0; }
+
+.sim-score-tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px,1fr)); gap: var(--sp-3); margin-bottom: var(--sp-5); }
+.sim-score-tile { background: var(--surf1); border: 1px solid var(--bdr); border-radius: var(--r-md); padding: var(--sp-4); text-align: center; }
+.sim-score-tile-val { font-family: 'Bebas Neue', sans-serif; font-size: 2.2rem; color: var(--gold); line-height: 1; }
+.sim-score-tile-lbl { font-family: 'Barlow Condensed', sans-serif; font-size: var(--tx-xs); color: var(--tx3); text-transform: uppercase; letter-spacing: 1px; font-weight: 700; margin-top: 3px; }
+
+.sim-result-row {
+  display: grid; grid-template-columns: 1fr auto auto;
+  align-items: center; gap: var(--sp-4);
   padding: var(--sp-3) var(--sp-4);
   border-bottom: 1px solid rgba(255,255,255,0.04);
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: var(--tx-sm);
+  font-family: 'Barlow Condensed', sans-serif; font-size: var(--tx-sm);
 }
-.score-row:last-child { border-bottom: none; }
-.score-row-match { color: var(--tx2); }
-.score-row-pred { color: var(--tx3); font-size: var(--tx-xs); }
-.score-row-actual { font-weight: 700; }
-.score-row-pts {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: var(--tx-lg);
-  min-width: 32px;
-  text-align: right;
-}
-.pts-3 { color: var(--gold); }
-.pts-1 { color: var(--qualify); }
-.pts-0 { color: var(--tx3); }
+.sim-result-row:last-child { border-bottom: none; }
+.sim-result-match { color: var(--tx2); }
+.sim-result-pred { font-size: var(--tx-xs); color: var(--tx3); }
+.sim-result-actual { font-weight: 700; }
+.sim-result-pts { font-family: 'Bebas Neue', sans-serif; font-size: var(--tx-lg); min-width: 28px; text-align: right; }
+.sim-pts3 { color: var(--gold); }
+.sim-pts1 { color: var(--qualify); }
+.sim-pts0 { color: var(--tx3); }
 
-/* Progress indicator */
-.predictor-progress {
-  background: var(--surf1);
-  border: 1px solid var(--bdr);
-  border-radius: var(--r-md);
-  padding: var(--sp-4) var(--sp-5);
-  margin-bottom: var(--sp-5);
-  display: flex;
-  align-items: center;
-  gap: var(--sp-5);
-  flex-wrap: wrap;
+@media(max-width:768px) {
+  .sim-fix-row { grid-template-columns: 1fr auto 1fr; gap: var(--sp-2); padding: var(--sp-2) var(--sp-3); }
+  .sim-team span { max-width: 60px; }
+  .sim-inp { width: 36px; height: 36px; font-size: 1.1rem; }
+  .sim-ko-row { grid-template-columns: 1fr auto 1fr; gap: var(--sp-2); }
 }
-.pp-stat { text-align: center; }
-.pp-val { font-family: 'Bebas Neue', sans-serif; font-size: 1.6rem; color: var(--gold); line-height: 1; }
-.pp-lbl { font-family: 'Barlow Condensed', sans-serif; font-size: var(--tx-xs); color: var(--tx3); text-transform: uppercase; letter-spacing: 1px; font-weight: 700; }
-.pp-bar-wrap { flex: 1; min-width: 180px; }
-.pp-bar { height: 6px; background: var(--bdr); border-radius: 3px; overflow: hidden; margin-top: var(--sp-2); }
-.pp-fill { height: 100%; background: linear-gradient(90deg, var(--gold), var(--qualify)); border-radius: 3px; transition: width 0.5s var(--ease-out); }
-/* ═══════════════════════════════════════════════════
-   PRINT
-   ═══════════════════════════════════════════════════ */
+
+@media print {
   header, .nav-bar, .theme-panel, .toast, .overlay, .confetti-canvas { display: none !important; }
   body { background: #fff !important; color: #000 !important; }
   .section { display: block !important; }
@@ -3663,9 +3110,6 @@ input[type=number] { -moz-appearance: textfield; }
     <button class="nav-btn" onclick="showSection('goldenboot',this)" aria-label="Golden Boot">
       <span class="nb-icon">👟</span> Golden Boot
     </button>
-    <button class="nav-btn" onclick="showSection('simulate',this)" aria-label="Tournament Predictor">
-      <span class="nb-icon">🔮</span> Predictor
-    </button>
     <button class="nav-btn" onclick="showSection('predictions',this)" aria-label="AI Predictions">
       <span class="nb-icon">🤖</span> AI Predict
     </button>
@@ -3676,23 +3120,13 @@ input[type=number] { -moz-appearance: textfield; }
       </button>
       <div class="more-dropdown" id="moreDropdown" role="menu">
         <button class="more-item" onclick="showSection('fixtures',null);toggleMoreMenu()" role="menuitem"><span class="mi-icon">📅</span> All Fixtures</button>
-        <button class="more-item" onclick="showSection('compare',null);toggleMoreMenu()" role="menuitem"><span class="mi-icon">⚔️</span> Compare Nations</button>
+        <button class="more-item" onclick="showSection('simulate',null);toggleMoreMenu()" role="menuitem"><span class="mi-icon">🔮</span> Predictor</button>
         <button class="more-item" onclick="showSection('timeline',null);toggleMoreMenu()" role="menuitem"><span class="mi-icon">📋</span> Match Log</button>
         <button class="more-item" onclick="showSection('league',null);toggleMoreMenu()" role="menuitem"><span class="mi-icon">🏅</span> Pred League</button>
         <button class="more-item" onclick="showSection('squads',null);toggleMoreMenu()" role="menuitem"><span class="mi-icon">👥</span> Squads</button>
         <button class="more-item" onclick="showSection('fairplay',null);toggleMoreMenu()" role="menuitem"><span class="mi-icon">🟨</span> Fair Play</button>
         <button class="more-item" onclick="showSection('share',null);toggleMoreMenu()" role="menuitem"><span class="mi-icon">🔗</span> Share</button>
       </div>
-    </div>
-  </div>
-</div>
-
-<!-- Live results ticker -->
-<div class="live-ticker" id="liveTicker">
-  <div class="ticker-label">⚡ RESULTS</div>
-  <div class="ticker-scroll">
-    <div class="ticker-inner" id="tickerInner">
-      <span class="ticker-item" style="color:var(--tx3);font-family:'Barlow Condensed',sans-serif;font-size:var(--tx-xs)">Enter results to see them scroll here ·</span>
     </div>
   </div>
 </div>
@@ -3708,45 +3142,16 @@ input[type=number] { -moz-appearance: textfield; }
 
 <main>
 
-<!-- GROUPS — spectacular hero + timeline -->
+<!-- GROUPS — Enhancement 2: Today's Matches hero -->
 <section class="section active" id="sec-groups">
   <div id="todayHero"></div>
-
-  <!-- Tournament Phase Timeline -->
-  <div class="tournament-timeline" id="tournamentTimeline"></div>
-
-  <!-- Groups Hero Stats Banner -->
-  <div class="groups-hero" id="groupsHero">
-    <div class="groups-hero-stat">
-      <div class="groups-hero-val" id="heroMatches">0</div>
-      <div class="groups-hero-lbl">Matches Played</div>
-    </div>
-    <div class="groups-hero-stat">
-      <div class="groups-hero-val" id="heroGoals">0</div>
-      <div class="groups-hero-lbl">Goals Scored</div>
-    </div>
-    <div class="groups-hero-stat">
-      <div class="groups-hero-val" id="heroGPG">—</div>
-      <div class="groups-hero-lbl">Goals / Match</div>
-    </div>
-    <div class="groups-hero-stat">
-      <div class="groups-hero-val" id="heroRemaining">72</div>
-      <div class="groups-hero-lbl">Remaining</div>
-    </div>
-    <div class="groups-progress-bar">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
-        <span style="font-family:'Barlow Condensed',sans-serif;font-size:var(--tx-xs);color:var(--tx3);text-transform:uppercase;letter-spacing:1px;font-weight:700">Group Stage Progress</span>
-        <span class="pill gold" id="playedPill">0 / 72 played</span>
-      </div>
-      <div class="gp-track"><div class="gp-fill" id="groupsProgressFill" style="width:0%"></div></div>
-    </div>
-  </div>
-
-  <div class="section-header" style="margin-bottom:var(--sp-4)">
+  <div class="section-header">
     <div>
-      <div class="section-sub">12 groups · 72 fixtures · Click any fixture to enter result · All times <span id="tzLabelInline">BST</span></div>
+      <div class="section-title">Group Stage</div>
+      <div class="section-sub">72 fixtures · 12 groups · All kick-off times UTC · Click any fixture to enter result</div>
     </div>
     <div class="section-actions">
+      <span class="pill gold" id="playedPill">0 / 72 played</span>
       <button class="btn secondary sm" onclick="resetAllScores()">↺ Reset</button>
     </div>
   </div>
@@ -3886,99 +3291,60 @@ input[type=number] { -moz-appearance: textfield; }
   <div id="fixtureList"></div>
 </section>
 
-<!-- TOURNAMENT PREDICTOR — predict every game, simulate the whole tournament -->
+<!-- TOURNAMENT PREDICTOR -->
 <section class="section" id="sec-simulate">
   <div class="section-header">
     <div>
       <div class="section-title">Tournament Predictor</div>
-      <div class="section-sub">Predict every score · simulate the full knockout · compare vs reality after the tournament</div>
+      <div class="section-sub">Predict every score · simulate the full knockout · check your score after the tournament</div>
     </div>
     <div class="section-actions">
-      <button class="btn sm" onclick="simShowView('predict')" id="simBtnPredict">✏️ Enter Predictions</button>
-      <button class="btn secondary sm" onclick="simShowView('simulate')" id="simBtnSim">🔮 Simulate</button>
-      <button class="btn secondary sm" onclick="simShowView('score')" id="simBtnScore">🏅 My Score</button>
       <button class="btn ghost sm" onclick="clearSimPreds()">↺ Reset</button>
     </div>
   </div>
 
-  <!-- Progress bar -->
-  <div class="predictor-progress" id="simProgress">
-    <div class="pp-stat"><div class="pp-val" id="simFilled">0</div><div class="pp-lbl">Predicted</div></div>
-    <div class="pp-stat"><div class="pp-val" id="simTotal">72</div><div class="pp-lbl">Group Games</div></div>
-    <div class="pp-stat"><div class="pp-val" id="simPct">0%</div><div class="pp-lbl">Complete</div></div>
-    <div class="pp-bar-wrap">
+  <!-- Progress -->
+  <div class="sim-progress-bar">
+    <div class="sim-prog-stat"><div class="sim-prog-val" id="simFilled">0</div><div class="sim-prog-lbl">Predicted</div></div>
+    <div class="sim-prog-stat"><div class="sim-prog-val" id="simPct">0%</div><div class="sim-prog-lbl">Complete</div></div>
+    <div class="sim-prog-track-wrap">
       <div style="display:flex;justify-content:space-between;font-family:'Barlow Condensed',sans-serif;font-size:var(--tx-xs);color:var(--tx3);margin-bottom:4px;font-weight:700;letter-spacing:1px;text-transform:uppercase">
-        <span>Group stage progress</span>
-        <span id="simPctLabel">0 / 72</span>
+        <span>Group stage predictions</span><span id="simPctLabel">0 / 72</span>
       </div>
-      <div class="pp-bar"><div class="pp-fill" id="simProgressFill" style="width:0%"></div></div>
+      <div class="sim-prog-track"><div class="sim-prog-fill" id="simProgFill" style="width:0%"></div></div>
     </div>
-    <button class="btn sm" onclick="simShowView('simulate')" id="simRunBtn" style="opacity:0.4;pointer-events:none">🔮 Simulate Now</button>
+    <button class="btn sm" id="simRunBtn" style="opacity:0.4;pointer-events:none" onclick="simShowView('simulate')">🔮 Simulate</button>
   </div>
 
-  <!-- PREDICT VIEW — group tabs + score inputs -->
+  <!-- View switcher -->
+  <div class="sim-view-btns">
+    <button class="btn sm" id="simBtnPredict" onclick="simShowView('predict')">✏️ Enter Predictions</button>
+    <button class="btn secondary sm" id="simBtnSimulate" onclick="simShowView('simulate')">🔮 Simulate Tournament</button>
+    <button class="btn secondary sm" id="simBtnScore" onclick="simShowView('score')">🏅 My Score</button>
+  </div>
+
+  <!-- PREDICT -->
   <div id="simViewPredict">
-    <div class="predictor-tabs" id="simGroupTabs" role="tablist"></div>
+    <div class="sim-group-tabs" id="simGroupTabs" role="tablist"></div>
     <div id="simGroupContent"></div>
   </div>
 
-  <!-- SIMULATE VIEW — full knockout bracket from predictions -->
+  <!-- SIMULATE -->
   <div id="simViewSimulate" style="display:none">
-    <div class="sim-phase-header">
-      <div>
-        <div class="sim-phase-title">🔮 Simulated Tournament</div>
-        <div class="sim-phase-sub">Based on your predicted group stage scores · Winners progress to knockout</div>
-      </div>
-      <button class="btn sm" onclick="runSimulation()">↺ Re-Simulate</button>
+    <div class="hero-bar" style="margin-bottom:var(--sp-4)">
+      <div><h2 style="font-family:'Bebas Neue',sans-serif;font-size:1.4rem;color:var(--gold);letter-spacing:2px">Simulated Bracket</h2><p style="font-size:var(--tx-xs);color:var(--tx3)">Based on your predictions · FIFA ranking used as knockout tiebreaker</p></div>
+      <button class="btn sm" onclick="runSimulation()">↺ Re-run</button>
     </div>
     <div id="simResults"></div>
   </div>
 
-  <!-- SCORE VIEW — compare predictions vs actual results -->
+  <!-- SCORE -->
   <div id="simViewScore" style="display:none">
-    <div class="sim-phase-header">
-      <div>
-        <div class="sim-phase-title">🏅 Your Score</div>
-        <div class="sim-phase-sub">3pts exact score · 1pt correct result · Compare your predictions to what actually happened</div>
-      </div>
+    <div class="hero-bar" style="margin-bottom:var(--sp-4)">
+      <div><h2 style="font-family:'Bebas Neue',sans-serif;font-size:1.4rem;color:var(--gold);letter-spacing:2px">Your Score</h2><p style="font-size:var(--tx-xs);color:var(--tx3)">3pts exact score · 1pt correct result · updates as real results are entered</p></div>
     </div>
-    <div class="score-summary-grid" id="simScoreSummary"></div>
-    <div class="card" id="simScoreDetail">
-      <div class="card-header"><span class="card-title">📋 Match by Match</span></div>
-      <div id="simScoreRows" style="max-height:600px;overflow-y:auto"></div>
-    </div>
-  </div>
-</section>
-
-<!-- COMPARE NATIONS — new feature -->
-<section class="section" id="sec-compare">
-  <div class="section-header">
-    <div>
-      <div class="section-title">Compare Nations</div>
-      <div class="section-sub">Head-to-head stats · FIFA ranking · Group performance</div>
-    </div>
-  </div>
-  <div class="compare-selector">
-    <div>
-      <div class="form-label" style="margin-bottom:var(--sp-2)">Nation 1</div>
-      <select class="inp" id="compareA" onchange="renderCompare()">
-        <option value="">— Select team —</option>
-      </select>
-    </div>
-    <div class="compare-vs">VS</div>
-    <div>
-      <div class="form-label" style="margin-bottom:var(--sp-2)">Nation 2</div>
-      <select class="inp" id="compareB" onchange="renderCompare()">
-        <option value="">— Select team —</option>
-      </select>
-    </div>
-  </div>
-  <div id="comparePanel">
-    <div class="empty-state">
-      <div class="empty-icon">⚔️</div>
-      <div class="empty-title">Select Two Nations</div>
-      <div class="empty-sub">Compare any two teams head-to-head — rankings, group form, goals and more</div>
-    </div>
+    <div class="sim-score-tiles" id="simScoreTiles"></div>
+    <div class="card"><div class="card-header"><span class="card-title">📋 Match by Match</span></div><div id="simScoreRows" style="max-height:600px;overflow-y:auto"></div></div>
   </div>
 </section>
 
@@ -4091,9 +3457,9 @@ input[type=number] { -moz-appearance: textfield; }
     <div class="modal-title" id="modalTitle">Enter Result</div>
     <div class="modal-sub" id="modalSub">Match details</div>
     <div class="modal-teams">
-      <div class="modal-team"><span class="m-flag" id="mFlag1"></span><div class="m-name" id="mName1">Team A</div></div>
+      <div class="modal-team"><span class="m-flag" id="mFlag1">🏳️</span><div class="m-name" id="mName1">Team A</div></div>
       <span class="m-vs">VS</span>
-      <div class="modal-team"><span class="m-flag" id="mFlag2"></span><div class="m-name" id="mName2">Team B</div></div>
+      <div class="modal-team"><span class="m-flag" id="mFlag2">🏳️</span><div class="m-name" id="mName2">Team B</div></div>
     </div>
     <!-- Enhancement 7: match context -->
     <div class="modal-context" id="modalContext" style="display:none">
@@ -4171,19 +3537,19 @@ input[type=number] { -moz-appearance: textfield; }
 // DATA — ALL FROM SPREADSHEET WCup_2026_4_0_en.xlsx
 // ═══════════════════════════════════════════════════════
 const G = {
-  A:{t:['Mexico','South Africa','Rep. of Korea','Czechia'],f:['mx','za','kr','cz']},
-  B:{t:['Canada','Bosnia-Herzegovina','Qatar','Switzerland'],f:['ca','ba','qa','ch']},
-  C:{t:['Brazil','Morocco','Haiti','Scotland'],f:['br','ma','ht','gb-sct']},
-  D:{t:['USA','Paraguay','Australia','Türkiye'],f:['us','py','au','tr']},
-  E:{t:['Germany','Curaçao','Ivory Coast','Ecuador'],f:['de','cw','ci','ec']},
-  F:{t:['Netherlands','Japan','Sweden','Tunisia'],f:['nl','jp','se','tn']},
-  G:{t:['Belgium','Egypt','IR Iran','New Zealand'],f:['be','eg','ir','nz']},
-  H:{t:['Spain','Cape Verde','Saudi Arabia','Uruguay'],f:['es','cv','sa','uy']},
-  I:{t:['France','Senegal','Iraq','Norway'],f:['fr','sn','iq','no']},
-  J:{t:['Argentina','Algeria','Austria','Jordan'],f:['ar','dz','at','jo']},
-  K:{t:['Portugal','DR Congo','Uzbekistan','Colombia'],f:['pt','cd','uz','co']},
-  L:{t:['England','Croatia','Ghana','Panama'],f:['gb-eng','hr','gh','pa']}
-}
+  A:{t:['Mexico','South Africa','Rep. of Korea','Czechia'],f:['🇲🇽','🇿🇦','🇰🇷','🇨🇿']},
+  B:{t:['Canada','Bosnia-Herzegovina','Qatar','Switzerland'],f:['🇨🇦','🇧🇦','🇶🇦','🇨🇭']},
+  C:{t:['Brazil','Morocco','Haiti','Scotland'],f:['🇧🇷','🇲🇦','🇭🇹','🏴󠁧󠁢󠁳󠁣󠁴󠁿']},
+  D:{t:['USA','Paraguay','Australia','Türkiye'],f:['🇺🇸','🇵🇾','🇦🇺','🇹🇷']},
+  E:{t:['Germany','Curaçao','Ivory Coast','Ecuador'],f:['🇩🇪','🇨🇼','🇨🇮','🇪🇨']},
+  F:{t:['Netherlands','Japan','Sweden','Tunisia'],f:['🇳🇱','🇯🇵','🇸🇪','🇹🇳']},
+  G:{t:['Belgium','Egypt','IR Iran','New Zealand'],f:['🇧🇪','🇪🇬','🇮🇷','🇳🇿']},
+  H:{t:['Spain','Cape Verde','Saudi Arabia','Uruguay'],f:['🇪🇸','🇨🇻','🇸🇦','🇺🇾']},
+  I:{t:['France','Senegal','Iraq','Norway'],f:['🇫🇷','🇸🇳','🇮🇶','🇳🇴']},
+  J:{t:['Argentina','Algeria','Austria','Jordan'],f:['🇦🇷','🇩🇿','🇦🇹','🇯🇴']},
+  K:{t:['Portugal','DR Congo','Uzbekistan','Colombia'],f:['🇵🇹','🇨🇩','🇺🇿','🇨🇴']},
+  L:{t:['England','Croatia','Ghana','Panama'],f:['🏴󠁧󠁢󠁥󠁮󠁧󠁿','🇭🇷','🇬🇭','🇵🇦']}
+};
 
 // All 72 group fixtures [t1, t2, matchNum, utcDatetime, venue]
 const FX = {
@@ -4250,22 +3616,22 @@ const ASSIGN_THIRD=[
 ];
 
 const SQUADS={
-  Argentina:{flag:'ar',group:'J',coach:'Lionel Scaloni',stars:['Lionel Messi','Julián Álvarez','Enzo Fernández'],p:[{n:'E. Martínez',pos:'GK',caps:52,club:'Aston Villa',e:'🧤'},{n:'C. Romero',pos:'DEF',caps:38,club:'Tottenham',e:'🛡️'},{n:'N. Otamendi',pos:'DEF',caps:112,club:'Benfica',e:'🛡️'},{n:'R. de Paul',pos:'MID',caps:71,club:'Atlético Madrid',e:'⚙️'},{n:'E. Fernández',pos:'MID',caps:38,club:'Chelsea',e:'⚙️'},{n:'A. Mac Allister',pos:'MID',caps:32,club:'Liverpool',e:'⚙️'},{n:'L. Messi',pos:'FWD',caps:185,club:'Inter Miami',e:'⚽'},{n:'J. Álvarez',pos:'FWD',caps:46,club:'Atlético Madrid',e:'⚽'},{n:'L. Martínez',pos:'FWD',caps:68,club:'Inter Milan',e:'⚽'}]},
-  France:{flag:'fr',group:'I',coach:'Didier Deschamps',stars:['Kylian Mbappé','Antoine Griezmann','Aurélien Tchouaméni'],p:[{n:'M. Maignan',pos:'GK',caps:27,club:'AC Milan',e:'🧤'},{n:'W. Saliba',pos:'DEF',caps:24,club:'Arsenal',e:'🛡️'},{n:'D. Upamecano',pos:'DEF',caps:37,club:'Bayern Munich',e:'🛡️'},{n:'A. Tchouaméni',pos:'MID',caps:40,club:'Real Madrid',e:'⚙️'},{n:'A. Griezmann',pos:'MID',caps:133,club:'Atlético Madrid',e:'⚙️'},{n:'K. Mbappé',pos:'FWD',caps:82,club:'Real Madrid',e:'⚽'},{n:'O. Dembélé',pos:'FWD',caps:54,club:'PSG',e:'⚽'},{n:'M. Thuram',pos:'FWD',caps:26,club:'Inter Milan',e:'⚽'}]},
-  England:{flag:'gb-eng',group:'L',coach:'Thomas Tuchel',stars:['Jude Bellingham','Harry Kane','Bukayo Saka'],p:[{n:'J. Pickford',pos:'GK',caps:72,club:'Everton',e:'🧤'},{n:'J. Stones',pos:'DEF',caps:73,club:'Man City',e:'🛡️'},{n:'T. Alexander-Arnold',pos:'DEF',caps:42,club:'Real Madrid',e:'🛡️'},{n:'D. Rice',pos:'MID',caps:52,club:'Arsenal',e:'⚙️'},{n:'J. Bellingham',pos:'MID',caps:46,club:'Real Madrid',e:'⚙️'},{n:'P. Foden',pos:'MID',caps:44,club:'Man City',e:'⚙️'},{n:'H. Kane',pos:'FWD',caps:97,club:'Bayern Munich',e:'⚽'},{n:'B. Saka',pos:'FWD',caps:46,club:'Arsenal',e:'⚽'},{n:'C. Palmer',pos:'MID',caps:12,club:'Chelsea',e:'⚙️'}]},
-  Brazil:{flag:'br',group:'C',coach:'Dorival Júnior',stars:['Vinicius Jr','Rodrygo','Bruno Guimarães'],p:[{n:'Alisson',pos:'GK',caps:72,club:'Liverpool',e:'🧤'},{n:'Marquinhos',pos:'DEF',caps:86,club:'PSG',e:'🛡️'},{n:'G. Magalhães',pos:'DEF',caps:26,club:'Arsenal',e:'🛡️'},{n:'Casemiro',pos:'MID',caps:72,club:'Man United',e:'⚙️'},{n:'B. Guimarães',pos:'MID',caps:42,club:'Newcastle',e:'⚙️'},{n:'Vinicius Jr',pos:'FWD',caps:46,club:'Real Madrid',e:'⚽'},{n:'Rodrygo',pos:'FWD',caps:34,club:'Real Madrid',e:'⚽'},{n:'Raphinha',pos:'FWD',caps:42,club:'Barcelona',e:'⚽'}]},
-  Spain:{flag:'es',group:'H',coach:'Luis de la Fuente',stars:['Lamine Yamal','Pedri','Rodri'],p:[{n:'U. Simón',pos:'GK',caps:36,club:'Athletic Club',e:'🧤'},{n:'D. Carvajal',pos:'DEF',caps:74,club:'Real Madrid',e:'🛡️'},{n:'A. Laporte',pos:'DEF',caps:52,club:'Al-Nassr',e:'🛡️'},{n:'Rodri',pos:'MID',caps:48,club:'Man City',e:'⚙️'},{n:'Pedri',pos:'MID',caps:38,club:'Barcelona',e:'⚙️'},{n:'L. Yamal',pos:'FWD',caps:18,club:'Barcelona',e:'⚽'},{n:'N. Williams',pos:'FWD',caps:20,club:'Athletic Club',e:'⚽'},{n:'Á. Morata',pos:'FWD',caps:72,club:'AC Milan',e:'⚽'}]},
-  Germany:{flag:'de',group:'E',coach:'Julian Nagelsmann',stars:['Florian Wirtz','Jamal Musiala','Kai Havertz'],p:[{n:'M. Neuer',pos:'GK',caps:121,club:'Bayern Munich',e:'🧤'},{n:'A. Rüdiger',pos:'DEF',caps:82,club:'Real Madrid',e:'🛡️'},{n:'J. Kimmich',pos:'DEF',caps:80,club:'Bayern Munich',e:'🛡️'},{n:'J. Musiala',pos:'MID',caps:42,club:'Bayern Munich',e:'⚙️'},{n:'F. Wirtz',pos:'FWD',caps:28,club:'Leverkusen',e:'⚽'},{n:'K. Havertz',pos:'FWD',caps:58,club:'Arsenal',e:'⚽'},{n:'T. Müller',pos:'FWD',caps:130,club:'Bayern Munich',e:'⚽'}]},
-  Portugal:{flag:'pt',group:'K',coach:'Roberto Martínez',stars:['Cristiano Ronaldo','Rafael Leão','Bruno Fernandes'],p:[{n:'D. Costa',pos:'GK',caps:24,club:'Porto',e:'🧤'},{n:'R. Dias',pos:'DEF',caps:62,club:'Man City',e:'🛡️'},{n:'J. Cancelo',pos:'DEF',caps:58,club:'Barcelona',e:'🛡️'},{n:'J. Palhinha',pos:'MID',caps:34,club:'Bayern Munich',e:'⚙️'},{n:'B. Fernandes',pos:'MID',caps:72,club:'Man United',e:'⚙️'},{n:'C. Ronaldo',pos:'FWD',caps:212,club:'Al-Nassr',e:'⚽'},{n:'R. Leão',pos:'FWD',caps:32,club:'AC Milan',e:'⚽'},{n:'G. Ramos',pos:'FWD',caps:18,club:'PSG',e:'⚽'}]},
-  Netherlands:{flag:'nl',group:'F',coach:'Ronald Koeman',stars:['Virgil van Dijk','Cody Gakpo','Xavi Simons'],p:[{n:'B. Verbruggen',pos:'GK',caps:14,club:'Brighton',e:'🧤'},{n:'V. van Dijk',pos:'DEF',caps:68,club:'Liverpool',e:'🛡️'},{n:'D. Dumfries',pos:'DEF',caps:52,club:'Inter Milan',e:'🛡️'},{n:'F. de Jong',pos:'MID',caps:62,club:'Barcelona',e:'⚙️'},{n:'X. Simons',pos:'MID',caps:22,club:'Leipzig',e:'⚙️'},{n:'C. Gakpo',pos:'FWD',caps:44,club:'Liverpool',e:'⚽'},{n:'M. Depay',pos:'FWD',caps:96,club:'Free',e:'⚽'}]},
-  Belgium:{flag:'be',group:'G',coach:'Domenico Tedesco',stars:['Kevin De Bruyne','Romelu Lukaku','Lois Openda'],p:[{n:'K. Casteels',pos:'GK',caps:38,club:'Al Qadsiah',e:'🧤'},{n:'J. Vertonghen',pos:'DEF',caps:146,club:'Anderlecht',e:'🛡️'},{n:'K. De Bruyne',pos:'MID',caps:106,club:'Man City',e:'⚙️'},{n:'Y. Tielemans',pos:'MID',caps:74,club:'Aston Villa',e:'⚙️'},{n:'L. Trossard',pos:'MID',caps:34,club:'Arsenal',e:'⚙️'},{n:'R. Lukaku',pos:'FWD',caps:112,club:'Napoli',e:'⚽'},{n:'L. Openda',pos:'FWD',caps:22,club:'Leipzig',e:'⚽'}]},
-  USA:{flag:'us',group:'D',coach:'Mauricio Pochettino',stars:['Christian Pulisic','Weston McKennie','Tyler Adams'],p:[{n:'M. Turner',pos:'GK',caps:38,club:'Crystal Palace',e:'🧤'},{n:'T. Ream',pos:'DEF',caps:56,club:'Fulham',e:'🛡️'},{n:'A. Robinson',pos:'DEF',caps:38,club:'Fulham',e:'🛡️'},{n:'T. Adams',pos:'MID',caps:42,club:'Bournemouth',e:'⚙️'},{n:'W. McKennie',pos:'MID',caps:58,club:'Juventus',e:'⚙️'},{n:'C. Pulisic',pos:'FWD',caps:72,club:'AC Milan',e:'⚽'},{n:'G. Reyna',pos:'MID',caps:24,club:'Nottm Forest',e:'⚙️'}]},
-  Sweden:{flag:'se',group:'F',coach:'Jon Dahl Tomasson',stars:['Viktor Gyökeres','Alexander Isak','Dejan Kulusevski'],p:[{n:'R. Olsen',pos:'GK',caps:62,club:'Roma',e:'🧤'},{n:'V. Lindelöf',pos:'DEF',caps:88,club:'Man United',e:'🛡️'},{n:'I. Hien',pos:'DEF',caps:28,club:'Atalanta',e:'🛡️'},{n:'E. Forsberg',pos:'MID',caps:100,club:'Leipzig',e:'⚙️'},{n:'D. Kulusevski',pos:'MID',caps:46,club:'Tottenham',e:'⚙️'},{n:'V. Gyökeres',pos:'FWD',caps:32,club:'Sporting CP',e:'⚽'},{n:'A. Isak',pos:'FWD',caps:38,club:'Newcastle',e:'⚽'}]},
-  'Bosnia-Herzegovina':{flag:'ba',group:'B',coach:'Sergej Barbarez',stars:['Haris Tabakovic','Amar Dedic','Ermedin Demirović'],p:[{n:'A. Šehić',pos:'GK',caps:58,club:'Kasımpaşa',e:'🧤'},{n:'A. Dedic',pos:'DEF',caps:22,club:'Salzburg',e:'🛡️'},{n:'D. Sunjić',pos:'MID',caps:46,club:'Fortuna D.',e:'⚙️'},{n:'E. Demirović',pos:'FWD',caps:34,club:'Stuttgart',e:'⚽'},{n:'H. Tabakovic',pos:'FWD',caps:26,club:'Hertha BSC',e:'⚽'},{n:'M. Džeko',pos:'FWD',caps:98,club:'Free',e:'⚽'}]},
-  'Türkiye':{flag:'tr',group:'D',coach:'Vincenzo Montella',stars:['Hakan Çalhanoğlu','Arda Güler','Kenan Yıldız'],p:[{n:'Mert Günok',pos:'GK',caps:28,club:'Beşiktaş',e:'🧤'},{n:'M. Demiral',pos:'DEF',caps:44,club:'Al-Qadsiah',e:'🛡️'},{n:'S. Soyuncu',pos:'DEF',caps:52,club:'Atlético Madrid',e:'🛡️'},{n:'H. Çalhanoğlu',pos:'MID',caps:80,club:'Inter Milan',e:'⚙️'},{n:'A. Güler',pos:'MID',caps:22,club:'Real Madrid',e:'⚙️'},{n:'K. Yıldız',pos:'FWD',caps:18,club:'Juventus',e:'⚽'},{n:'C. Akgün',pos:'FWD',caps:16,club:'Galatasaray',e:'⚽'}]},
-  Czechia:{flag:'cz',group:'A',coach:'Ivan Hašek',stars:['Tomáš Souček','Patrik Schick','Vladimír Coufal'],p:[{n:'J. Staněk',pos:'GK',caps:22,club:'Fiorentina',e:'🧤'},{n:'V. Coufal',pos:'DEF',caps:42,club:'West Ham',e:'🛡️'},{n:'T. Souček',pos:'MID',caps:68,club:'West Ham',e:'⚙️'},{n:'L. Provod',pos:'MID',caps:26,club:'Slavia Prague',e:'⚙️'},{n:'P. Schick',pos:'FWD',caps:56,club:'Leverkusen',e:'⚽'},{n:'A. Hložek',pos:'FWD',caps:24,club:'Leverkusen',e:'⚽'}]},
-  'DR Congo':{flag:'cd',group:'K',coach:'Sébastien Desabre',stars:['Chancel Mbemba','Yoane Wissa','Axel Tuanzebe'],p:[{n:'A. Mpasi',pos:'GK',caps:24,club:'AS V. Club',e:'🧤'},{n:'C. Mbemba',pos:'DEF',caps:62,club:'Marseille',e:'🛡️'},{n:'A. Tuanzebe',pos:'DEF',caps:12,club:'Ipswich',e:'🛡️'},{n:'D. Zakaria',pos:'MID',caps:28,club:'Chelsea',e:'⚙️'},{n:'Y. Wissa',pos:'FWD',caps:36,club:'Brentford',e:'⚽'},{n:'F. Batshuayi',pos:'FWD',caps:54,club:'Fenerbahçe',e:'⚽'}]},
-  Iraq:{flag:'iq',group:'I',coach:'Jesús Casas',stars:['Aymen Hussein','Amjed Attwan','Bashar Resan'],p:[{n:'J. Al-Habsi',pos:'GK',caps:38,club:'Al-Shorta',e:'🧤'},{n:'A. Attwan',pos:'DEF',caps:42,club:'Al-Zawraa',e:'🛡️'},{n:'A. Abbas',pos:'DEF',caps:36,club:'Al-Quwa',e:'🛡️'},{n:'B. Resan',pos:'MID',caps:44,club:'Al-Zawraa',e:'⚙️'},{n:'A. Hussein',pos:'FWD',caps:52,club:'Al-Zawraa',e:'⚽'},{n:'M. Al-Tamari',pos:'FWD',caps:28,club:'Stoke City',e:'⚽'}]}
+  Argentina:{flag:'🇦🇷',group:'J',coach:'Lionel Scaloni',stars:['Lionel Messi','Julián Álvarez','Enzo Fernández'],p:[{n:'E. Martínez',pos:'GK',caps:52,club:'Aston Villa',e:'🧤'},{n:'C. Romero',pos:'DEF',caps:38,club:'Tottenham',e:'🛡️'},{n:'N. Otamendi',pos:'DEF',caps:112,club:'Benfica',e:'🛡️'},{n:'R. de Paul',pos:'MID',caps:71,club:'Atlético Madrid',e:'⚙️'},{n:'E. Fernández',pos:'MID',caps:38,club:'Chelsea',e:'⚙️'},{n:'A. Mac Allister',pos:'MID',caps:32,club:'Liverpool',e:'⚙️'},{n:'L. Messi',pos:'FWD',caps:185,club:'Inter Miami',e:'⚽'},{n:'J. Álvarez',pos:'FWD',caps:46,club:'Atlético Madrid',e:'⚽'},{n:'L. Martínez',pos:'FWD',caps:68,club:'Inter Milan',e:'⚽'}]},
+  France:{flag:'🇫🇷',group:'I',coach:'Didier Deschamps',stars:['Kylian Mbappé','Antoine Griezmann','Aurélien Tchouaméni'],p:[{n:'M. Maignan',pos:'GK',caps:27,club:'AC Milan',e:'🧤'},{n:'W. Saliba',pos:'DEF',caps:24,club:'Arsenal',e:'🛡️'},{n:'D. Upamecano',pos:'DEF',caps:37,club:'Bayern Munich',e:'🛡️'},{n:'A. Tchouaméni',pos:'MID',caps:40,club:'Real Madrid',e:'⚙️'},{n:'A. Griezmann',pos:'MID',caps:133,club:'Atlético Madrid',e:'⚙️'},{n:'K. Mbappé',pos:'FWD',caps:82,club:'Real Madrid',e:'⚽'},{n:'O. Dembélé',pos:'FWD',caps:54,club:'PSG',e:'⚽'},{n:'M. Thuram',pos:'FWD',caps:26,club:'Inter Milan',e:'⚽'}]},
+  England:{flag:'🏴󠁧󠁢󠁥󠁮󠁧󠁿',group:'L',coach:'Thomas Tuchel',stars:['Jude Bellingham','Harry Kane','Bukayo Saka'],p:[{n:'J. Pickford',pos:'GK',caps:72,club:'Everton',e:'🧤'},{n:'J. Stones',pos:'DEF',caps:73,club:'Man City',e:'🛡️'},{n:'T. Alexander-Arnold',pos:'DEF',caps:42,club:'Real Madrid',e:'🛡️'},{n:'D. Rice',pos:'MID',caps:52,club:'Arsenal',e:'⚙️'},{n:'J. Bellingham',pos:'MID',caps:46,club:'Real Madrid',e:'⚙️'},{n:'P. Foden',pos:'MID',caps:44,club:'Man City',e:'⚙️'},{n:'H. Kane',pos:'FWD',caps:97,club:'Bayern Munich',e:'⚽'},{n:'B. Saka',pos:'FWD',caps:46,club:'Arsenal',e:'⚽'},{n:'C. Palmer',pos:'MID',caps:12,club:'Chelsea',e:'⚙️'}]},
+  Brazil:{flag:'🇧🇷',group:'C',coach:'Dorival Júnior',stars:['Vinicius Jr','Rodrygo','Bruno Guimarães'],p:[{n:'Alisson',pos:'GK',caps:72,club:'Liverpool',e:'🧤'},{n:'Marquinhos',pos:'DEF',caps:86,club:'PSG',e:'🛡️'},{n:'G. Magalhães',pos:'DEF',caps:26,club:'Arsenal',e:'🛡️'},{n:'Casemiro',pos:'MID',caps:72,club:'Man United',e:'⚙️'},{n:'B. Guimarães',pos:'MID',caps:42,club:'Newcastle',e:'⚙️'},{n:'Vinicius Jr',pos:'FWD',caps:46,club:'Real Madrid',e:'⚽'},{n:'Rodrygo',pos:'FWD',caps:34,club:'Real Madrid',e:'⚽'},{n:'Raphinha',pos:'FWD',caps:42,club:'Barcelona',e:'⚽'}]},
+  Spain:{flag:'🇪🇸',group:'H',coach:'Luis de la Fuente',stars:['Lamine Yamal','Pedri','Rodri'],p:[{n:'U. Simón',pos:'GK',caps:36,club:'Athletic Club',e:'🧤'},{n:'D. Carvajal',pos:'DEF',caps:74,club:'Real Madrid',e:'🛡️'},{n:'A. Laporte',pos:'DEF',caps:52,club:'Al-Nassr',e:'🛡️'},{n:'Rodri',pos:'MID',caps:48,club:'Man City',e:'⚙️'},{n:'Pedri',pos:'MID',caps:38,club:'Barcelona',e:'⚙️'},{n:'L. Yamal',pos:'FWD',caps:18,club:'Barcelona',e:'⚽'},{n:'N. Williams',pos:'FWD',caps:20,club:'Athletic Club',e:'⚽'},{n:'Á. Morata',pos:'FWD',caps:72,club:'AC Milan',e:'⚽'}]},
+  Germany:{flag:'🇩🇪',group:'E',coach:'Julian Nagelsmann',stars:['Florian Wirtz','Jamal Musiala','Kai Havertz'],p:[{n:'M. Neuer',pos:'GK',caps:121,club:'Bayern Munich',e:'🧤'},{n:'A. Rüdiger',pos:'DEF',caps:82,club:'Real Madrid',e:'🛡️'},{n:'J. Kimmich',pos:'DEF',caps:80,club:'Bayern Munich',e:'🛡️'},{n:'J. Musiala',pos:'MID',caps:42,club:'Bayern Munich',e:'⚙️'},{n:'F. Wirtz',pos:'FWD',caps:28,club:'Leverkusen',e:'⚽'},{n:'K. Havertz',pos:'FWD',caps:58,club:'Arsenal',e:'⚽'},{n:'T. Müller',pos:'FWD',caps:130,club:'Bayern Munich',e:'⚽'}]},
+  Portugal:{flag:'🇵🇹',group:'K',coach:'Roberto Martínez',stars:['Cristiano Ronaldo','Rafael Leão','Bruno Fernandes'],p:[{n:'D. Costa',pos:'GK',caps:24,club:'Porto',e:'🧤'},{n:'R. Dias',pos:'DEF',caps:62,club:'Man City',e:'🛡️'},{n:'J. Cancelo',pos:'DEF',caps:58,club:'Barcelona',e:'🛡️'},{n:'J. Palhinha',pos:'MID',caps:34,club:'Bayern Munich',e:'⚙️'},{n:'B. Fernandes',pos:'MID',caps:72,club:'Man United',e:'⚙️'},{n:'C. Ronaldo',pos:'FWD',caps:212,club:'Al-Nassr',e:'⚽'},{n:'R. Leão',pos:'FWD',caps:32,club:'AC Milan',e:'⚽'},{n:'G. Ramos',pos:'FWD',caps:18,club:'PSG',e:'⚽'}]},
+  Netherlands:{flag:'🇳🇱',group:'F',coach:'Ronald Koeman',stars:['Virgil van Dijk','Cody Gakpo','Xavi Simons'],p:[{n:'B. Verbruggen',pos:'GK',caps:14,club:'Brighton',e:'🧤'},{n:'V. van Dijk',pos:'DEF',caps:68,club:'Liverpool',e:'🛡️'},{n:'D. Dumfries',pos:'DEF',caps:52,club:'Inter Milan',e:'🛡️'},{n:'F. de Jong',pos:'MID',caps:62,club:'Barcelona',e:'⚙️'},{n:'X. Simons',pos:'MID',caps:22,club:'Leipzig',e:'⚙️'},{n:'C. Gakpo',pos:'FWD',caps:44,club:'Liverpool',e:'⚽'},{n:'M. Depay',pos:'FWD',caps:96,club:'Free',e:'⚽'}]},
+  Belgium:{flag:'🇧🇪',group:'G',coach:'Domenico Tedesco',stars:['Kevin De Bruyne','Romelu Lukaku','Lois Openda'],p:[{n:'K. Casteels',pos:'GK',caps:38,club:'Al Qadsiah',e:'🧤'},{n:'J. Vertonghen',pos:'DEF',caps:146,club:'Anderlecht',e:'🛡️'},{n:'K. De Bruyne',pos:'MID',caps:106,club:'Man City',e:'⚙️'},{n:'Y. Tielemans',pos:'MID',caps:74,club:'Aston Villa',e:'⚙️'},{n:'L. Trossard',pos:'MID',caps:34,club:'Arsenal',e:'⚙️'},{n:'R. Lukaku',pos:'FWD',caps:112,club:'Napoli',e:'⚽'},{n:'L. Openda',pos:'FWD',caps:22,club:'Leipzig',e:'⚽'}]},
+  USA:{flag:'🇺🇸',group:'D',coach:'Mauricio Pochettino',stars:['Christian Pulisic','Weston McKennie','Tyler Adams'],p:[{n:'M. Turner',pos:'GK',caps:38,club:'Crystal Palace',e:'🧤'},{n:'T. Ream',pos:'DEF',caps:56,club:'Fulham',e:'🛡️'},{n:'A. Robinson',pos:'DEF',caps:38,club:'Fulham',e:'🛡️'},{n:'T. Adams',pos:'MID',caps:42,club:'Bournemouth',e:'⚙️'},{n:'W. McKennie',pos:'MID',caps:58,club:'Juventus',e:'⚙️'},{n:'C. Pulisic',pos:'FWD',caps:72,club:'AC Milan',e:'⚽'},{n:'G. Reyna',pos:'MID',caps:24,club:'Nottm Forest',e:'⚙️'}]},
+  Sweden:{flag:'🇸🇪',group:'F',coach:'Jon Dahl Tomasson',stars:['Viktor Gyökeres','Alexander Isak','Dejan Kulusevski'],p:[{n:'R. Olsen',pos:'GK',caps:62,club:'Roma',e:'🧤'},{n:'V. Lindelöf',pos:'DEF',caps:88,club:'Man United',e:'🛡️'},{n:'I. Hien',pos:'DEF',caps:28,club:'Atalanta',e:'🛡️'},{n:'E. Forsberg',pos:'MID',caps:100,club:'Leipzig',e:'⚙️'},{n:'D. Kulusevski',pos:'MID',caps:46,club:'Tottenham',e:'⚙️'},{n:'V. Gyökeres',pos:'FWD',caps:32,club:'Sporting CP',e:'⚽'},{n:'A. Isak',pos:'FWD',caps:38,club:'Newcastle',e:'⚽'}]},
+  'Bosnia-Herzegovina':{flag:'🇧🇦',group:'B',coach:'Sergej Barbarez',stars:['Haris Tabakovic','Amar Dedic','Ermedin Demirović'],p:[{n:'A. Šehić',pos:'GK',caps:58,club:'Kasımpaşa',e:'🧤'},{n:'A. Dedic',pos:'DEF',caps:22,club:'Salzburg',e:'🛡️'},{n:'D. Sunjić',pos:'MID',caps:46,club:'Fortuna D.',e:'⚙️'},{n:'E. Demirović',pos:'FWD',caps:34,club:'Stuttgart',e:'⚽'},{n:'H. Tabakovic',pos:'FWD',caps:26,club:'Hertha BSC',e:'⚽'},{n:'M. Džeko',pos:'FWD',caps:98,club:'Free',e:'⚽'}]},
+  'Türkiye':{flag:'🇹🇷',group:'D',coach:'Vincenzo Montella',stars:['Hakan Çalhanoğlu','Arda Güler','Kenan Yıldız'],p:[{n:'Mert Günok',pos:'GK',caps:28,club:'Beşiktaş',e:'🧤'},{n:'M. Demiral',pos:'DEF',caps:44,club:'Al-Qadsiah',e:'🛡️'},{n:'S. Soyuncu',pos:'DEF',caps:52,club:'Atlético Madrid',e:'🛡️'},{n:'H. Çalhanoğlu',pos:'MID',caps:80,club:'Inter Milan',e:'⚙️'},{n:'A. Güler',pos:'MID',caps:22,club:'Real Madrid',e:'⚙️'},{n:'K. Yıldız',pos:'FWD',caps:18,club:'Juventus',e:'⚽'},{n:'C. Akgün',pos:'FWD',caps:16,club:'Galatasaray',e:'⚽'}]},
+  Czechia:{flag:'🇨🇿',group:'A',coach:'Ivan Hašek',stars:['Tomáš Souček','Patrik Schick','Vladimír Coufal'],p:[{n:'J. Staněk',pos:'GK',caps:22,club:'Fiorentina',e:'🧤'},{n:'V. Coufal',pos:'DEF',caps:42,club:'West Ham',e:'🛡️'},{n:'T. Souček',pos:'MID',caps:68,club:'West Ham',e:'⚙️'},{n:'L. Provod',pos:'MID',caps:26,club:'Slavia Prague',e:'⚙️'},{n:'P. Schick',pos:'FWD',caps:56,club:'Leverkusen',e:'⚽'},{n:'A. Hložek',pos:'FWD',caps:24,club:'Leverkusen',e:'⚽'}]},
+  'DR Congo':{flag:'🇨🇩',group:'K',coach:'Sébastien Desabre',stars:['Chancel Mbemba','Yoane Wissa','Axel Tuanzebe'],p:[{n:'A. Mpasi',pos:'GK',caps:24,club:'AS V. Club',e:'🧤'},{n:'C. Mbemba',pos:'DEF',caps:62,club:'Marseille',e:'🛡️'},{n:'A. Tuanzebe',pos:'DEF',caps:12,club:'Ipswich',e:'🛡️'},{n:'D. Zakaria',pos:'MID',caps:28,club:'Chelsea',e:'⚙️'},{n:'Y. Wissa',pos:'FWD',caps:36,club:'Brentford',e:'⚽'},{n:'F. Batshuayi',pos:'FWD',caps:54,club:'Fenerbahçe',e:'⚽'}]},
+  Iraq:{flag:'🇮🇶',group:'I',coach:'Jesús Casas',stars:['Aymen Hussein','Amjed Attwan','Bashar Resan'],p:[{n:'J. Al-Habsi',pos:'GK',caps:38,club:'Al-Shorta',e:'🧤'},{n:'A. Attwan',pos:'DEF',caps:42,club:'Al-Zawraa',e:'🛡️'},{n:'A. Abbas',pos:'DEF',caps:36,club:'Al-Quwa',e:'🛡️'},{n:'B. Resan',pos:'MID',caps:44,club:'Al-Zawraa',e:'⚙️'},{n:'A. Hussein',pos:'FWD',caps:52,club:'Al-Zawraa',e:'⚽'},{n:'M. Al-Tamari',pos:'FWD',caps:28,club:'Stoke City',e:'⚽'}]}
 };
 
 // ═══════════════════════════════════════════════════════
@@ -4283,8 +3649,7 @@ ST.theme = ST.theme||'dark';
 ST.notes = ST.notes||{};           // Enhancement 10: match notes
 ST.starredGroups = ST.starredGroups||[]; // Enhancement 3: favourites
 ST.tzOffset = ST.tzOffset!==undefined ? ST.tzOffset : 1; // Enhancement 2: BST default
-ST.simPreds = ST.simPreds||{};     // Tournament Predictor predicted scores
-ST.simChampion = ST.simChampion||null; // Simulated winner
+ST.simPreds = ST.simPreds||{};     // Tournament Predictor
 
 const save=()=>localStorage.setItem('wc26v4',JSON.stringify(ST));
 
@@ -4393,7 +3758,6 @@ function showSection(id,btn){
     dashboard:renderDashboard,
     share:updateShare,
     fixtures:()=>{renderFixtureList();renderTVGuide();},
-    compare:()=>{renderCompare();},
     simulate:()=>{initSimulator();},
   };
   if(renders[id])renders[id]();
@@ -4484,7 +3848,7 @@ function renderTodayHero(){
       <div class="tm-badge ${isNext?'next':''}">${isNext?'▶ Next Up':''} ${hasScore?'✓ Full Time':''}M${m.num} · Grp ${m.g}</div>
       <div class="tm-teams">
         <div class="tm-team">
-          <div class="tm-flag">${flag(G[m.g].f[m.a],"l")}</div>
+          <div class="tm-flag">${G[m.g].f[m.a]}</div>
           <div class="tm-name">${G[m.g].t[m.a]}</div>
         </div>
         <div class="tm-score-box">
@@ -4493,7 +3857,7 @@ function renderTodayHero(){
           <div class="tm-score">${hasScore?sb:'–'}</div>
         </div>
         <div class="tm-team">
-          <div class="tm-flag">${flag(G[m.g].f[m.b],"l")}</div>
+          <div class="tm-flag">${G[m.g].f[m.b]}</div>
           <div class="tm-name">${G[m.g].t[m.b]}</div>
         </div>
       </div>
@@ -4580,7 +3944,7 @@ function renderGroups(){
       const elimLabel=confirmedEliminated.has(t.name)&&groupComplete?`<span class="qualified-label" style="color:var(--danger)">OUT</span>`:'';
       h+=`<tr class="${rowCls}">
         <td><div class="pos-badge ${pc}">${i+1}</div></td>
-        <td class="tl"><div class="team-cell">${flag(t.f)}<span class="tname">${t.name}</span>${qualLabel}${elimLabel}</div></td>
+        <td class="tl"><div class="team-cell"><span class="flag-em">${t.f}</span><span class="tname">${t.name}</span>${qualLabel}${elimLabel}</div></td>
         <td class="num">${t.mp}</td><td class="num">${t.w}</td><td class="num">${t.d}</td><td class="num">${t.l}</td>
         <td class="num">${t.gf}</td><td class="num">${t.ga}</td>
         <td class="num ${gdCls}">${t.gd>0?'+':''}${t.gd}</td>
@@ -4601,13 +3965,13 @@ function renderGroups(){
       const localTime=fmtLocalTime(dt);
       const noteIcon=ST.notes[k]?`<span class="fixture-note-icon" title="${ST.notes[k]}">${ST.notes[k].charAt(0)}</span>`:'';
       h+=`<div class="fixture-row ${hs?'played':''}" onclick="openModal('${g}',${fi})">
-        <div class="fix-team">${flag(G[g].f[a])}<span>${G[g].t[a]}</span></div>
+        <div class="fix-team"><span class="flag-em" style="font-size:.85rem">${G[g].f[a]}</span><span>${G[g].t[a]}</span></div>
         <div class="score-box">
           <div class="score-num ${hs?'filled':'tbd'}">${hs?sa:'?'}</div>
           <span class="score-sep">:</span>
           <div class="score-num ${hs?'filled':'tbd'}">${hs?sb:'?'}</div>
         </div>
-        <div class="fix-team" style="flex-direction:row-reverse;text-align:right"><span>${G[g].t[b]}</span>${flag(G[g].f[b])}</div>
+        <div class="fix-team" style="flex-direction:row-reverse;text-align:right"><span>${G[g].t[b]}</span><span class="flag-em" style="font-size:.85rem">${G[g].f[b]}</span></div>
         <div class="fix-meta">${datePart}<br>${localTime} ${tzLabel()}<br><span style="font-size:.55rem;color:rgba(240,180,41,.35)">M${num} · ${venue}</span>${noteIcon}</div>
       </div>`;
     });
@@ -4642,8 +4006,6 @@ function renderGroups(){
 
   document.getElementById('playedPill').textContent=`${played} / 72 played`;
   renderTodayHero();
-  renderGroupsHero();
-  renderTicker();
 
   // Signal bracket needs update
   if(played>0){bracketDirty=true;document.getElementById('bracketDot').classList.add('show');}
@@ -4660,8 +4022,8 @@ function toggleH2H(btn){
 function openModal(g,fi){
   const[a,b,num,dt,venue]=FX[g][fi];
   mCtx={g,fi,type:'group'};
-  document.getElementById('mFlag1').innerHTML=flag(G[g].f[a],'l');
-  document.getElementById('mFlag2').innerHTML=flag(G[g].f[b],'l');
+  document.getElementById('mFlag1').textContent=G[g].f[a];
+  document.getElementById('mFlag2').textContent=G[g].f[b];
   document.getElementById('mName1').textContent=G[g].t[a];
   document.getElementById('mName2').textContent=G[g].t[b];
   const localTime=fmtLocalTime(dt);
@@ -4681,8 +4043,8 @@ function openModal(g,fi){
 }
 function openBracketModal(id,t1,t2,meta){
   mCtx={id,t1,t2,meta,type:'bracket'};
-  document.getElementById('mFlag1').innerHTML=flag(getFlag(t1)||'gb','l');
-  document.getElementById('mFlag2').innerHTML=flag(getFlag(t2)||'gb','l');
+  document.getElementById('mFlag1').textContent=getFlag(t1);
+  document.getElementById('mFlag2').textContent=getFlag(t2);
   document.getElementById('mName1').textContent=t1;
   document.getElementById('mName2').textContent=t2;
   document.getElementById('modalSub').textContent=meta;
@@ -4806,48 +4168,16 @@ function resolveTeam(code){
 }
 
 // Flag lookup by team name — covers all 48 teams + common bracket resolved names
-// FLAG_MAP: team name -> ISO 3166-1 alpha-2 code (for flagcdn.com)
-// Includes both G object teams + common alternative name spellings
-const FLAG_MAP_RAW = {
-  'Mexico':'mx','South Africa':'za','Rep. of Korea':'kr','Czechia':'cz',
-  'Canada':'ca','Bosnia-Herzegovina':'ba','Qatar':'qa','Switzerland':'ch',
-  'Brazil':'br','Morocco':'ma','Haiti':'ht','Scotland':'gb-sct',
-  'USA':'us','Paraguay':'py','Australia':'au','Türkiye':'tr',
-  'Germany':'de','Curaçao':'cw','Ivory Coast':'ci','Ecuador':'ec',
-  'Netherlands':'nl','Japan':'jp','Sweden':'se','Tunisia':'tn',
-  'Belgium':'be','Egypt':'eg','IR Iran':'ir','New Zealand':'nz',
-  'Spain':'es','Cape Verde':'cv','Saudi Arabia':'sa','Uruguay':'uy',
-  'France':'fr','Senegal':'sn','Iraq':'iq','Norway':'no',
-  'Argentina':'ar','Algeria':'dz','Austria':'at','Jordan':'jo',
-  'Portugal':'pt','DR Congo':'cd','Uzbekistan':'uz','Colombia':'co',
-  'England':'gb-eng','Croatia':'hr','Ghana':'gh','Panama':'pa',
-  // Alt spellings
-  'Turkey':'tr','Bosnia':'ba','Ivory Coast':'ci',"Cote d'Ivoire":'ci',
-  'Iran':'ir','South Korea':'kr','Korea Republic':'kr',
-  'United States':'us','Bosnia and Herzegovina':'ba',
-  'Democratic Republic of Congo':'cd','Congo DR':'cd',
-  'Cape Verde':'cv','Cabo Verde':'cv',
-};
 const FLAG_MAP = (()=>{
-  const m = {...FLAG_MAP_RAW};
-  // Also index by G object entries for lookup consistency
-  Object.keys(G).forEach(g=>G[g].t.forEach((t,i)=>{ if(!m[t]) m[t]=G[g].f[i]; }));
+  const m={};
+  Object.keys(G).forEach(g=>G[g].t.forEach((t,i)=>m[t]=G[g].f[i]));
+  // Extra entries for stored bracket team names
+  Object.values(SQUADS).forEach(s=>{ /* already in G */ });
   return m;
 })();
 function getFlag(name){
-  if(!name||name==='TBD')return null;
-  return FLAG_MAP[name]||FLAG_MAP[Object.keys(FLAG_MAP).find(k=>k.toLowerCase()===name.toLowerCase())]||null;
-}
-
-// flag(code, size) — flagcdn.com image flags, crisp on all devices
-// size: 's'=20x15, 'm'=28x21, 'l'=40x30
-function flag(code,size){
-  size=size||'s';
-  if(!code) return '<span style="display:inline-block;width:20px;height:14px;background:rgba(255,255,255,0.1);border-radius:2px;vertical-align:middle"></span>';
-  const dims={s:'20x15',m:'28x21',l:'40x30'};
-  const dims2x={s:'40x30',m:'56x42',l:'80x60'};
-  const w=dims[size].split('x')[0], h=dims[size].split('x')[1];
-  return `<img src="https://flagcdn.com/${dims[size]}/${code}.png" srcset="https://flagcdn.com/${dims2x[size]}/${code}.png 2x" width="${w}" height="${h}" alt="" class="flag-img flag-${size}" loading="lazy" onerror="this.style.display='none'">`;
+  if(!name||name==='TBD')return'⬜';
+  return FLAG_MAP[name]||FLAG_MAP[Object.keys(FLAG_MAP).find(k=>k.toLowerCase()===name.toLowerCase())]||'🏳️';
 }
 
 function bMatch(id,t1n,t2n,meta,num,isFinal=false){
@@ -4860,11 +4190,11 @@ function bMatch(id,t1n,t2n,meta,num,isFinal=false){
   return`<div class="b-match ${fc}" onclick="openBracketModal('${id}','${e1}','${e2}','${meta}')">
     <div class="b-match-num">M${num} · ${meta}</div>
     <div class="b-team ${w1?'win':''} ${w2&&!w1?'lose':''}">
-      <div class="b-tname">${flag(f1)}<span>${t1n}</span></div>
+      <div class="b-tname"><span style="font-size:.85rem">${f1}</span><span>${t1n}</span></div>
       <span class="b-score">${s1!==''?s1:''}</span>
     </div>
     <div class="b-team ${w2?'win':''} ${w1&&!w2?'lose':''}">
-      <div class="b-tname">${flag(f2)}<span>${t2n}</span></div>
+      <div class="b-tname"><span style="font-size:.85rem">${f2}</span><span>${t2n}</span></div>
       <span class="b-score">${s2!==''?s2:''}</span>
     </div>
   </div>`;
@@ -4879,11 +4209,11 @@ function bMatchResolved(id,t1k,t2k,meta,num){
   return`<div class="b-match" onclick="openBracketModal('${id}','${e1}','${e2}','${meta}')">
     <div class="b-match-num">M${num} · ${meta}</div>
     <div class="b-team ${w1?'win':''} ${w2&&!w1?'lose':''}">
-      <div class="b-tname">${flag(t1.f)}<span>${t1.n}</span></div>
+      <div class="b-tname"><span style="font-size:.85rem">${t1.f}</span><span>${t1.n}</span></div>
       <span class="b-score">${s1!==''?s1:''}</span>
     </div>
     <div class="b-team ${w2?'win':''} ${w1&&!w2?'lose':''}">
-      <div class="b-tname">${flag(t2.f)}<span>${t2.n}</span></div>
+      <div class="b-tname"><span style="font-size:.85rem">${t2.f}</span><span>${t2.n}</span></div>
       <span class="b-score">${s2!==''?s2:''}</span>
     </div>
   </div>`;
@@ -4905,7 +4235,7 @@ function renderBracket(){
     const top8=thirds.slice(0,8);
     tp.innerHTML=`<div class="third-panel">
       <div class="third-panel-title">🔵 Best 8 Third-Place Teams (${thirds.length} groups played)</div>
-      <div class="third-grid">${top8.map((t,i)=>`<div class="third-entry"><span class="third-rank">${i+1}</span>${flag(t.f)}<strong>${t.name}</strong><span style="color:var(--tx3);font-size:var(--tx-xs);margin-left:4px">Grp ${t.group} · ${t.p}pts · GD${t.gd>0?'+':''}${t.gd}</span></div>`).join('')}</div>
+      <div class="third-grid">${top8.map((t,i)=>`<div class="third-entry"><span class="third-rank">${i+1}</span><span class="flag-em">${t.f}</span><strong>${t.name}</strong><span style="color:var(--tx3);font-size:var(--tx-xs);margin-left:4px">Grp ${t.group} · ${t.p}pts · GD${t.gd>0?'+':''}${t.gd}</span></div>`).join('')}</div>
       <div style="margin-top:var(--sp-3);font-size:var(--tx-xs);color:var(--tx3);font-family:'Barlow Condensed',sans-serif">Ranked by FIFA algorithm: Pts × 1M + GD × 1K + GF − Fair Play × 0.001 − FIFA Rank × 0.000001</div>
     </div>`;
   } else tp.innerHTML='';
@@ -5131,9 +4461,9 @@ function renderAIResult(g,fi,pred){
   panel.innerHTML=`<div>
     <div style="font-family:'Bebas Neue',sans-serif;font-size:var(--tx-lg);color:var(--ai-c);letter-spacing:2px;margin-bottom:var(--sp-4)">🤖 AI Prediction</div>
     <div style="display:flex;align-items:center;justify-content:center;gap:var(--sp-5);margin-bottom:var(--sp-4)">
-      <div style="text-align:center"><span style="display:block;margin-bottom:4px">${flag(G[g].f[a],"m")}</span><div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:var(--tx-base)">${G[g].t[a]}</div><div style="font-size:var(--tx-xs);color:var(--tx3)">Watch: ${pred.watch1||'—'}</div></div>
+      <div style="text-align:center"><span style="font-size:2rem;display:block;margin-bottom:4px">${G[g].f[a]}</span><div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:var(--tx-base)">${G[g].t[a]}</div><div style="font-size:var(--tx-xs);color:var(--tx3)">Watch: ${pred.watch1||'—'}</div></div>
       <span style="font-family:'Bebas Neue',sans-serif;font-size:1.6rem;color:var(--tx3);opacity:0.4">VS</span>
-      <div style="text-align:center"><span style="display:block;margin-bottom:4px">${flag(G[g].f[b],"m")}</span><div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:var(--tx-base)">${G[g].t[b]}</div><div style="font-size:var(--tx-xs);color:var(--tx3)">Watch: ${pred.watch2||'—'}</div></div>
+      <div style="text-align:center"><span style="font-size:2rem;display:block;margin-bottom:4px">${G[g].f[b]}</span><div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:var(--tx-base)">${G[g].t[b]}</div><div style="font-size:var(--tx-xs);color:var(--tx3)">Watch: ${pred.watch2||'—'}</div></div>
     </div>
     <div class="ai-score-display">${pred.score||'?'}</div>
     <div class="conf-bar-wrap"><div class="conf-label"><span>${G[g].t[a]} Win</span><span>${pred.prob1||0}%</span></div><div class="conf-bar"><div class="conf-fill" style="width:${pred.prob1||0}%"></div></div></div>
@@ -5315,7 +4645,7 @@ function renderDashboard(){
       return`<div class="dash-group-mini" onclick="setGroupFilter('${g}',document.querySelector('#groupFilter .filter-chip:nth-child(${Object.keys(G).indexOf(g)+2})'));showSection('groups',null)">
         <div class="dash-grp-letter">Group ${g}</div>
         <div class="dash-leader">
-          ${flag(leader.f)}
+          <span class="flag-em">${leader.f}</span>
           <span class="dash-leader-name">${leader.name}</span>
           <span class="dash-pts">${leader.p}pt</span>
         </div>
@@ -5725,7 +5055,7 @@ function renderFixtureList() {
         <div class="fl-match-col">
           <div class="fl-teams">
             <div class="fl-team">
-              ${flag(m.f1)}
+              <span class="flag-em" style="font-size:1rem">${m.f1}</span>
               <span class="fl-team-name">${m.t1}</span>
             </div>
             <div class="fl-score-mid">
@@ -5735,7 +5065,7 @@ function renderFixtureList() {
               }
             </div>
             <div class="fl-team" style="flex-direction:row-reverse">
-              ${flag(m.f2)}
+              <span class="flag-em" style="font-size:1rem">${m.f2}</span>
               <span class="fl-team-name" style="text-align:right">${m.t2}</span>
             </div>
           </div>
@@ -5952,7 +5282,7 @@ function renderTVGuide(){
     const note=m.nation?` <span style="color:var(--qualify);font-weight:700">★</span>`:'';
     return`<div class="tv-guide-match" onclick="openModal('${m.g}',${m.fi})">
       <span class="tv-guide-time">${m.localTime}</span>
-      <span class="tv-guide-teams">${G[m.g].f[m.a]} ${G[m.g].t[m.a]} <span style="color:var(--tx3);font-weight:400">vs</span> ${G[m.g].t[m.b]} ${flag(G[m.g].f[m.b])}${note}</span>
+      <span class="tv-guide-teams">${G[m.g].f[m.a]} ${G[m.g].t[m.a]} <span style="color:var(--tx3);font-weight:400">vs</span> ${G[m.g].t[m.b]} ${G[m.g].f[m.b]}${note}</span>
     </div>`;
   }
   el.innerHTML=`<div class="tv-guide-bar">
@@ -5977,623 +5307,317 @@ function addNoteEmoji(emoji){
   inp.focus();
 }
 
-// ═══════════════════════════════════════════════════════
-// LIVE TICKER
-// ═══════════════════════════════════════════════════════
-function renderTicker(){
-  const ticker=document.getElementById('tickerInner');
-  if(!ticker)return;
-  const results=[];
-  Object.keys(G).forEach(g=>{
-    FX[g].forEach(([a,b,num,dt],fi)=>{
-      const k=`${g}_${fi}`;
-      if(ST.scores[k]===undefined)return;
-      const[sa,sb]=ST.scores[k];
-      const noteStr=ST.notes[k]?` ${ST.notes[k]}`:'';
-      results.push({g,fi,a,b,sa,sb,num,noteStr,dt});
-    });
-  });
-  if(results.length===0){
-    ticker.innerHTML=`<span class="ticker-item" style="color:var(--tx3)">Enter your first result to see it appear here · FIFA World Cup 2026 · Jun 11 – Jul 19 · USA · Canada · Mexico ·</span>`;
-    return;
-  }
-  // Sort by match number
-  results.sort((x,y)=>x.num-y.num);
-  // Duplicate for seamless loop
-  const itemsHTML=results.map(r=>{
-    const win1=r.sa>r.sb, win2=r.sb>r.sa;
-    const t1style=win1?'color:var(--gold);font-weight:700':'';
-    const t2style=win2?'color:var(--gold);font-weight:700':'';
-    return`<span class="ticker-item" onclick="openModal('${r.g}',${r.fi})">
-      <span style="${t1style}">${G[r.g].t[r.a]}</span>
-      <span class="ticker-score">${r.sa}–${r.sb}</span>
-      <span style="${t2style}">${G[r.g].t[r.b]}</span>
-      ${r.noteStr?`<span style="color:var(--ai-c)">${r.noteStr}</span>`:''}
-    </span><span class="ticker-sep">·</span>`;
-  }).join('');
-  // Duplicate for seamless scroll
-  ticker.innerHTML=itemsHTML+itemsHTML;
-  // Adjust animation speed based on content width
-  const spd=Math.max(20,results.length*4);
-  ticker.style.animationDuration=spd+'s';
-}
 
 // ═══════════════════════════════════════════════════════
-// TOURNAMENT TIMELINE
-// ═══════════════════════════════════════════════════════
-function renderTournamentTimeline(){
-  const el=document.getElementById('tournamentTimeline');
-  if(!el)return;
-  const now=new Date();
-  const phases=[
-    {label:'Group Stage',date:'Jun 11–28',start:new Date('2026-06-11'),end:new Date('2026-06-28'),icon:'⚽'},
-    {label:'Round of 32',date:'Jun 28–Jul 4',start:new Date('2026-06-28'),end:new Date('2026-07-04'),icon:'32'},
-    {label:'Round of 16',date:'Jul 4–7',start:new Date('2026-07-04'),end:new Date('2026-07-07'),icon:'16'},
-    {label:'Quarter Finals',date:'Jul 9–12',start:new Date('2026-07-09'),end:new Date('2026-07-12'),icon:'QF'},
-    {label:'Semi Finals',date:'Jul 14–15',start:new Date('2026-07-14'),end:new Date('2026-07-15'),icon:'SF'},
-    {label:'Final',date:'Jul 19',start:new Date('2026-07-19'),end:new Date('2026-07-19'),icon:'🏆'},
-  ];
-  const dots=phases.map(p=>{
-    const isActive=now>=p.start&&now<=p.end;
-    const isComplete=now>p.end;
-    const cls=isActive?'active':isComplete?'complete':'';
-    return`<div class="tl-phase ${cls}">
-      <div class="tl-phase-dot">${p.icon}</div>
-      <div class="tl-phase-label">${p.label}</div>
-      <div class="tl-phase-date">${p.date}</div>
-    </div>`;
-  }).join('');
-  el.innerHTML=`<div class="tl-phases">${dots}</div>`;
-}
-
-// ═══════════════════════════════════════════════════════
-// GROUPS HERO STATS
-// ═══════════════════════════════════════════════════════
-function renderGroupsHero(){
-  let played=0,goals=0;
-  Object.keys(G).forEach(g=>FX[g].forEach(([],fi)=>{
-    const k=`${g}_${fi}`;
-    if(ST.scores[k]===undefined)return;
-    played++;goals+=ST.scores[k][0]+ST.scores[k][1];
-  }));
-  const gpg=played>0?(goals/played).toFixed(1):'—';
-  const remaining=72-played;
-  const pct=Math.round((played/72)*100);
-
-  const hm=document.getElementById('heroMatches');
-  const hg=document.getElementById('heroGoals');
-  const hgpg=document.getElementById('heroGPG');
-  const hr=document.getElementById('heroRemaining');
-  const fill=document.getElementById('groupsProgressFill');
-  const pp=document.getElementById('playedPill');
-  const tzLbl=document.getElementById('tzLabelInline');
-
-  if(hm)hm.textContent=played;
-  if(hg)hg.textContent=goals;
-  if(hgpg)hgpg.textContent=gpg;
-  if(hr)hr.textContent=remaining;
-  if(fill)fill.style.width=pct+'%';
-  if(pp)pp.textContent=`${played} / 72 played`;
-  if(tzLbl)tzLbl.textContent=tzLabel();
-}
-
-// ═══════════════════════════════════════════════════════
-// COMPARE NATIONS
-// ═══════════════════════════════════════════════════════
-function initCompare(){
-  const selA=document.getElementById('compareA');
-  const selB=document.getElementById('compareB');
-  if(!selA||!selB)return;
-  const teams=[];
-  Object.keys(G).forEach(g=>G[g].t.forEach(t=>teams.push({t,g})));
-  teams.sort((a,b)=>a.t.localeCompare(b.t));
-  const opts=teams.map(({t,g})=>`<option value="${t}">${t} (Grp ${g})</option>`).join('');
-  selA.innerHTML='<option value="">— Select team —</option>'+opts;
-  selB.innerHTML='<option value="">— Select team —</option>'+opts;
-}
-
-function renderCompare(){
-  const a=document.getElementById('compareA')?.value;
-  const b=document.getElementById('compareB')?.value;
-  const el=document.getElementById('comparePanel');
-  if(!el)return;
-  if(!a||!b||a===b){
-    el.innerHTML=`<div class="empty-state"><div class="empty-icon">⚔️</div><div class="empty-title">Select Two Different Nations</div></div>`;
-    return;
-  }
-
-  // Get groups and standings
-  const gA=Object.keys(G).find(g=>G[g].t.includes(a));
-  const gB=Object.keys(G).find(g=>G[g].t.includes(b));
-  const sA=standings(gA);
-  const sB=standings(gB);
-  const tA=sA.find(t=>t.name===a)||{p:0,mp:0,w:0,d:0,l:0,gf:0,ga:0,gd:0};
-  const tB=sB.find(t=>t.name===b)||{p:0,mp:0,w:0,d:0,l:0,gf:0,ga:0,gd:0};
-  const rankA=rank(a), rankB=rank(b);
-
-  function cmpVal(va,vb,lowerBetter=false){
-    if(va===vb)return['',''];
-    const aWins=lowerBetter?(va<vb):(va>vb);
-    return aWins?['better','worse']:['worse','better'];
-  }
-
-  const rows=[
-    {label:'FIFA Ranking',va:'#'+rankA,vb:'#'+rankB,ca:cmpVal(rankA,rankB,true)[0],cb:cmpVal(rankA,rankB,true)[1]},
-    {label:'Group',va:`Group ${gA}`,vb:`Group ${gB}`,ca:'',cb:''},
-    {label:'Points',va:tA.p,vb:tB.p,...({ca:cmpVal(tA.p,tB.p)[0],cb:cmpVal(tA.p,tB.p)[1]})},
-    {label:'Played',va:tA.mp,vb:tB.mp,ca:'',cb:''},
-    {label:'Won',va:tA.w,vb:tB.w,...({ca:cmpVal(tA.w,tB.w)[0],cb:cmpVal(tA.w,tB.w)[1]})},
-    {label:'Goals For',va:tA.gf,vb:tB.gf,...({ca:cmpVal(tA.gf,tB.gf)[0],cb:cmpVal(tA.gf,tB.gf)[1]})},
-    {label:'Goals Against',va:tA.ga,vb:tB.ga,...({ca:cmpVal(tA.ga,tB.ga,true)[0],cb:cmpVal(tA.ga,tB.ga,true)[1]})},
-    {label:'Goal Diff',va:(tA.gd>=0?'+':'')+tA.gd,vb:(tB.gd>=0?'+':'')+tB.gd,...({ca:cmpVal(tA.gd,tB.gd)[0],cb:cmpVal(tA.gd,tB.gd)[1]})},
-  ];
-
-  const rowsHtml=rows.map(r=>`
-    <div class="compare-stat-row">
-      <div class="compare-stat-val ${r.ca}">${r.va}</div>
-      <div class="compare-stat-label">${r.label}</div>
-      <div class="compare-stat-val ${r.cb}">${r.vb}</div>
-    </div>`).join('');
-
-  const isoA=FLAG_MAP[a]||'gb', isoB=FLAG_MAP[b]||'gb';
-  const sqA=Object.values(SQUADS).find(s=>Object.keys(SQUADS).find(k=>k===a));
-  const sqB=Object.values(SQUADS).find(s=>Object.keys(SQUADS).find(k=>k===b));
-  const starsA=sqA?.stars||[];
-  const starsB=sqB?.stars||[];
-
-  el.innerHTML=`
-    <div class="compare-panel">
-      <div class="compare-nation">
-        <div class="compare-flag">${flag(isoA,'l')}</div>
-        <div class="compare-name">${a}</div>
-        <div style="font-size:var(--tx-xs);color:var(--tx3);font-family:'Barlow Condensed',sans-serif">${starsA.slice(0,2).join(' · ')||'—'}</div>
-      </div>
-      <div class="compare-nation">
-        <div class="compare-flag">${flag(isoB,'l')}</div>
-        <div class="compare-name">${b}</div>
-        <div style="font-size:var(--tx-xs);color:var(--tx3);font-family:'Barlow Condensed',sans-serif">${starsB.slice(0,2).join(' · ')||'—'}</div>
-      </div>
-    </div>
-    <div class="card" style="margin-top:var(--sp-4)">
-      <div class="card-header"><span class="card-title">📊 Head to Head Stats</span></div>
-      <div style="padding:var(--sp-2) var(--sp-5)">
-        <div style="display:grid;grid-template-columns:1fr auto 1fr;font-family:'Bebas Neue',sans-serif;font-size:var(--tx-xs);letter-spacing:2px;color:var(--tx3);padding:var(--sp-3) 0;text-transform:uppercase">
-          <span>${a}</span><span></span><span style="text-align:right">${b}</span>
-        </div>
-        ${rowsHtml}
-      </div>
-    </div>
-    <div style="margin-top:var(--sp-4);text-align:center">
-      <button class="btn purple" onclick="runAI_compare('${a}','${b}')">🤖 AI Match Prediction</button>
-    </div>`;
-}
-
-function runAI_compare(a,b){
-  // Navigate to AI predictions tab and auto-select the right fixture
-  showSection('predictions',null);
-  // Find the fixture between these two teams
-  const gA=Object.keys(G).find(g=>G[g].t.includes(a));
-  const gB=Object.keys(G).find(g=>G[g].t.includes(b));
-  if(gA&&gA===gB){
-    // Same group - find the fixture
-    const fi=FX[gA].findIndex(([ia,ib])=>{
-      const ta=G[gA].t[ia],tb=G[gA].t[ib];
-      return (ta===a&&tb===b)||(ta===b&&tb===a);
-    });
-    if(fi>=0){
-      setTimeout(()=>{
-        const cards=document.querySelectorAll('.ai-fixture-card');
-        cards.forEach(c=>{if(c.textContent.includes(a)&&c.textContent.includes(b))c.click();});
-      },200);
-    }
-  }
-}
-
-// ═══════════════════════════════════════════════════════
-// TOURNAMENT PREDICTOR — full simulation engine
+// TOURNAMENT PREDICTOR ENGINE
 // ═══════════════════════════════════════════════════════
 
-// ST.simPreds stores predicted scores: { 'A_0': [2,1], 'A_1': [0,0], ... }
-// Keys match same format as ST.scores
+let currentSimGroup = 'A';
 
 function simUpdateProgress(){
-  let filled=0;
-  Object.keys(G).forEach(g=>FX[g].forEach((_,fi)=>{
-    if(ST.simPreds[`${g}_${fi}`]!==undefined)filled++;
+  let filled = 0;
+  Object.keys(G).forEach(g => FX[g].forEach((_,fi) => {
+    const p = ST.simPreds[g+'_'+fi];
+    if(p !== undefined && p[0] !== null && p[1] !== null) filled++;
   }));
-  const pct=Math.round((filled/72)*100);
-  const el=id=>document.getElementById(id);
-  if(el('simFilled'))el('simFilled').textContent=filled;
-  if(el('simPct'))el('simPct').textContent=pct+'%';
-  if(el('simPctLabel'))el('simPctLabel').textContent=`${filled} / 72`;
-  if(el('simProgressFill'))el('simProgressFill').style.width=pct+'%';
-  const runBtn=el('simRunBtn');
-  if(runBtn){
-    const ready=filled>=72;
-    runBtn.style.opacity=ready?'1':'0.4';
-    runBtn.style.pointerEvents=ready?'all':'none';
-    runBtn.textContent=filled===0?'🔮 Simulate Now':`🔮 Simulate (${filled}/72)`;
-  }
-  // Update group tab completion dots
-  Object.keys(G).forEach(g=>{
-    const done=FX[g].every((_,fi)=>ST.simPreds[`${g}_${fi}`]!==undefined);
-    const dot=document.querySelector(`#simTab_${g} .pred-tab-done`);
-    if(dot)dot.classList.toggle('show',done);
+  const pct = Math.round((filled/72)*100);
+  const $id = id => document.getElementById(id);
+  if($id('simFilled')) $id('simFilled').textContent = filled;
+  if($id('simPct'))    $id('simPct').textContent = pct+'%';
+  if($id('simPctLabel')) $id('simPctLabel').textContent = filled+' / 72';
+  if($id('simProgFill')) $id('simProgFill').style.width = pct+'%';
+  const rb = $id('simRunBtn');
+  if(rb){ rb.style.opacity = filled>0?'1':'0.4'; rb.style.pointerEvents = filled>0?'all':'none'; rb.textContent = '🔮 Simulate ('+filled+'/72)'; }
+  // Tab completion dots
+  Object.keys(G).forEach(g => {
+    const done = FX[g].every((_,fi) => { const p=ST.simPreds[g+'_'+fi]; return p&&p[0]!==null&&p[1]!==null; });
+    const dot = document.querySelector('#simTab_'+g+' .sim-tab-dot');
+    if(dot) dot.classList.toggle('show', done);
   });
 }
 
 function simShowView(view){
-  ['predict','simulate','score'].forEach(v=>{
-    const el=document.getElementById(`simView${v.charAt(0).toUpperCase()+v.slice(1)}`);
-    if(el)el.style.display=v===view?'':'none';
+  ['Predict','Simulate','Score'].forEach(v => {
+    const el = document.getElementById('simView'+v);
+    if(el) el.style.display = v.toLowerCase()===view ? '' : 'none';
+    const btn = document.getElementById('simBtn'+v);
+    if(btn) btn.className = v.toLowerCase()===view ? 'btn sm' : 'btn secondary sm';
   });
-  // Update button states
-  ['predict','simulate','score'].forEach(v=>{
-    const btn=document.getElementById(`simBtn${v.charAt(0).toUpperCase()+v.slice(1)}`);
-    if(btn){
-      btn.className=v===view?'btn sm':'btn secondary sm';
-    }
-  });
-  if(view==='simulate')runSimulation();
-  if(view==='score')renderSimScore();
-  if(view==='predict')renderSimGroupContent(currentSimGroup||Object.keys(G)[0]);
+  if(view === 'simulate') runSimulation();
+  if(view === 'score')    renderSimScore();
+  if(view === 'predict')  renderSimGroupContent(currentSimGroup);
 }
 
-let currentSimGroup='A';
-
 function renderSimTabs(){
-  const tabs=document.getElementById('simGroupTabs');
-  if(!tabs)return;
-  tabs.innerHTML=Object.keys(G).map(g=>{
-    const done=FX[g].every((_,fi)=>ST.simPreds[`${g}_${fi}`]!==undefined);
-    return`<button class="pred-tab ${g===currentSimGroup?'active':''}" id="simTab_${g}" onclick="switchSimGroup('${g}')" role="tab" aria-selected="${g===currentSimGroup}">
-      Grp ${g}
-      <span class="pred-tab-done ${done?'show':''}"></span>
-    </button>`;
+  const el = document.getElementById('simGroupTabs');
+  if(!el) return;
+  el.innerHTML = Object.keys(G).map(g => {
+    const done = FX[g].every((_,fi) => { const p=ST.simPreds[g+'_'+fi]; return p&&p[0]!==null&&p[1]!==null; });
+    return '<button class="sim-tab '+(g===currentSimGroup?'active':'')+'" id="simTab_'+g+'" onclick="switchSimGroup(''+g+'')" role="tab">'
+      +'Grp '+g+'<span class="sim-tab-dot '+(done?'show':'')+'"></span></button>';
   }).join('');
 }
 
 function switchSimGroup(g){
-  currentSimGroup=g;
+  currentSimGroup = g;
   renderSimTabs();
   renderSimGroupContent(g);
 }
 
 function renderSimGroupContent(g){
-  const el=document.getElementById('simGroupContent');
-  if(!el)return;
-  const matches=FX[g].map(([a,b,num,dt,venue],fi)=>{
-    const k=`${g}_${fi}`;
-    const pred=ST.simPreds[k];
-    const hasPred=pred!==undefined;
-    const localTime=fmtLocalTime(dt);
-    return`<div class="pred-fix-row ${hasPred?'has-pred':''}" id="simRow_${g}_${fi}">
-      <div class="pred-team">
-        ${flag(G[g].f[a],'s')}
-        <span class="pred-team-name">${G[g].t[a]}</span>
-      </div>
-      <div class="pred-score-entry">
-        <input class="pred-score-inp ${hasPred?'filled':''}" type="number" min="0" max="20"
-          value="${hasPred?pred[0]:''}" placeholder="?"
-          id="simInp_${g}_${fi}_0"
-          onchange="saveSimPred('${g}',${fi},0,this.value)"
-          oninput="saveSimPred('${g}',${fi},0,this.value)"
-          aria-label="${G[g].t[a]} predicted score">
-        <span class="pred-score-dash">–</span>
-        <input class="pred-score-inp ${hasPred?'filled':''}" type="number" min="0" max="20"
-          value="${hasPred?pred[1]:''}" placeholder="?"
-          id="simInp_${g}_${fi}_1"
-          onchange="saveSimPred('${g}',${fi},1,this.value)"
-          oninput="saveSimPred('${g}',${fi},1,this.value)"
-          aria-label="${G[g].t[b]} predicted score">
-      </div>
-      <div class="pred-team away">
-        <span class="pred-team-name">${G[g].t[b]}</span>
-        ${flag(G[g].f[b],'s')}
-      </div>
-    </div>`;
+  const el = document.getElementById('simGroupContent');
+  if(!el) return;
+
+  const fixHTML = FX[g].map(([a,b,num,dt,venue],fi) => {
+    const k = g+'_'+fi;
+    const p = ST.simPreds[k];
+    const v1 = p&&p[0]!==null ? p[0] : '';
+    const v2 = p&&p[1]!==null ? p[1] : '';
+    const done = v1!==''&&v2!=='';
+    const localTime = fmtLocalTime(dt);
+    return '<div class="sim-fix-row '+(done?'done':'')+'" id="simRow_'+k+'">'
+      +'<div class="sim-team"><span class="flag-em">'+G[g].f[a]+'</span><span>'+G[g].t[a]+'</span></div>'
+      +'<div class="sim-score-entry">'
+        +'<input class="sim-inp '+(done?'filled':'')+'" type="number" min="0" max="20" value="'+v1+'" placeholder="?" id="si_'+k+'_0" onchange="saveSimPred(''+g+'','+fi+',0,this.value)" aria-label="'+G[g].t[a]+' score">'
+        +'<span class="sim-inp-sep">–</span>'
+        +'<input class="sim-inp '+(done?'filled':'')+'" type="number" min="0" max="20" value="'+v2+'" placeholder="?" id="si_'+k+'_1" onchange="saveSimPred(''+g+'','+fi+',1,this.value)" aria-label="'+G[g].t[b]+' score">'
+      +'</div>'
+      +'<div class="sim-team away"><span>'+G[g].t[b]+'</span><span class="flag-em">'+G[g].f[b]+'</span></div>'
+      +'</div>';
   }).join('');
 
-  // Show quick standings preview
-  const s=simStandings(g);
-  const standingsPreview=`<div style="padding:var(--sp-3) var(--sp-4);border-top:1px solid var(--bdr);background:rgba(0,0,0,0.2)">
-    <div style="font-family:'Barlow Condensed',sans-serif;font-size:var(--tx-xs);color:var(--tx3);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:var(--sp-2);font-weight:700">Predicted Standings</div>
-    ${s.map((t,i)=>`<div style="display:flex;align-items:center;gap:var(--sp-2);padding:4px 0;font-family:'Barlow Condensed',sans-serif;font-size:var(--tx-sm);${i<2?'color:var(--qualify)':i===2?'color:var(--third-c)':'color:var(--tx3)'}">
-      <span style="font-family:'Bebas Neue',sans-serif;font-size:var(--tx-md);color:inherit;min-width:16px">${i+1}</span>
-      ${flag(t.f,'s')}
-      <span style="font-weight:700;flex:1">${t.name}</span>
-      <span style="font-family:'Bebas Neue',sans-serif;font-size:var(--tx-lg);color:var(--gold)">${t.p}</span>
-      <span style="color:var(--tx3);font-size:var(--tx-xs)">pts</span>
-    </div>`).join('')}
-  </div>`;
+  const s = simStandings(g);
+  const standHTML = '<div class="sim-standings-preview">'
+    +'<div style="font-family:'Barlow Condensed',sans-serif;font-size:var(--tx-xs);color:var(--tx3);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:6px;font-weight:700">Predicted Standings</div>'
+    + s.map((t,i) =>
+      '<div class="sim-standings-row" style="'+(i<2?'color:var(--qualify)':i===2?'color:var(--third-c)':'color:var(--tx3)')+'">'
+      +'<span style="font-family:'Bebas Neue',sans-serif;font-size:var(--tx-md);min-width:16px">'+(i+1)+'</span>'
+      +'<span class="flag-em">'+t.f+'</span>'
+      +'<span style="font-weight:700;flex:1">'+t.name+'</span>'
+      +'<span style="font-family:'Bebas Neue',sans-serif;font-size:var(--tx-md);color:var(--gold)">'+t.p+'</span>'
+      +'<span style="color:var(--tx3);font-size:var(--tx-xs);margin-left:3px">pts</span>'
+      +'</div>'
+    ).join('')
+    +'</div>';
 
-  el.innerHTML=`<div class="pred-group-card ${FX[g].every((_,fi)=>ST.simPreds[`${g}_${fi}`]!==undefined)?'complete':''}">
-    <div class="pred-group-header">
-      <span class="pred-group-letter">Group ${g}</span>
-      <span class="pred-group-count">${FX[g].filter((_,fi)=>ST.simPreds[`${g}_${fi}`]!==undefined).length}/${FX[g].length} predicted</span>
-    </div>
-    ${matches}
-    ${standingsPreview}
-  </div>`;
+  const filled = FX[g].filter((_,fi) => { const p=ST.simPreds[g+'_'+fi]; return p&&p[0]!==null&&p[1]!==null; }).length;
+  el.innerHTML = '<div class="group-card">'
+    +'<div class="group-header">'
+      +'<span class="group-letter">Group '+g+'</span>'
+      +'<span class="group-meta">'+filled+'/'+FX[g].length+' predicted</span>'
+    +'</div>'
+    + fixHTML
+    + standHTML
+    +'</div>';
 }
 
-function saveSimPred(g,fi,slot,val){
-  const k=`${g}_${fi}`;
-  if(val===''){
-    // Only delete if both are empty
-    const other=slot===0?document.getElementById(`simInp_${g}_${fi}_1`):document.getElementById(`simInp_${g}_${fi}_0`);
-    if(!other||other.value==='')delete ST.simPreds[k];
-    else if(ST.simPreds[k])ST.simPreds[k][slot]=null;
-  } else {
-    if(!ST.simPreds[k])ST.simPreds[k]=[null,null];
-    ST.simPreds[k][slot]=parseInt(val)||0;
-  }
-  // Mark as complete only when both scores filled
-  if(ST.simPreds[k]&&ST.simPreds[k][0]!==null&&ST.simPreds[k][1]!==null){
-    const inp0=document.getElementById(`simInp_${g}_${fi}_0`);
-    const inp1=document.getElementById(`simInp_${g}_${fi}_1`);
-    const row=document.getElementById(`simRow_${g}_${fi}`);
-    if(inp0)inp0.classList.add('filled');
-    if(inp1)inp1.classList.add('filled');
-    if(row)row.classList.add('has-pred');
-  }
+function saveSimPred(g, fi, slot, val){
+  const k = g+'_'+fi;
+  if(!ST.simPreds[k]) ST.simPreds[k] = [null, null];
+  ST.simPreds[k][slot] = val==='' ? null : parseInt(val)||0;
+  const p = ST.simPreds[k];
+  if(p[0]===null && p[1]===null) delete ST.simPreds[k];
   save();
   simUpdateProgress();
-  // Refresh the standings preview in current group
-  if(g===currentSimGroup){
-    const s=simStandings(g);
-    const preview=document.querySelector('#simGroupContent [style*="Predicted Standings"]')?.closest('[style*="rgba(0,0,0,0.2)"]');
-    if(preview){
-      preview.innerHTML=`<div style="font-family:'Barlow Condensed',sans-serif;font-size:var(--tx-xs);color:var(--tx3);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:var(--sp-2);font-weight:700">Predicted Standings</div>
-        ${s.map((t,i)=>`<div style="display:flex;align-items:center;gap:var(--sp-2);padding:4px 0;font-family:'Barlow Condensed',sans-serif;font-size:var(--tx-sm);${i<2?'color:var(--qualify)':i===2?'color:var(--third-c)':'color:var(--tx3)'}">
-          <span style="font-family:'Bebas Neue',sans-serif;font-size:var(--tx-md);color:inherit;min-width:16px">${i+1}</span>
-          ${flag(t.f,'s')}
-          <span style="font-weight:700;flex:1">${t.name}</span>
-          <span style="font-family:'Bebas Neue',sans-serif;font-size:var(--tx-lg);color:var(--gold)">${t.p}</span>
-          <span style="color:var(--tx3);font-size:var(--tx-xs)">pts</span>
-        </div>`).join('')}`;
+  // Update row styling
+  const done = p && p[0]!==null && p[1]!==null;
+  const row = document.getElementById('simRow_'+k);
+  if(row) row.classList.toggle('done', done);
+  ['0','1'].forEach(s => { const inp=document.getElementById('si_'+k+'_'+s); if(inp)inp.classList.toggle('filled',done); });
+  // Refresh standings preview
+  if(g === currentSimGroup){
+    const sv = document.querySelector('.sim-standings-preview');
+    if(sv){
+      const ns = simStandings(g);
+      sv.innerHTML = '<div style="font-family:'Barlow Condensed',sans-serif;font-size:var(--tx-xs);color:var(--tx3);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:6px;font-weight:700">Predicted Standings</div>'
+        + ns.map((t,i) =>
+          '<div class="sim-standings-row" style="'+(i<2?'color:var(--qualify)':i===2?'color:var(--third-c)':'color:var(--tx3)')+'">'
+          +'<span style="font-family:'Bebas Neue',sans-serif;font-size:var(--tx-md);min-width:16px">'+(i+1)+'</span>'
+          +'<span class="flag-em">'+t.f+'</span>'
+          +'<span style="font-weight:700;flex:1">'+t.name+'</span>'
+          +'<span style="font-family:'Bebas Neue',sans-serif;font-size:var(--tx-md);color:var(--gold)">'+t.p+'</span>'
+          +'<span style="color:var(--tx3);font-size:var(--tx-xs);margin-left:3px">pts</span>'
+          +'</div>'
+        ).join('');
     }
   }
 }
 
-// Simulated standings — uses ST.simPreds instead of ST.scores
+// Simulate standings from ST.simPreds (not ST.scores)
 function simStandings(g){
-  const t=G[g].t.map((name,i)=>({name,f:G[g].f[i],p:0,w:0,d:0,l:0,gf:0,ga:0,gd:0,mp:0,rank:rank(name),fp:0}));
-  FX[g].forEach(([a,b],fi)=>{
-    const k=`${g}_${fi}`;
-    if(!ST.simPreds[k]||ST.simPreds[k][0]===null||ST.simPreds[k][1]===null)return;
-    const[sa,sb]=ST.simPreds[k];
-    t[a].mp++;t[b].mp++;t[a].gf+=sa;t[a].ga+=sb;t[b].gf+=sb;t[b].ga+=sa;
+  const t = G[g].t.map((name,i) => ({name, f:G[g].f[i], p:0, w:0, d:0, l:0, gf:0, ga:0, gd:0, mp:0, rank:rank(name)}));
+  FX[g].forEach(([a,b],fi) => {
+    const p = ST.simPreds[g+'_'+fi];
+    if(!p || p[0]===null || p[1]===null) return;
+    const sa=p[0], sb=p[1];
+    t[a].mp++; t[b].mp++; t[a].gf+=sa; t[a].ga+=sb; t[b].gf+=sb; t[b].ga+=sa;
     if(sa>sb){t[a].p+=3;t[a].w++;t[b].l++;}
     else if(sb>sa){t[b].p+=3;t[b].w++;t[a].l++;}
     else{t[a].p++;t[b].p++;t[a].d++;t[b].d++;}
   });
-  t.forEach(x=>x.gd=x.gf-x.ga);
-  return t.sort((a,b)=>b.p-a.p||b.gd-a.gd||b.gf-a.gf||a.rank-b.rank);
-}
-
-function simBestThirds(){
-  return Object.keys(G).map(g=>{
-    const s=simStandings(g); const t=s[2];
-    if(!t||t.mp===0)return null;
-    const coeff=t.p*1e6+t.gd*1e3+t.gf-t.rank*0.000001;
-    return{...t,group:g,coeff};
-  }).filter(Boolean).sort((a,b)=>b.coeff-a.coeff);
+  t.forEach(x => x.gd=x.gf-x.ga);
+  return t.sort((a,b) => b.p-a.p||b.gd-a.gd||b.gf-a.gf||a.rank-b.rank);
 }
 
 function simAllGroupResults(){
-  const r={};
-  Object.keys(G).forEach(g=>{const s=simStandings(g);r[g]={first:s[0],second:s[1],third:s[2]};});
+  const r = {};
+  Object.keys(G).forEach(g => { const s=simStandings(g); r[g]={first:s[0],second:s[1],third:s[2]}; });
   return r;
 }
 
-function simResolveTeam(code, gr){
-  if(!code)return{n:'TBD',f:null};
-  if(code.startsWith('1')){const g=code[1];const t=gr[g]?.first;return t?{n:t.name,f:t.f}:{n:`1st ${g}`,f:null};}
-  if(code.startsWith('2')){const g=code[1];const t=gr[g]?.second;return t?{n:t.name,f:t.f}:{n:`2nd ${g}`,f:null};}
-  if(code.startsWith('3'))return{n:'Best 3rd',f:null};
-  return{n:code,f:null};
+function simResolve(code, gr){
+  if(!code) return {n:'TBD', f:'⬜'};
+  if(code.startsWith('1')){ const g=code[1]; const t=gr[g]?.first; return t?{n:t.name,f:t.f}:{n:'1st '+g,f:'⬜'}; }
+  if(code.startsWith('2')){ const g=code[1]; const t=gr[g]?.second; return t?{n:t.name,f:t.f}:{n:'2nd '+g,f:'⬜'}; }
+  return {n:code, f:'⬜'};
 }
 
-// Run the full simulation — derives knockout bracket from predicted group stage
+function pickWinner(t1, t2){
+  if(t1.n==='TBD'||t2.n==='TBD') return null;
+  const r1=rank(t1.n)||99, r2=rank(t2.n)||99;
+  return r1<=r2 ? t1 : t2;
+}
+
 function runSimulation(){
-  const el=document.getElementById('simResults');
-  if(!el)return;
+  const el = document.getElementById('simResults');
+  if(!el) return;
 
-  const gr=simAllGroupResults();
-  const thirds=simBestThirds().slice(0,8);
+  const gr = simAllGroupResults();
 
-  // Resolve R32 matchups
-  const r32teams=R32.map(m=>{
-    let t1,t2;
-    if(m.t1k.startsWith('3')){
-      // best third — simplified assignment
-      t1={n:'Best 3rd',f:null};
-    } else {
-      t1=simResolveTeam(m.t1k,gr);
-    }
-    if(m.t2k.startsWith('3')){
-      t2={n:'Best 3rd',f:null};
-    } else {
-      t2=simResolveTeam(m.t2k,gr);
-    }
-    return{...m,t1,t2};
+  // Resolve all R32 pairings
+  const r32 = R32.map(m => {
+    const t1 = simResolve(m.t1k, gr);
+    const t2 = simResolve(m.t2k, gr);
+    return {...m, t1, t2, winner: pickWinner(t1,t2)};
   });
 
-  // Simulate knockout rounds using FIFA ranking as tiebreaker when scores aren't predicted
-  // (We're simulating based on group predictions — knockout picks higher-ranked team by default,
-  //  or the team with better group stage performance)
-  function pickWinner(t1,t2){
-    // Use relative group performance / FIFA rank to determine simulated winner
-    const r1=rank(t1.n)||50, r2=rank(t2.n)||50;
-    return r1<=r2?t1:t2; // lower rank number = better team
+  // Build subsequent rounds by pairing consecutive winners
+  function buildRound(prev, meta){
+    return prev.reduce((acc, _m, i, arr) => {
+      if(i%2!==0) return acc;
+      const w1 = arr[i].winner   || {n:'TBD',f:'⬜'};
+      const w2 = arr[i+1]?.winner || {n:'TBD',f:'⬜'};
+      const m  = meta[acc.length] || {m:0,v:'TBD',d:'TBD'};
+      acc.push({t1:w1, t2:w2, winner:pickWinner(w1,w2), m:m.m, v:m.v, d:m.d});
+      return acc;
+    }, []);
   }
 
-  function renderKOSection(title, matchups){
-    const rows=matchups.map(({t1,t2,winner,m,v,d})=>{
-      const hasTeams=t1.n!=='TBD'&&t2.n!=='TBD';
-      const isFinal=m===104;
-      return`<div class="sim-bracket-row ${winner?'winner-decided':''}" ${isFinal?'style="border:2px solid var(--gold);border-radius:var(--r-lg)"':''}>
-        <div class="sim-team-cell ${winner?.n===t1.n?'winner':winner?'loser':''}">
-          ${flag(t1.f||getFlag(t1.n),'s')}
-          <span>${t1.n}</span>
-        </div>
-        <div>
-          <div class="sim-score ${hasTeams?'':'tbd'}">${hasTeams?'vs':'TBD'}</div>
-          <div class="sim-venue">M${m} · ${v}</div>
-          <div class="sim-venue">${d}</div>
-        </div>
-        <div class="sim-team-cell right ${winner?.n===t2.n?'winner':winner?'loser':''}">
-          <span>${t2.n}</span>
-          ${flag(t2.f||getFlag(t2.n),'s')}
-        </div>
-      </div>`;
-    }).join('');
-    return`<div class="sim-section-divider">${title}</div>${rows}`;
+  const r16 = buildRound(r32, R16);
+  const qf  = buildRound(r16, QF);
+  const sf  = buildRound(qf, SF);
+
+  const fin1 = sf[0]?.winner || {n:'TBD',f:'⬜'};
+  const fin2 = sf[1]?.winner || {n:'TBD',f:'⬜'};
+  const champion = pickWinner(fin1, fin2);
+  const third1 = sf[0] ? (sf[0].winner===sf[0].t1 ? sf[0].t2 : sf[0].t1) : {n:'TBD',f:'⬜'};
+  const third2 = sf[1] ? (sf[1].winner===sf[1].t1 ? sf[1].t2 : sf[1].t1) : {n:'TBD',f:'⬜'};
+  const thirdPlace = pickWinner(third1, third2);
+
+  function koSection(title, matches){
+    return '<div class="sim-ko-section"><div class="sim-ko-title">'+title+'</div>'
+      + matches.map(m =>
+          '<div class="sim-ko-row">'
+          +'<div class="sim-ko-team '+(m.winner?.n===m.t1.n?'win':m.winner?'lose':'')+'">'
+          +'<span class="flag-em">'+m.t1.f+'</span><span>'+m.t1.n+'</span></div>'
+          +'<div class="sim-ko-mid"><div class="sim-ko-vstext">vs</div><div class="sim-ko-venue">M'+m.m+' · '+m.v+'</div><div class="sim-ko-venue">'+m.d+'</div></div>'
+          +'<div class="sim-ko-team right '+(m.winner?.n===m.t2.n?'win':m.winner?'lose':'')+'">'
+          +'<span>'+m.t2.n+'</span><span class="flag-em">'+m.t2.f+'</span></div>'
+          +'</div>'
+        ).join('')
+      +'</div>';
   }
 
-  // R32
-  const r32results=r32teams.map(m=>{
-    const w=m.t1.n!=='TBD'&&m.t2.n!=='TBD'?pickWinner(m.t1,m.t2):null;
-    return{...m,winner:w};
-  });
-
-  // R16 — pair consecutive R32 winners
-  const r16matchups=[];
-  for(let i=0;i<r32results.length;i+=2){
-    const w1=r32results[i].winner||{n:'TBD',f:null};
-    const w2=r32results[i+1]?.winner||{n:'TBD',f:null};
-    const rl=R16[i/2]||{m:89+i/2,v:'TBD',d:'TBD'};
-    const w=w1.n!=='TBD'&&w2.n!=='TBD'?pickWinner(w1,w2):null;
-    r16matchups.push({t1:w1,t2:w2,winner:w,m:rl.m,v:rl.v,d:rl.d});
-  }
-
-  // QF
-  const qfMatchups=[];
-  for(let i=0;i<r16matchups.length;i+=2){
-    const w1=r16matchups[i].winner||{n:'TBD',f:null};
-    const w2=r16matchups[i+1]?.winner||{n:'TBD',f:null};
-    const ql=QF[i/2]||{m:97+i/2,v:'TBD',d:'TBD'};
-    const w=w1.n!=='TBD'&&w2.n!=='TBD'?pickWinner(w1,w2):null;
-    qfMatchups.push({t1:w1,t2:w2,winner:w,m:ql.m,v:ql.v,d:ql.d});
-  }
-
-  // SF
-  const sfMatchups=[];
-  for(let i=0;i<qfMatchups.length;i+=2){
-    const w1=qfMatchups[i].winner||{n:'TBD',f:null};
-    const w2=qfMatchups[i+1]?.winner||{n:'TBD',f:null};
-    const sl=SF[i/2]||{m:101+i/2,v:'TBD',d:'TBD'};
-    const w=w1.n!=='TBD'&&w2.n!=='TBD'?pickWinner(w1,w2):null;
-    sfMatchups.push({t1:w1,t2:w2,winner:w,m:sl.m,v:sl.v,d:sl.d,loser:w?{...w1,...w2}[w===w1?'t2':'t1']:null});
-    sfMatchups[sfMatchups.length-1].loser=w?(w===w1?w2:w1):null;
-  }
-
-  // Final + 3rd place
-  const finalist1=sfMatchups[0]?.winner||{n:'TBD',f:null};
-  const finalist2=sfMatchups[1]?.winner||{n:'TBD',f:null};
-  const third1=sfMatchups[0]?.loser||{n:'TBD',f:null};
-  const third2=sfMatchups[1]?.loser||{n:'TBD',f:null};
-  const champion=finalist1.n!=='TBD'&&finalist2.n!=='TBD'?pickWinner(finalist1,finalist2):null;
-  const thirdPlace=third1.n!=='TBD'&&third2.n!=='TBD'?pickWinner(third1,third2):null;
-
-  // Store simulated champion in ST for display
-  ST.simChampion=champion?.n||null;
-  save();
-
-  el.innerHTML=
-    renderKOSection('⚡ Round of 32', r32results)+
-    renderKOSection('🔟 Round of 16', r16matchups)+
-    renderKOSection('🔷 Quarter-Finals', qfMatchups)+
-    renderKOSection('🔶 Semi-Finals', sfMatchups)+
-    renderKOSection('🥉 3rd Place', [{t1:third1,t2:third2,winner:thirdPlace,m:103,v:'Miami',d:'Jul 18'}])+
-    `<div class="sim-section-divider">🏆 Final · MetLife Stadium NJ · Jul 19</div>
-    <div class="sim-bracket-row" style="border:2px solid var(--gold);border-radius:var(--r-lg)">
-      <div class="sim-team-cell ${champion?.n===finalist1.n?'winner':champion?'loser':''}">
-        ${flag(finalist1.f||getFlag(finalist1.n),'s')}
-        <span>${finalist1.n}</span>
-      </div>
-      <div>
-        <div class="sim-score ${finalist1.n!=='TBD'?'':'tbd'}">${finalist1.n!=='TBD'?'FINAL':'TBD'}</div>
-        <div class="sim-venue">M104 · MetLife NJ · Jul 19</div>
-      </div>
-      <div class="sim-team-cell right ${champion?.n===finalist2.n?'winner':champion?'loser':''}">
-        <span>${finalist2.n}</span>
-        ${flag(finalist2.f||getFlag(finalist2.n),'s')}
-      </div>
-    </div>
-    ${champion?`<div class="sim-winner-card">
-      <div class="sim-winner-trophy">🏆</div>
-      <div class="sim-winner-label">Your Predicted World Champion</div>
-      <div class="sim-winner-flag">${flag(champion.f||getFlag(champion.n),'l')}</div>
-      <div class="sim-winner-name">${champion.n}</div>
-      <div style="margin-top:var(--sp-3);font-family:'Barlow Condensed',sans-serif;font-size:var(--tx-sm);color:var(--tx3)">Based on your group stage predictions · FIFA rankings used as knockout tiebreaker</div>
-    </div>`:''}`;
+  el.innerHTML =
+    koSection('⚡ Round of 32', r32) +
+    koSection('🔟 Round of 16', r16) +
+    koSection('🔷 Quarter-Finals', qf) +
+    koSection('🔶 Semi-Finals', sf) +
+    koSection('🥉 3rd Place · Miami · Jul 18', [{t1:third1,t2:third2,winner:thirdPlace,m:103,v:'Miami',d:'Jul 18'}]) +
+    '<div class="sim-ko-title">🏆 Final · MetLife Stadium NJ · Jul 19</div>'
+    +'<div class="sim-ko-row" style="border:2px solid var(--gold);border-radius:var(--r-lg)">'
+      +'<div class="sim-ko-team '+(champion?.n===fin1.n?'win':champion?'lose':'')+'">'
+      +'<span class="flag-em">'+fin1.f+'</span><span>'+fin1.n+'</span></div>'
+      +'<div class="sim-ko-mid"><div class="sim-ko-vstext">FINAL</div><div class="sim-ko-venue">M104 · MetLife NJ</div></div>'
+      +'<div class="sim-ko-team right '+(champion?.n===fin2.n?'win':champion?'lose':'')+'">'
+      +'<span>'+fin2.n+'</span><span class="flag-em">'+fin2.f+'</span></div>'
+    +'</div>'
+    +(champion ? '<div class="sim-champion-card">'
+      +'<div class="sim-champion-trophy">🏆</div>'
+      +'<div class="sim-champion-label">Your Predicted World Champion</div>'
+      +'<div class="sim-champion-flag">'+champion.f+'</div>'
+      +'<div class="sim-champion-name">'+champion.n+'</div>'
+      +'<div style="margin-top:var(--sp-3);font-family:'Barlow Condensed',sans-serif;font-size:var(--tx-sm);color:var(--tx3)">Based on your predicted group stage scores · FIFA rankings used as knockout tiebreaker</div>'
+      +'</div>' : '');
 }
 
-// Score calculation — compare simPreds vs actual ST.scores
+// Score calculation — predicted vs actual
 function renderSimScore(){
-  const el=document.getElementById('simScoreRows');
-  const summary=document.getElementById('simScoreSummary');
-  if(!el||!summary)return;
+  const tilesEl = document.getElementById('simScoreTiles');
+  const rowsEl  = document.getElementById('simScoreRows');
+  if(!tilesEl||!rowsEl) return;
 
   let totalPts=0, exact=0, correct=0, wrong=0, pending=0;
-  const rows=[];
+  const rows = [];
 
-  Object.keys(G).forEach(g=>{
-    FX[g].forEach(([a,b,num,dt],fi)=>{
-      const k=`${g}_${fi}`;
-      const pred=ST.simPreds[k];
-      const actual=ST.scores[k];
-      if(!pred||pred[0]===null||pred[1]===null){pending++;return;}
-      if(!actual){pending++;return;}
-
-      const[ps1,ps2]=pred,[as1,as2]=actual;
-      let pts=0,badge='';
-      if(ps1===as1&&ps2===as2){pts=3;exact++;badge='pts-3';}
-      else if((ps1>ps2&&as1>as2)||(ps1<ps2&&as1<as2)||(ps1===ps2&&as1===as2)){pts=1;correct++;badge='pts-1';}
-      else{wrong++;badge='pts-0';}
+  Object.keys(G).forEach(g => {
+    FX[g].forEach(([a,b,num],fi) => {
+      const k = g+'_'+fi;
+      const pred   = ST.simPreds[k];
+      const actual = ST.scores[k];
+      if(!pred||pred[0]===null||pred[1]===null){ pending++; return; }
+      if(!actual){ pending++; return; }
+      const [ps1,ps2]=pred, [as1,as2]=actual;
+      let pts=0, cls='sim-pts0';
+      if(ps1===as1&&ps2===as2){       pts=3; exact++;   cls='sim-pts3'; }
+      else if((ps1>ps2&&as1>as2)||(ps1<ps2&&as1<as2)||(ps1===ps2&&as1===as2)){ pts=1; correct++; cls='sim-pts1'; }
+      else{ wrong++; }
       totalPts+=pts;
-
-      rows.push(`<div class="score-row">
-        <div>
-          <div class="score-row-match">${flag(G[g].f[a],'s')} ${G[g].t[a]} vs ${G[g].t[b]} ${flag(G[g].f[b],'s')}</div>
-          <div class="score-row-pred">Your prediction: ${ps1}–${ps2}</div>
-        </div>
-        <div class="score-row-actual">${as1}–${as2}</div>
-        <div class="score-row-pts ${badge}">${pts>0?'+'+pts:pts}</div>
-      </div>`);
+      rows.push('<div class="sim-result-row">'
+        +'<div><div class="sim-result-match"><span class="flag-em">'+G[g].f[a]+'</span> '+G[g].t[a]+' vs '+G[g].t[b]+' <span class="flag-em">'+G[g].f[b]+'</span></div>'
+        +'<div class="sim-result-pred">Predicted: '+ps1+'–'+ps2+'</div></div>'
+        +'<div class="sim-result-actual">'+as1+'–'+as2+'</div>'
+        +'<div class="sim-result-pts '+cls+'">'+(pts>0?'+':'')+pts+'</div>'
+        +'</div>');
     });
   });
 
-  const played=rows.length;
-  summary.innerHTML=`
-    <div class="score-summary-tile"><div class="score-summary-val" style="color:var(--gold)">${totalPts}</div><div class="score-summary-lbl">Total Points</div></div>
-    <div class="score-summary-tile"><div class="score-summary-val">${played>0?Math.round((totalPts/(played*3))*100):0}%</div><div class="score-summary-lbl">Accuracy</div></div>
-    <div class="score-summary-tile"><div class="score-summary-val" style="color:var(--gold)">${exact}</div><div class="score-summary-lbl">Exact Scores</div></div>
-    <div class="score-summary-tile"><div class="score-summary-val" style="color:var(--qualify)">${correct}</div><div class="score-summary-lbl">Correct Result</div></div>
-    <div class="score-summary-tile"><div class="score-summary-val" style="color:var(--danger)">${wrong}</div><div class="score-summary-lbl">Wrong</div></div>
-    <div class="score-summary-tile"><div class="score-summary-val" style="color:var(--tx3)">${pending}</div><div class="score-summary-lbl">Pending</div></div>`;
+  const played = rows.length;
+  const pct = played>0 ? Math.round((totalPts/(played*3))*100) : 0;
+  tilesEl.innerHTML = [
+    [totalPts,'Points'],
+    [pct+'%','Accuracy'],
+    [exact,'Exact Scores (3pts)'],
+    [correct,'Correct Results (1pt)'],
+    [wrong,'Wrong'],
+    [pending,'Pending'],
+  ].map(([v,l]) =>
+    '<div class="sim-score-tile"><div class="sim-score-tile-val">'+v+'</div><div class="sim-score-tile-lbl">'+l+'</div></div>'
+  ).join('');
 
-  el.innerHTML=rows.length?rows.join(''):`<div class="empty-state"><div class="empty-icon">⏳</div><div class="empty-title">No Results Yet</div><div class="empty-sub">Enter actual match results in the Groups tab to start seeing your score</div></div>`;
+  rowsEl.innerHTML = rows.length
+    ? rows.join('')
+    : '<div class="empty-state"><div class="empty-icon">⏳</div><div class="empty-title">No Results Yet</div><div class="empty-sub">Enter actual results in the Groups tab to start scoring</div></div>';
 }
 
 function clearSimPreds(){
-  if(!confirm('Clear all your tournament predictions?'))return;
-  ST.simPreds={};save();
+  if(!confirm('Clear all your tournament predictions?')) return;
+  ST.simPreds = {}; save();
   simUpdateProgress();
   renderSimTabs();
   renderSimGroupContent(currentSimGroup);
   simShowView('predict');
-  toast('Predictions cleared','info');
+  toast('Predictions cleared', 'info');
 }
 
 function initSimulator(){
   renderSimTabs();
   renderSimGroupContent(currentSimGroup);
   simUpdateProgress();
+  simShowView('predict');
 }
 
+// ═══════════════════════════════════════════════════════
 // ═══════════════════════════════════════════════════════
 // INIT
 // ═══════════════════════════════════════════════════════
@@ -6602,12 +5626,8 @@ renderGroups();
 renderBracket();
 renderScorers();
 renderDashboard();
-renderTVGuide();
-renderTournamentTimeline();
-renderGroupsHero();
-renderTicker();
-initCompare();
 initSimulator();
+renderTVGuide(); // Enhancement 9
 
 // Apply saved timezone to selectors
 (()=>{
@@ -6625,7 +5645,7 @@ document.querySelectorAll('.theme-opt').forEach(o=>{
 
 // ── Mobile: bottom tab bar active state sync ──
 function syncTabBar(sectionId){
-  const map={groups:'tab-groups',dashboard:'tab-dashboard',bracket:'tab-bracket',goldenboot:'tab-boot',fixtures:'tab-more',timeline:'tab-more',league:'tab-more',squads:'tab-more',fairplay:'tab-more',share:'tab-more',predictions:'tab-more',compare:'tab-more',simulate:'tab-more'};
+  const map={groups:'tab-groups',dashboard:'tab-dashboard',bracket:'tab-bracket',goldenboot:'tab-boot',fixtures:'tab-more',timeline:'tab-more',league:'tab-more',squads:'tab-more',fairplay:'tab-more',share:'tab-more',predictions:'tab-more',simulate:'tab-more'};
   document.querySelectorAll('.tab-item').forEach(t=>t.classList.remove('active'));
   const tid=map[sectionId];
   if(tid){const el=document.getElementById(tid);if(el)el.classList.add('active');}
@@ -6708,17 +5728,13 @@ syncTabBar('groups');
   <div class="more-sheet-handle"></div>
   <div class="more-sheet-title">More</div>
   <div class="more-sheet-grid">
-    <button class="more-sheet-item" onclick="showSection('simulate',this)" aria-label="Tournament Predictor">
-      <span class="msi-icon">🔮</span>
-      <span class="msi-label">Predictor</span>
-    </button>
-    <button class="more-sheet-item" onclick="showSection('compare',this)" aria-label="Compare Nations">
-      <span class="msi-icon">⚔️</span>
-      <span class="msi-label">Compare</span>
-    </button>
     <button class="more-sheet-item" onclick="showSection('fixtures',this)" aria-label="All Fixtures">
       <span class="msi-icon">📅</span>
       <span class="msi-label">All Fixtures</span>
+    </button>
+    <button class="more-sheet-item" onclick="showSection('simulate',this)" aria-label="Tournament Predictor">
+      <span class="msi-icon">🔮</span>
+      <span class="msi-label">Predictor</span>
     </button>
     <button class="more-sheet-item" onclick="showSection('predictions',this)" aria-label="AI Predict">
       <span class="msi-icon">🤖</span>
