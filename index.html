@@ -3032,9 +3032,334 @@ main { max-width: var(--max-w); margin: 0 auto; padding: var(--sp-6) var(--sp-6)
 }
 
 /* ═══════════════════════════════════════════════════
+   TOURNAMENT PREDICTOR
+   ═══════════════════════════════════════════════════ */
+.predictor-tabs {
+  display: flex;
+  gap: 2px;
+  background: var(--bg3);
+  border: 1px solid var(--bdr);
+  border-radius: var(--r-md);
+  padding: var(--sp-1);
+  margin-bottom: var(--sp-5);
+  flex-wrap: wrap;
+}
+.pred-tab {
+  flex: 1;
+  min-width: 60px;
+  background: transparent;
+  border: none;
+  color: var(--tx3);
+  padding: var(--sp-2) var(--sp-3);
+  border-radius: var(--r-sm);
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: var(--tx-sm);
+  letter-spacing: 1.5px;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+  text-align: center;
+  position: relative;
+}
+.pred-tab:hover { color: var(--tx); background: var(--surf1); }
+.pred-tab.active { background: var(--gold); color: #000; }
+.pred-tab .pred-tab-done {
+  position: absolute;
+  top: 3px; right: 4px;
+  width: 6px; height: 6px;
+  background: var(--qualify);
+  border-radius: 50%;
+  display: none;
+}
+.pred-tab .pred-tab-done.show { display: block; }
+
+/* Group prediction grid */
+.pred-group-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--sp-5);
+}
+@media(max-width: 900px) { .pred-group-grid { grid-template-columns: 1fr; } }
+
+.pred-group-card {
+  background: var(--surf1);
+  border: 1px solid var(--bdr);
+  border-radius: var(--r-md);
+  overflow: hidden;
+  transition: border-color 0.2s;
+}
+.pred-group-card.complete { border-color: rgba(34,197,94,0.4); }
+
+.pred-group-header {
+  background: linear-gradient(90deg, rgba(240,180,41,0.1), transparent);
+  border-bottom: 1px solid var(--bdr);
+  padding: var(--sp-3) var(--sp-4);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.pred-group-letter {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.3rem;
+  color: var(--gold);
+  letter-spacing: 2px;
+}
+.pred-group-count {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: var(--tx-xs);
+  color: var(--tx3);
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+/* Individual fixture prediction row */
+.pred-fix-row {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: var(--sp-3) var(--sp-4);
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  transition: background 0.1s;
+}
+.pred-fix-row:last-child { border-bottom: none; }
+.pred-fix-row:hover { background: rgba(255,255,255,0.02); }
+.pred-fix-row.has-pred { background: rgba(240,180,41,0.03); }
+
+.pred-team {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: var(--tx-sm);
+  font-weight: 700;
+  overflow: hidden;
+}
+.pred-team.away { flex-direction: row-reverse; text-align: right; }
+.pred-team-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 80px;
+}
+
+.pred-score-entry {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-1);
+  flex-shrink: 0;
+}
+.pred-score-inp {
+  width: 38px;
+  height: 38px;
+  background: var(--bg3);
+  border: 1px solid var(--bdr2);
+  color: var(--gold);
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.3rem;
+  text-align: center;
+  border-radius: var(--r-sm);
+  transition: border-color 0.15s, box-shadow 0.15s;
+  -moz-appearance: textfield;
+}
+.pred-score-inp::-webkit-inner-spin-button,
+.pred-score-inp::-webkit-outer-spin-button { -webkit-appearance: none; }
+.pred-score-inp:focus {
+  outline: none;
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(240,180,41,0.15);
+}
+.pred-score-inp.filled { border-color: rgba(240,180,41,0.4); }
+.pred-score-dash {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: var(--tx-md);
+  color: var(--tx3);
+  opacity: 0.4;
+}
+
+/* Simulate results panel */
+.sim-phase-header {
+  background: linear-gradient(90deg, rgba(240,180,41,0.1), transparent);
+  border: 1px solid var(--bdr-gold);
+  border-radius: var(--r-md);
+  padding: var(--sp-4) var(--sp-5);
+  margin-bottom: var(--sp-4);
+  display: flex;
+  align-items: center;
+  gap: var(--sp-4);
+  flex-wrap: wrap;
+}
+.sim-phase-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: var(--tx-lg);
+  color: var(--gold);
+  letter-spacing: 2px;
+}
+.sim-phase-sub {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: var(--tx-sm);
+  color: var(--tx3);
+}
+.sim-bracket-row {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: var(--sp-4);
+  padding: var(--sp-3) var(--sp-4);
+  background: var(--surf1);
+  border: 1px solid var(--bdr);
+  border-radius: var(--r-sm);
+  margin-bottom: var(--sp-2);
+  transition: border-color 0.15s;
+}
+.sim-bracket-row.winner-decided { border-color: rgba(240,180,41,0.3); }
+.sim-team-cell {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: var(--tx-base);
+  font-weight: 700;
+}
+.sim-team-cell.right { flex-direction: row-reverse; text-align: right; }
+.sim-team-cell.winner { color: var(--gold); }
+.sim-team-cell.loser { opacity: 0.4; }
+.sim-score {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.3rem;
+  color: var(--gold);
+  text-align: center;
+  min-width: 48px;
+  letter-spacing: 3px;
+}
+.sim-score.tbd {
+  font-size: var(--tx-xs);
+  color: var(--tx3);
+  letter-spacing: 1px;
+  font-family: 'Barlow Condensed', sans-serif;
+}
+.sim-venue {
+  font-size: var(--tx-xs);
+  color: var(--tx3);
+  text-align: center;
+  font-family: 'Barlow Condensed', sans-serif;
+  letter-spacing: 0.5px;
+}
+.sim-section-divider {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: var(--tx-md);
+  color: var(--gold);
+  letter-spacing: 3px;
+  padding: var(--sp-4) 0 var(--sp-3);
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+}
+.sim-section-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--bdr-gold);
+}
+.sim-winner-card {
+  background: linear-gradient(135deg,
+    rgba(240,180,41,0.15) 0%,
+    rgba(240,180,41,0.05) 100%);
+  border: 2px solid var(--gold);
+  border-radius: var(--r-lg);
+  padding: var(--sp-8);
+  text-align: center;
+  margin-top: var(--sp-5);
+  position: relative;
+  overflow: hidden;
+}
+.sim-winner-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 50% 0%,
+    rgba(240,180,41,0.1) 0%, transparent 60%);
+  pointer-events: none;
+}
+.sim-winner-trophy { font-size: 4rem; margin-bottom: var(--sp-3); filter: drop-shadow(0 0 20px rgba(240,180,41,0.6)); animation: trophy-float 3s ease-in-out infinite; }
+.sim-winner-label { font-family: 'Barlow Condensed', sans-serif; font-size: var(--tx-sm); color: var(--tx3); letter-spacing: 3px; text-transform: uppercase; margin-bottom: var(--sp-2); }
+.sim-winner-name { font-family: 'Bebas Neue', sans-serif; font-size: 3rem; color: var(--gold); letter-spacing: 4px; text-shadow: 0 0 30px rgba(240,180,41,0.5); }
+.sim-winner-flag { margin: var(--sp-3) auto var(--sp-2); display: flex; justify-content: center; }
+
+/* Scoring summary */
+.score-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: var(--sp-4);
+  margin-bottom: var(--sp-5);
+}
+.score-summary-tile {
+  background: var(--surf1);
+  border: 1px solid var(--bdr);
+  border-radius: var(--r-md);
+  padding: var(--sp-5);
+  text-align: center;
+}
+.score-summary-val {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 2.5rem;
+  color: var(--gold);
+  line-height: 1;
+}
+.score-summary-lbl {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: var(--tx-xs);
+  color: var(--tx3);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin-top: var(--sp-1);
+  font-weight: 700;
+}
+.score-row {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  gap: var(--sp-4);
+  padding: var(--sp-3) var(--sp-4);
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: var(--tx-sm);
+}
+.score-row:last-child { border-bottom: none; }
+.score-row-match { color: var(--tx2); }
+.score-row-pred { color: var(--tx3); font-size: var(--tx-xs); }
+.score-row-actual { font-weight: 700; }
+.score-row-pts {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: var(--tx-lg);
+  min-width: 32px;
+  text-align: right;
+}
+.pts-3 { color: var(--gold); }
+.pts-1 { color: var(--qualify); }
+.pts-0 { color: var(--tx3); }
+
+/* Progress indicator */
+.predictor-progress {
+  background: var(--surf1);
+  border: 1px solid var(--bdr);
+  border-radius: var(--r-md);
+  padding: var(--sp-4) var(--sp-5);
+  margin-bottom: var(--sp-5);
+  display: flex;
+  align-items: center;
+  gap: var(--sp-5);
+  flex-wrap: wrap;
+}
+.pp-stat { text-align: center; }
+.pp-val { font-family: 'Bebas Neue', sans-serif; font-size: 1.6rem; color: var(--gold); line-height: 1; }
+.pp-lbl { font-family: 'Barlow Condensed', sans-serif; font-size: var(--tx-xs); color: var(--tx3); text-transform: uppercase; letter-spacing: 1px; font-weight: 700; }
+.pp-bar-wrap { flex: 1; min-width: 180px; }
+.pp-bar { height: 6px; background: var(--bdr); border-radius: 3px; overflow: hidden; margin-top: var(--sp-2); }
+.pp-fill { height: 100%; background: linear-gradient(90deg, var(--gold), var(--qualify)); border-radius: 3px; transition: width 0.5s var(--ease-out); }
+/* ═══════════════════════════════════════════════════
    PRINT
    ═══════════════════════════════════════════════════ */
-@media print {
   header, .nav-bar, .theme-panel, .toast, .overlay, .confetti-canvas { display: none !important; }
   body { background: #fff !important; color: #000 !important; }
   .section { display: block !important; }
@@ -3338,6 +3663,9 @@ input[type=number] { -moz-appearance: textfield; }
     <button class="nav-btn" onclick="showSection('goldenboot',this)" aria-label="Golden Boot">
       <span class="nb-icon">👟</span> Golden Boot
     </button>
+    <button class="nav-btn" onclick="showSection('simulate',this)" aria-label="Tournament Predictor">
+      <span class="nb-icon">🔮</span> Predictor
+    </button>
     <button class="nav-btn" onclick="showSection('predictions',this)" aria-label="AI Predictions">
       <span class="nb-icon">🤖</span> AI Predict
     </button>
@@ -3556,6 +3884,70 @@ input[type=number] { -moz-appearance: textfield; }
   </div>
   <div id="tvGuideBar"></div>
   <div id="fixtureList"></div>
+</section>
+
+<!-- TOURNAMENT PREDICTOR — predict every game, simulate the whole tournament -->
+<section class="section" id="sec-simulate">
+  <div class="section-header">
+    <div>
+      <div class="section-title">Tournament Predictor</div>
+      <div class="section-sub">Predict every score · simulate the full knockout · compare vs reality after the tournament</div>
+    </div>
+    <div class="section-actions">
+      <button class="btn sm" onclick="simShowView('predict')" id="simBtnPredict">✏️ Enter Predictions</button>
+      <button class="btn secondary sm" onclick="simShowView('simulate')" id="simBtnSim">🔮 Simulate</button>
+      <button class="btn secondary sm" onclick="simShowView('score')" id="simBtnScore">🏅 My Score</button>
+      <button class="btn ghost sm" onclick="clearSimPreds()">↺ Reset</button>
+    </div>
+  </div>
+
+  <!-- Progress bar -->
+  <div class="predictor-progress" id="simProgress">
+    <div class="pp-stat"><div class="pp-val" id="simFilled">0</div><div class="pp-lbl">Predicted</div></div>
+    <div class="pp-stat"><div class="pp-val" id="simTotal">72</div><div class="pp-lbl">Group Games</div></div>
+    <div class="pp-stat"><div class="pp-val" id="simPct">0%</div><div class="pp-lbl">Complete</div></div>
+    <div class="pp-bar-wrap">
+      <div style="display:flex;justify-content:space-between;font-family:'Barlow Condensed',sans-serif;font-size:var(--tx-xs);color:var(--tx3);margin-bottom:4px;font-weight:700;letter-spacing:1px;text-transform:uppercase">
+        <span>Group stage progress</span>
+        <span id="simPctLabel">0 / 72</span>
+      </div>
+      <div class="pp-bar"><div class="pp-fill" id="simProgressFill" style="width:0%"></div></div>
+    </div>
+    <button class="btn sm" onclick="simShowView('simulate')" id="simRunBtn" style="opacity:0.4;pointer-events:none">🔮 Simulate Now</button>
+  </div>
+
+  <!-- PREDICT VIEW — group tabs + score inputs -->
+  <div id="simViewPredict">
+    <div class="predictor-tabs" id="simGroupTabs" role="tablist"></div>
+    <div id="simGroupContent"></div>
+  </div>
+
+  <!-- SIMULATE VIEW — full knockout bracket from predictions -->
+  <div id="simViewSimulate" style="display:none">
+    <div class="sim-phase-header">
+      <div>
+        <div class="sim-phase-title">🔮 Simulated Tournament</div>
+        <div class="sim-phase-sub">Based on your predicted group stage scores · Winners progress to knockout</div>
+      </div>
+      <button class="btn sm" onclick="runSimulation()">↺ Re-Simulate</button>
+    </div>
+    <div id="simResults"></div>
+  </div>
+
+  <!-- SCORE VIEW — compare predictions vs actual results -->
+  <div id="simViewScore" style="display:none">
+    <div class="sim-phase-header">
+      <div>
+        <div class="sim-phase-title">🏅 Your Score</div>
+        <div class="sim-phase-sub">3pts exact score · 1pt correct result · Compare your predictions to what actually happened</div>
+      </div>
+    </div>
+    <div class="score-summary-grid" id="simScoreSummary"></div>
+    <div class="card" id="simScoreDetail">
+      <div class="card-header"><span class="card-title">📋 Match by Match</span></div>
+      <div id="simScoreRows" style="max-height:600px;overflow-y:auto"></div>
+    </div>
+  </div>
 </section>
 
 <!-- COMPARE NATIONS — new feature -->
@@ -3891,6 +4283,8 @@ ST.theme = ST.theme||'dark';
 ST.notes = ST.notes||{};           // Enhancement 10: match notes
 ST.starredGroups = ST.starredGroups||[]; // Enhancement 3: favourites
 ST.tzOffset = ST.tzOffset!==undefined ? ST.tzOffset : 1; // Enhancement 2: BST default
+ST.simPreds = ST.simPreds||{};     // Tournament Predictor predicted scores
+ST.simChampion = ST.simChampion||null; // Simulated winner
 
 const save=()=>localStorage.setItem('wc26v4',JSON.stringify(ST));
 
@@ -4000,6 +4394,7 @@ function showSection(id,btn){
     share:updateShare,
     fixtures:()=>{renderFixtureList();renderTVGuide();},
     compare:()=>{renderCompare();},
+    simulate:()=>{initSimulator();},
   };
   if(renders[id])renders[id]();
   if(moreOpen)toggleMoreMenu();
@@ -5795,6 +6190,411 @@ function runAI_compare(a,b){
 }
 
 // ═══════════════════════════════════════════════════════
+// TOURNAMENT PREDICTOR — full simulation engine
+// ═══════════════════════════════════════════════════════
+
+// ST.simPreds stores predicted scores: { 'A_0': [2,1], 'A_1': [0,0], ... }
+// Keys match same format as ST.scores
+
+function simUpdateProgress(){
+  let filled=0;
+  Object.keys(G).forEach(g=>FX[g].forEach((_,fi)=>{
+    if(ST.simPreds[`${g}_${fi}`]!==undefined)filled++;
+  }));
+  const pct=Math.round((filled/72)*100);
+  const el=id=>document.getElementById(id);
+  if(el('simFilled'))el('simFilled').textContent=filled;
+  if(el('simPct'))el('simPct').textContent=pct+'%';
+  if(el('simPctLabel'))el('simPctLabel').textContent=`${filled} / 72`;
+  if(el('simProgressFill'))el('simProgressFill').style.width=pct+'%';
+  const runBtn=el('simRunBtn');
+  if(runBtn){
+    const ready=filled>=72;
+    runBtn.style.opacity=ready?'1':'0.4';
+    runBtn.style.pointerEvents=ready?'all':'none';
+    runBtn.textContent=filled===0?'🔮 Simulate Now':`🔮 Simulate (${filled}/72)`;
+  }
+  // Update group tab completion dots
+  Object.keys(G).forEach(g=>{
+    const done=FX[g].every((_,fi)=>ST.simPreds[`${g}_${fi}`]!==undefined);
+    const dot=document.querySelector(`#simTab_${g} .pred-tab-done`);
+    if(dot)dot.classList.toggle('show',done);
+  });
+}
+
+function simShowView(view){
+  ['predict','simulate','score'].forEach(v=>{
+    const el=document.getElementById(`simView${v.charAt(0).toUpperCase()+v.slice(1)}`);
+    if(el)el.style.display=v===view?'':'none';
+  });
+  // Update button states
+  ['predict','simulate','score'].forEach(v=>{
+    const btn=document.getElementById(`simBtn${v.charAt(0).toUpperCase()+v.slice(1)}`);
+    if(btn){
+      btn.className=v===view?'btn sm':'btn secondary sm';
+    }
+  });
+  if(view==='simulate')runSimulation();
+  if(view==='score')renderSimScore();
+  if(view==='predict')renderSimGroupContent(currentSimGroup||Object.keys(G)[0]);
+}
+
+let currentSimGroup='A';
+
+function renderSimTabs(){
+  const tabs=document.getElementById('simGroupTabs');
+  if(!tabs)return;
+  tabs.innerHTML=Object.keys(G).map(g=>{
+    const done=FX[g].every((_,fi)=>ST.simPreds[`${g}_${fi}`]!==undefined);
+    return`<button class="pred-tab ${g===currentSimGroup?'active':''}" id="simTab_${g}" onclick="switchSimGroup('${g}')" role="tab" aria-selected="${g===currentSimGroup}">
+      Grp ${g}
+      <span class="pred-tab-done ${done?'show':''}"></span>
+    </button>`;
+  }).join('');
+}
+
+function switchSimGroup(g){
+  currentSimGroup=g;
+  renderSimTabs();
+  renderSimGroupContent(g);
+}
+
+function renderSimGroupContent(g){
+  const el=document.getElementById('simGroupContent');
+  if(!el)return;
+  const matches=FX[g].map(([a,b,num,dt,venue],fi)=>{
+    const k=`${g}_${fi}`;
+    const pred=ST.simPreds[k];
+    const hasPred=pred!==undefined;
+    const localTime=fmtLocalTime(dt);
+    return`<div class="pred-fix-row ${hasPred?'has-pred':''}" id="simRow_${g}_${fi}">
+      <div class="pred-team">
+        ${flag(G[g].f[a],'s')}
+        <span class="pred-team-name">${G[g].t[a]}</span>
+      </div>
+      <div class="pred-score-entry">
+        <input class="pred-score-inp ${hasPred?'filled':''}" type="number" min="0" max="20"
+          value="${hasPred?pred[0]:''}" placeholder="?"
+          id="simInp_${g}_${fi}_0"
+          onchange="saveSimPred('${g}',${fi},0,this.value)"
+          oninput="saveSimPred('${g}',${fi},0,this.value)"
+          aria-label="${G[g].t[a]} predicted score">
+        <span class="pred-score-dash">–</span>
+        <input class="pred-score-inp ${hasPred?'filled':''}" type="number" min="0" max="20"
+          value="${hasPred?pred[1]:''}" placeholder="?"
+          id="simInp_${g}_${fi}_1"
+          onchange="saveSimPred('${g}',${fi},1,this.value)"
+          oninput="saveSimPred('${g}',${fi},1,this.value)"
+          aria-label="${G[g].t[b]} predicted score">
+      </div>
+      <div class="pred-team away">
+        <span class="pred-team-name">${G[g].t[b]}</span>
+        ${flag(G[g].f[b],'s')}
+      </div>
+    </div>`;
+  }).join('');
+
+  // Show quick standings preview
+  const s=simStandings(g);
+  const standingsPreview=`<div style="padding:var(--sp-3) var(--sp-4);border-top:1px solid var(--bdr);background:rgba(0,0,0,0.2)">
+    <div style="font-family:'Barlow Condensed',sans-serif;font-size:var(--tx-xs);color:var(--tx3);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:var(--sp-2);font-weight:700">Predicted Standings</div>
+    ${s.map((t,i)=>`<div style="display:flex;align-items:center;gap:var(--sp-2);padding:4px 0;font-family:'Barlow Condensed',sans-serif;font-size:var(--tx-sm);${i<2?'color:var(--qualify)':i===2?'color:var(--third-c)':'color:var(--tx3)'}">
+      <span style="font-family:'Bebas Neue',sans-serif;font-size:var(--tx-md);color:inherit;min-width:16px">${i+1}</span>
+      ${flag(t.f,'s')}
+      <span style="font-weight:700;flex:1">${t.name}</span>
+      <span style="font-family:'Bebas Neue',sans-serif;font-size:var(--tx-lg);color:var(--gold)">${t.p}</span>
+      <span style="color:var(--tx3);font-size:var(--tx-xs)">pts</span>
+    </div>`).join('')}
+  </div>`;
+
+  el.innerHTML=`<div class="pred-group-card ${FX[g].every((_,fi)=>ST.simPreds[`${g}_${fi}`]!==undefined)?'complete':''}">
+    <div class="pred-group-header">
+      <span class="pred-group-letter">Group ${g}</span>
+      <span class="pred-group-count">${FX[g].filter((_,fi)=>ST.simPreds[`${g}_${fi}`]!==undefined).length}/${FX[g].length} predicted</span>
+    </div>
+    ${matches}
+    ${standingsPreview}
+  </div>`;
+}
+
+function saveSimPred(g,fi,slot,val){
+  const k=`${g}_${fi}`;
+  if(val===''){
+    // Only delete if both are empty
+    const other=slot===0?document.getElementById(`simInp_${g}_${fi}_1`):document.getElementById(`simInp_${g}_${fi}_0`);
+    if(!other||other.value==='')delete ST.simPreds[k];
+    else if(ST.simPreds[k])ST.simPreds[k][slot]=null;
+  } else {
+    if(!ST.simPreds[k])ST.simPreds[k]=[null,null];
+    ST.simPreds[k][slot]=parseInt(val)||0;
+  }
+  // Mark as complete only when both scores filled
+  if(ST.simPreds[k]&&ST.simPreds[k][0]!==null&&ST.simPreds[k][1]!==null){
+    const inp0=document.getElementById(`simInp_${g}_${fi}_0`);
+    const inp1=document.getElementById(`simInp_${g}_${fi}_1`);
+    const row=document.getElementById(`simRow_${g}_${fi}`);
+    if(inp0)inp0.classList.add('filled');
+    if(inp1)inp1.classList.add('filled');
+    if(row)row.classList.add('has-pred');
+  }
+  save();
+  simUpdateProgress();
+  // Refresh the standings preview in current group
+  if(g===currentSimGroup){
+    const s=simStandings(g);
+    const preview=document.querySelector('#simGroupContent [style*="Predicted Standings"]')?.closest('[style*="rgba(0,0,0,0.2)"]');
+    if(preview){
+      preview.innerHTML=`<div style="font-family:'Barlow Condensed',sans-serif;font-size:var(--tx-xs);color:var(--tx3);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:var(--sp-2);font-weight:700">Predicted Standings</div>
+        ${s.map((t,i)=>`<div style="display:flex;align-items:center;gap:var(--sp-2);padding:4px 0;font-family:'Barlow Condensed',sans-serif;font-size:var(--tx-sm);${i<2?'color:var(--qualify)':i===2?'color:var(--third-c)':'color:var(--tx3)'}">
+          <span style="font-family:'Bebas Neue',sans-serif;font-size:var(--tx-md);color:inherit;min-width:16px">${i+1}</span>
+          ${flag(t.f,'s')}
+          <span style="font-weight:700;flex:1">${t.name}</span>
+          <span style="font-family:'Bebas Neue',sans-serif;font-size:var(--tx-lg);color:var(--gold)">${t.p}</span>
+          <span style="color:var(--tx3);font-size:var(--tx-xs)">pts</span>
+        </div>`).join('')}`;
+    }
+  }
+}
+
+// Simulated standings — uses ST.simPreds instead of ST.scores
+function simStandings(g){
+  const t=G[g].t.map((name,i)=>({name,f:G[g].f[i],p:0,w:0,d:0,l:0,gf:0,ga:0,gd:0,mp:0,rank:rank(name),fp:0}));
+  FX[g].forEach(([a,b],fi)=>{
+    const k=`${g}_${fi}`;
+    if(!ST.simPreds[k]||ST.simPreds[k][0]===null||ST.simPreds[k][1]===null)return;
+    const[sa,sb]=ST.simPreds[k];
+    t[a].mp++;t[b].mp++;t[a].gf+=sa;t[a].ga+=sb;t[b].gf+=sb;t[b].ga+=sa;
+    if(sa>sb){t[a].p+=3;t[a].w++;t[b].l++;}
+    else if(sb>sa){t[b].p+=3;t[b].w++;t[a].l++;}
+    else{t[a].p++;t[b].p++;t[a].d++;t[b].d++;}
+  });
+  t.forEach(x=>x.gd=x.gf-x.ga);
+  return t.sort((a,b)=>b.p-a.p||b.gd-a.gd||b.gf-a.gf||a.rank-b.rank);
+}
+
+function simBestThirds(){
+  return Object.keys(G).map(g=>{
+    const s=simStandings(g); const t=s[2];
+    if(!t||t.mp===0)return null;
+    const coeff=t.p*1e6+t.gd*1e3+t.gf-t.rank*0.000001;
+    return{...t,group:g,coeff};
+  }).filter(Boolean).sort((a,b)=>b.coeff-a.coeff);
+}
+
+function simAllGroupResults(){
+  const r={};
+  Object.keys(G).forEach(g=>{const s=simStandings(g);r[g]={first:s[0],second:s[1],third:s[2]};});
+  return r;
+}
+
+function simResolveTeam(code, gr){
+  if(!code)return{n:'TBD',f:null};
+  if(code.startsWith('1')){const g=code[1];const t=gr[g]?.first;return t?{n:t.name,f:t.f}:{n:`1st ${g}`,f:null};}
+  if(code.startsWith('2')){const g=code[1];const t=gr[g]?.second;return t?{n:t.name,f:t.f}:{n:`2nd ${g}`,f:null};}
+  if(code.startsWith('3'))return{n:'Best 3rd',f:null};
+  return{n:code,f:null};
+}
+
+// Run the full simulation — derives knockout bracket from predicted group stage
+function runSimulation(){
+  const el=document.getElementById('simResults');
+  if(!el)return;
+
+  const gr=simAllGroupResults();
+  const thirds=simBestThirds().slice(0,8);
+
+  // Resolve R32 matchups
+  const r32teams=R32.map(m=>{
+    let t1,t2;
+    if(m.t1k.startsWith('3')){
+      // best third — simplified assignment
+      t1={n:'Best 3rd',f:null};
+    } else {
+      t1=simResolveTeam(m.t1k,gr);
+    }
+    if(m.t2k.startsWith('3')){
+      t2={n:'Best 3rd',f:null};
+    } else {
+      t2=simResolveTeam(m.t2k,gr);
+    }
+    return{...m,t1,t2};
+  });
+
+  // Simulate knockout rounds using FIFA ranking as tiebreaker when scores aren't predicted
+  // (We're simulating based on group predictions — knockout picks higher-ranked team by default,
+  //  or the team with better group stage performance)
+  function pickWinner(t1,t2){
+    // Use relative group performance / FIFA rank to determine simulated winner
+    const r1=rank(t1.n)||50, r2=rank(t2.n)||50;
+    return r1<=r2?t1:t2; // lower rank number = better team
+  }
+
+  function renderKOSection(title, matchups){
+    const rows=matchups.map(({t1,t2,winner,m,v,d})=>{
+      const hasTeams=t1.n!=='TBD'&&t2.n!=='TBD';
+      const isFinal=m===104;
+      return`<div class="sim-bracket-row ${winner?'winner-decided':''}" ${isFinal?'style="border:2px solid var(--gold);border-radius:var(--r-lg)"':''}>
+        <div class="sim-team-cell ${winner?.n===t1.n?'winner':winner?'loser':''}">
+          ${flag(t1.f||getFlag(t1.n),'s')}
+          <span>${t1.n}</span>
+        </div>
+        <div>
+          <div class="sim-score ${hasTeams?'':'tbd'}">${hasTeams?'vs':'TBD'}</div>
+          <div class="sim-venue">M${m} · ${v}</div>
+          <div class="sim-venue">${d}</div>
+        </div>
+        <div class="sim-team-cell right ${winner?.n===t2.n?'winner':winner?'loser':''}">
+          <span>${t2.n}</span>
+          ${flag(t2.f||getFlag(t2.n),'s')}
+        </div>
+      </div>`;
+    }).join('');
+    return`<div class="sim-section-divider">${title}</div>${rows}`;
+  }
+
+  // R32
+  const r32results=r32teams.map(m=>{
+    const w=m.t1.n!=='TBD'&&m.t2.n!=='TBD'?pickWinner(m.t1,m.t2):null;
+    return{...m,winner:w};
+  });
+
+  // R16 — pair consecutive R32 winners
+  const r16matchups=[];
+  for(let i=0;i<r32results.length;i+=2){
+    const w1=r32results[i].winner||{n:'TBD',f:null};
+    const w2=r32results[i+1]?.winner||{n:'TBD',f:null};
+    const rl=R16[i/2]||{m:89+i/2,v:'TBD',d:'TBD'};
+    const w=w1.n!=='TBD'&&w2.n!=='TBD'?pickWinner(w1,w2):null;
+    r16matchups.push({t1:w1,t2:w2,winner:w,m:rl.m,v:rl.v,d:rl.d});
+  }
+
+  // QF
+  const qfMatchups=[];
+  for(let i=0;i<r16matchups.length;i+=2){
+    const w1=r16matchups[i].winner||{n:'TBD',f:null};
+    const w2=r16matchups[i+1]?.winner||{n:'TBD',f:null};
+    const ql=QF[i/2]||{m:97+i/2,v:'TBD',d:'TBD'};
+    const w=w1.n!=='TBD'&&w2.n!=='TBD'?pickWinner(w1,w2):null;
+    qfMatchups.push({t1:w1,t2:w2,winner:w,m:ql.m,v:ql.v,d:ql.d});
+  }
+
+  // SF
+  const sfMatchups=[];
+  for(let i=0;i<qfMatchups.length;i+=2){
+    const w1=qfMatchups[i].winner||{n:'TBD',f:null};
+    const w2=qfMatchups[i+1]?.winner||{n:'TBD',f:null};
+    const sl=SF[i/2]||{m:101+i/2,v:'TBD',d:'TBD'};
+    const w=w1.n!=='TBD'&&w2.n!=='TBD'?pickWinner(w1,w2):null;
+    sfMatchups.push({t1:w1,t2:w2,winner:w,m:sl.m,v:sl.v,d:sl.d,loser:w?{...w1,...w2}[w===w1?'t2':'t1']:null});
+    sfMatchups[sfMatchups.length-1].loser=w?(w===w1?w2:w1):null;
+  }
+
+  // Final + 3rd place
+  const finalist1=sfMatchups[0]?.winner||{n:'TBD',f:null};
+  const finalist2=sfMatchups[1]?.winner||{n:'TBD',f:null};
+  const third1=sfMatchups[0]?.loser||{n:'TBD',f:null};
+  const third2=sfMatchups[1]?.loser||{n:'TBD',f:null};
+  const champion=finalist1.n!=='TBD'&&finalist2.n!=='TBD'?pickWinner(finalist1,finalist2):null;
+  const thirdPlace=third1.n!=='TBD'&&third2.n!=='TBD'?pickWinner(third1,third2):null;
+
+  // Store simulated champion in ST for display
+  ST.simChampion=champion?.n||null;
+  save();
+
+  el.innerHTML=
+    renderKOSection('⚡ Round of 32', r32results)+
+    renderKOSection('🔟 Round of 16', r16matchups)+
+    renderKOSection('🔷 Quarter-Finals', qfMatchups)+
+    renderKOSection('🔶 Semi-Finals', sfMatchups)+
+    renderKOSection('🥉 3rd Place', [{t1:third1,t2:third2,winner:thirdPlace,m:103,v:'Miami',d:'Jul 18'}])+
+    `<div class="sim-section-divider">🏆 Final · MetLife Stadium NJ · Jul 19</div>
+    <div class="sim-bracket-row" style="border:2px solid var(--gold);border-radius:var(--r-lg)">
+      <div class="sim-team-cell ${champion?.n===finalist1.n?'winner':champion?'loser':''}">
+        ${flag(finalist1.f||getFlag(finalist1.n),'s')}
+        <span>${finalist1.n}</span>
+      </div>
+      <div>
+        <div class="sim-score ${finalist1.n!=='TBD'?'':'tbd'}">${finalist1.n!=='TBD'?'FINAL':'TBD'}</div>
+        <div class="sim-venue">M104 · MetLife NJ · Jul 19</div>
+      </div>
+      <div class="sim-team-cell right ${champion?.n===finalist2.n?'winner':champion?'loser':''}">
+        <span>${finalist2.n}</span>
+        ${flag(finalist2.f||getFlag(finalist2.n),'s')}
+      </div>
+    </div>
+    ${champion?`<div class="sim-winner-card">
+      <div class="sim-winner-trophy">🏆</div>
+      <div class="sim-winner-label">Your Predicted World Champion</div>
+      <div class="sim-winner-flag">${flag(champion.f||getFlag(champion.n),'l')}</div>
+      <div class="sim-winner-name">${champion.n}</div>
+      <div style="margin-top:var(--sp-3);font-family:'Barlow Condensed',sans-serif;font-size:var(--tx-sm);color:var(--tx3)">Based on your group stage predictions · FIFA rankings used as knockout tiebreaker</div>
+    </div>`:''}`;
+}
+
+// Score calculation — compare simPreds vs actual ST.scores
+function renderSimScore(){
+  const el=document.getElementById('simScoreRows');
+  const summary=document.getElementById('simScoreSummary');
+  if(!el||!summary)return;
+
+  let totalPts=0, exact=0, correct=0, wrong=0, pending=0;
+  const rows=[];
+
+  Object.keys(G).forEach(g=>{
+    FX[g].forEach(([a,b,num,dt],fi)=>{
+      const k=`${g}_${fi}`;
+      const pred=ST.simPreds[k];
+      const actual=ST.scores[k];
+      if(!pred||pred[0]===null||pred[1]===null){pending++;return;}
+      if(!actual){pending++;return;}
+
+      const[ps1,ps2]=pred,[as1,as2]=actual;
+      let pts=0,badge='';
+      if(ps1===as1&&ps2===as2){pts=3;exact++;badge='pts-3';}
+      else if((ps1>ps2&&as1>as2)||(ps1<ps2&&as1<as2)||(ps1===ps2&&as1===as2)){pts=1;correct++;badge='pts-1';}
+      else{wrong++;badge='pts-0';}
+      totalPts+=pts;
+
+      rows.push(`<div class="score-row">
+        <div>
+          <div class="score-row-match">${flag(G[g].f[a],'s')} ${G[g].t[a]} vs ${G[g].t[b]} ${flag(G[g].f[b],'s')}</div>
+          <div class="score-row-pred">Your prediction: ${ps1}–${ps2}</div>
+        </div>
+        <div class="score-row-actual">${as1}–${as2}</div>
+        <div class="score-row-pts ${badge}">${pts>0?'+'+pts:pts}</div>
+      </div>`);
+    });
+  });
+
+  const played=rows.length;
+  summary.innerHTML=`
+    <div class="score-summary-tile"><div class="score-summary-val" style="color:var(--gold)">${totalPts}</div><div class="score-summary-lbl">Total Points</div></div>
+    <div class="score-summary-tile"><div class="score-summary-val">${played>0?Math.round((totalPts/(played*3))*100):0}%</div><div class="score-summary-lbl">Accuracy</div></div>
+    <div class="score-summary-tile"><div class="score-summary-val" style="color:var(--gold)">${exact}</div><div class="score-summary-lbl">Exact Scores</div></div>
+    <div class="score-summary-tile"><div class="score-summary-val" style="color:var(--qualify)">${correct}</div><div class="score-summary-lbl">Correct Result</div></div>
+    <div class="score-summary-tile"><div class="score-summary-val" style="color:var(--danger)">${wrong}</div><div class="score-summary-lbl">Wrong</div></div>
+    <div class="score-summary-tile"><div class="score-summary-val" style="color:var(--tx3)">${pending}</div><div class="score-summary-lbl">Pending</div></div>`;
+
+  el.innerHTML=rows.length?rows.join(''):`<div class="empty-state"><div class="empty-icon">⏳</div><div class="empty-title">No Results Yet</div><div class="empty-sub">Enter actual match results in the Groups tab to start seeing your score</div></div>`;
+}
+
+function clearSimPreds(){
+  if(!confirm('Clear all your tournament predictions?'))return;
+  ST.simPreds={};save();
+  simUpdateProgress();
+  renderSimTabs();
+  renderSimGroupContent(currentSimGroup);
+  simShowView('predict');
+  toast('Predictions cleared','info');
+}
+
+function initSimulator(){
+  renderSimTabs();
+  renderSimGroupContent(currentSimGroup);
+  simUpdateProgress();
+}
+
+// ═══════════════════════════════════════════════════════
 // INIT
 // ═══════════════════════════════════════════════════════
 buildGroupFilter();
@@ -5807,6 +6607,7 @@ renderTournamentTimeline();
 renderGroupsHero();
 renderTicker();
 initCompare();
+initSimulator();
 
 // Apply saved timezone to selectors
 (()=>{
@@ -5824,7 +6625,7 @@ document.querySelectorAll('.theme-opt').forEach(o=>{
 
 // ── Mobile: bottom tab bar active state sync ──
 function syncTabBar(sectionId){
-  const map={groups:'tab-groups',dashboard:'tab-dashboard',bracket:'tab-bracket',goldenboot:'tab-boot',fixtures:'tab-more',timeline:'tab-more',league:'tab-more',squads:'tab-more',fairplay:'tab-more',share:'tab-more',predictions:'tab-more',compare:'tab-more'};
+  const map={groups:'tab-groups',dashboard:'tab-dashboard',bracket:'tab-bracket',goldenboot:'tab-boot',fixtures:'tab-more',timeline:'tab-more',league:'tab-more',squads:'tab-more',fairplay:'tab-more',share:'tab-more',predictions:'tab-more',compare:'tab-more',simulate:'tab-more'};
   document.querySelectorAll('.tab-item').forEach(t=>t.classList.remove('active'));
   const tid=map[sectionId];
   if(tid){const el=document.getElementById(tid);if(el)el.classList.add('active');}
@@ -5907,6 +6708,10 @@ syncTabBar('groups');
   <div class="more-sheet-handle"></div>
   <div class="more-sheet-title">More</div>
   <div class="more-sheet-grid">
+    <button class="more-sheet-item" onclick="showSection('simulate',this)" aria-label="Tournament Predictor">
+      <span class="msi-icon">🔮</span>
+      <span class="msi-label">Predictor</span>
+    </button>
     <button class="more-sheet-item" onclick="showSection('compare',this)" aria-label="Compare Nations">
       <span class="msi-icon">⚔️</span>
       <span class="msi-label">Compare</span>
