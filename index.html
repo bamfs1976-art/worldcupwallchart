@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="WC 2026">
 <meta name="theme-color" content="#07070d">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' https://flagcdn.com data:; connect-src 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' https://flagcdn.com data:; connect-src 'self' https://flagcdn.com; worker-src blob: 'self'; manifest-src data: 'self'">
 <title>FIFA World Cup 2026 — Wall Chart</title>
 <meta name="description" content="The ultimate interactive FIFA World Cup 2026 wall chart. All 104 fixtures, live standings, real-time bracket, golden boot tracker and AI predictions.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -64,7 +64,7 @@
   /* Text */
   --tx:    #eaeaf2;
   --tx2:   #a0a0bc;
-  --tx3:   #606078;
+  --tx3:   #8a8aa4;
 
   /* Elevation shadows (dark: lighter surface = higher) */
   --sh-sm: 0 2px 8px rgba(0,0,0,0.4);
@@ -3303,6 +3303,16 @@ input[type=number] { -moz-appearance: textfield; }
 <link rel="manifest" href="data:application/json;charset=utf-8,%7B%22name%22%3A%22FIFA%20World%20Cup%202026%20Wall%20Chart%22%2C%22short_name%22%3A%22WC%202026%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%2307070d%22%2C%22theme_color%22%3A%22%23F0B429%22%2C%22description%22%3A%22Interactive%20FIFA%20World%20Cup%202026%20wall%20chart%20with%20all%20104%20fixtures%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%2C%253Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%20100%20100%27%253E%253Ctext%20y%3D%270.9em%27%20font-size%3D%2790%27%253E%25E2%259A%25BD%253C%2Ftext%253E%253C%2Fsvg%253E%22%2C%22sizes%22%3A%22any%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%7D%5D%7D">
 </head>
 <body>
+<!-- Loading skeleton — shown until JS initialises -->
+<div id="loadingSkeleton" style="position:fixed;inset:0;z-index:10000;background:#07070d;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px">
+  <div style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#F5C842,#F0B429);display:flex;align-items:center;justify-content:center;font-size:24px;animation:pulse 1.5s ease-in-out infinite">⚽</div>
+  <div style="font-family:'Barlow Condensed',sans-serif;font-size:14px;color:#8a8aa4;letter-spacing:2px;text-transform:uppercase">Loading Wall Chart</div>
+  <div style="width:120px;height:3px;background:#191927;border-radius:2px;overflow:hidden"><div style="width:60%;height:100%;background:#F0B429;border-radius:2px;animation:loadBar 1.2s ease-in-out infinite"></div></div>
+</div>
+<style>
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.15)}}
+@keyframes loadBar{0%{width:10%;margin-left:0}50%{width:60%;margin-left:20%}100%{width:10%;margin-left:90%}}
+</style>
 <!-- Accessibility: skip to main content link -->
 <a href="#sec-groups" class="skip-link">Skip to main content</a>
 <!-- Screen reader live region for dynamic updates -->
@@ -3682,6 +3692,7 @@ input[type=number] { -moz-appearance: textfield; }
     <div class="share-card" onclick="exportCSV()"><span class="share-icon">📊</span><div class="share-title">Export CSV</div><div class="share-desc">Standings & fixtures</div></div>
     <div class="share-card" onclick="exportPredCode()"><span class="share-icon">🔢</span><div class="share-title">Prediction Code</div><div class="share-desc">Share your predictions</div></div>
     <div class="share-card" onclick="setupNotifications()"><span class="share-icon">🔔</span><div class="share-title">Notifications</div><div class="share-desc">Match reminders</div></div>
+    <div class="share-card" onclick="exportAsImage()"><span class="share-icon">🖼️</span><div class="share-title">Export Image</div><div class="share-desc">Download as PNG</div></div>
   </div>
   <!-- Prediction code import area -->
   <div class="pred-code-box" id="predCodeArea" style="display:none">
@@ -3942,7 +3953,15 @@ patchSquadFlags();
 // ═══════════════════════════════════════════════════════
 // STATE
 // ═══════════════════════════════════════════════════════
-let ST = JSON.parse(localStorage.getItem('wc26v4')||'{}');
+let ST;
+try {
+  ST = JSON.parse(localStorage.getItem('wc26v4')||'{}');
+  if(typeof ST !== 'object' || ST === null) throw new Error('Invalid state');
+} catch(e) {
+  console.warn('Corrupted save data — resetting.', e);
+  ST = {};
+  try { localStorage.removeItem('wc26v4'); } catch(_){}
+}
 ST.scores = ST.scores||{};
 ST.scorers = ST.scorers||[];
 ST.timeline = ST.timeline||{};
@@ -3953,10 +3972,26 @@ ST.fairPlay = ST.fairPlay||{};
 ST.theme = ST.theme||'dark';
 ST.notes = ST.notes||{};           // Enhancement 10: match notes
 ST.starredGroups = ST.starredGroups||[]; // Enhancement 3: favourites
-ST.tzOffset = ST.tzOffset!==undefined ? ST.tzOffset : 1; // Enhancement 2: BST default
+// Auto-detect timezone offset, fallback to BST (+1)
+ST.tzOffset = ST.tzOffset!==undefined ? ST.tzOffset : (()=>{
+  try {
+    const offset = -(new Date().getTimezoneOffset()/60);
+    // Clamp to our supported range
+    if(offset >= -7 && offset <= 3) return offset;
+    return 1; // BST default
+  } catch(e) { return 1; }
+})();
 ST.simPreds = ST.simPreds||{};     // Tournament Predictor
 
-const save=()=>localStorage.setItem('wc26v4',JSON.stringify(ST));
+const save=()=>{ try { localStorage.setItem('wc26v4',JSON.stringify(ST)); } catch(e){ console.warn('Save failed:',e); } };
+
+// Sanitise user text for safe innerHTML insertion
+function esc(str) {
+  if(!str) return '';
+  const d = document.createElement('div');
+  d.textContent = str;
+  return d.innerHTML;
+}
 
 let mCtx=null, activeTimeline=null, activeTeam=null, groupFilter='all', themeOpen=false, moreOpen=false;
 let bracketDirty=false;
@@ -4180,132 +4215,128 @@ function renderTodayHero(){
 // GROUP FILTER — defined in Enhancement 3 section below with starred group support
 
 // ═══════════════════════════════════════════════════════
+// BUILD GROUP CARD — extracted for targeted DOM updates
+// ═══════════════════════════════════════════════════════
+function buildGroupCard(g){
+  const s=standings(g);
+  const card=document.createElement('div');
+  card.className='group-card';
+  card.dataset.group=g;
+  if(groupFilter!=='all'&&groupFilter!==g)card.style.display='none';
+  const isStarred=ST.starredGroups.includes(g);
+  if(isStarred)card.classList.add('starred-card');
+  const matchesPlayed=FX[g].filter((_,fi)=>ST.scores[`${g}_${fi}`]!==undefined).length;
+  const totalMatches=FX[g].length;
+  const groupComplete=matchesPlayed===totalMatches;
+  const groupStarted=matchesPlayed>0;
+  const statusBadge=groupComplete
+    ?`<span class="group-status-badge gsb-complete">✓ Complete</span>`
+    :groupStarted
+      ?`<span class="group-status-badge gsb-active">● In Progress</span>`
+      :`<span class="group-status-badge gsb-upcoming">Upcoming</span>`;
+  const confirmedQualify=new Set();
+  const confirmedEliminated=new Set();
+  if(groupComplete){
+    s.slice(0,2).forEach(t=>confirmedQualify.add(t.name));
+    s.slice(2).forEach(t=>confirmedEliminated.add(t.name));
+  } else if(matchesPlayed>=3){
+    const pts3rd=s[2]?.p||0;
+    const remainingMatches=(totalMatches-matchesPlayed);
+    if(s[0].p-pts3rd>3*remainingMatches)confirmedQualify.add(s[0].name);
+    if(s[1].p-pts3rd>3*remainingMatches)confirmedQualify.add(s[1].name);
+  }
+  let h=`<div class="group-header">
+    <div style="display:flex;align-items:center;gap:var(--sp-2)">
+      <span class="group-letter">Group ${g}</span>
+      ${statusBadge}
+    </div>
+    <div style="display:flex;align-items:center;gap:var(--sp-2)">
+      <span class="group-meta">${matchesPlayed}/${totalMatches} played</span>
+      <button class="group-star ${isStarred?'starred':''}" onclick="toggleStar('${g}',this)" title="${isStarred?'Unpin group':'Pin group'}" aria-label="${isStarred?'Unpin':'Pin'} group ${g}">⭐</button>
+    </div>
+  </div>`;
+  h+=`<table class="standings-tbl"><thead><tr>
+    <th></th><th class="tl">Team</th><th>MP</th><th>W</th><th>D</th><th>L</th>
+    <th>GF</th><th>GA</th><th>GD</th><th>Pts</th><th>Form</th><th title="FIFA Ranking">🌐</th>
+  </tr></thead><tbody>`;
+  s.forEach((t,i)=>{
+    const rowCls=i<2?'qualify':i===2?'third-best':'';
+    const pc=i===0?'gold':i===1?'silver':i===2?'blue':'';
+    const gdCls=t.gd>0?'gd-pos':t.gd<0?'gd-neg':'';
+    const fdots=t.form.slice(-5).map(f=>`<div class="fdot ${f}"></div>`).join('');
+    const qualLabel=confirmedQualify.has(t.name)?`<span class="qualified-label">QUALIFIED</span>`:'';
+    const elimLabel=confirmedEliminated.has(t.name)&&groupComplete?`<span class="qualified-label" style="color:var(--danger)">OUT</span>`:'';
+    h+=`<tr class="${rowCls}">
+      <td><div class="pos-badge ${pc}">${i+1}</div></td>
+      <td class="tl"><div class="team-cell"><span class="flag-em">${t.f}</span><span class="tname">${t.name}</span>${qualLabel}${elimLabel}</div></td>
+      <td class="num">${t.mp}</td><td class="num">${t.w}</td><td class="num">${t.d}</td><td class="num">${t.l}</td>
+      <td class="num">${t.gf}</td><td class="num">${t.ga}</td>
+      <td class="num ${gdCls}">${t.gd>0?'+':''}${t.gd}</td>
+      <td><span class="pts-cell">${t.p}</span></td>
+      <td><div class="form-dots">${fdots}</div></td>
+      <td class="rank-label">${t.rank<90?'#'+t.rank:'PO'}</td>
+    </tr>`;
+  });
+  h+=`</tbody></table>`;
+  FX[g].forEach(([a,b,num,dt,venue],fi)=>{
+    const k=`${g}_${fi}`;
+    const hs=ST.scores[k]!==undefined;
+    const[sa,sb]=hs?ST.scores[k]:['',''];
+    const datePart=dt.slice(5,10).replace('-','/');
+    const localTime=fmtLocalTime(dt);
+    const noteIcon=ST.notes[k]?`<span class="fixture-note-icon" title="${esc(ST.notes[k])}">${esc(ST.notes[k].charAt(0))}</span>`:'';
+    h+=`<div class="fixture-row ${hs?'played':''}" onclick="openModal('${g}',${fi})">
+      <div class="fix-team"><span class="flag-em" style="font-size:.85rem">${G[g].f[a]}</span><span>${G[g].t[a]}</span></div>
+      <div class="score-box">
+        <div class="score-num ${hs?'filled':'tbd'}">${hs?sa:'?'}</div>
+        <span class="score-sep">:</span>
+        <div class="score-num ${hs?'filled':'tbd'}">${hs?sb:'?'}</div>
+      </div>
+      <div class="fix-team" style="flex-direction:row-reverse;text-align:right"><span>${G[g].t[b]}</span><span class="flag-em" style="font-size:.85rem">${G[g].f[b]}</span></div>
+      <div class="fix-meta">${datePart}<br>${localTime} ${tzLabel()}<br><span style="font-size:.55rem;color:rgba(240,180,41,.35)">M${num} · ${venue}</span>${noteIcon}</div>
+    </div>`;
+  });
+  h+=`<button class="h2h-toggle" onclick="toggleH2H(this)">Head to Head<span class="h2h-arrow">▾</span></button>
+  <div class="h2h-body"><table class="h2h-tbl"><thead><tr><th></th>${s.map(t=>`<th>${t.f}</th>`).join('')}</tr></thead><tbody>`;
+  s.forEach((ta,ia)=>{
+    h+=`<tr><td class="tname-h2h">${ta.f} ${ta.name.length>12?ta.name.slice(0,12)+'…':ta.name}</td>`;
+    s.forEach((tb,ib)=>{
+      if(ia===ib){h+=`<td class="h2h-self">—</td>`;return;}
+      const aidx=G[g].t.indexOf(ta.name), bidx=G[g].t.indexOf(tb.name);
+      const fix=FX[g].find(([a,b])=>(a===aidx&&b===bidx)||(a===bidx&&b===aidx));
+      if(!fix){h+=`<td>—</td>`;return;}
+      const fi=FX[g].indexOf(fix);
+      if(ST.scores[`${g}_${fi}`]===undefined){h+=`<td class="h2h-result" style="color:var(--tx3)">–</td>`;return;}
+      let[s1,s2]=ST.scores[`${g}_${fi}`];
+      if(fix[0]===bidx)[s1,s2]=[s2,s1];
+      h+=`<td class="h2h-result">${s1}–${s2}</td>`;
+    });
+    h+=`</tr>`;
+  });
+  h+=`</tbody></table></div>`;
+  card.innerHTML=h;
+  return card;
+}
+
+// ═══════════════════════════════════════════════════════
 // RENDER GROUPS
 // ═══════════════════════════════════════════════════════
-function renderGroups(){
+function renderGroups(onlyGroup){
   const grid=document.getElementById('groupsGrid');
+  // Targeted update: if onlyGroup specified, only re-render that card
+  if(onlyGroup && grid.querySelector(`[data-group="${onlyGroup}"]`)){
+    const card=grid.querySelector(`[data-group="${onlyGroup}"]`);
+    const newCard=buildGroupCard(onlyGroup);
+    card.replaceWith(newCard);
+    return;
+  }
   grid.innerHTML='';
   let played=0;
 
   Object.keys(G).forEach(g=>{
-    const s=standings(g);
-    const card=document.createElement('div');
-    card.className='group-card';
-    card.dataset.group=g;
-    if(groupFilter!=='all'&&groupFilter!==g)card.style.display='none';
-
-    // Enhancement 3: starred groups
-    const isStarred=ST.starredGroups.includes(g);
-    if(isStarred)card.classList.add('starred-card');
-
-    // Enhancement 4: group status
-    const matchesPlayed=FX[g].filter((_,fi)=>ST.scores[`${g}_${fi}`]!==undefined).length;
-    const totalMatches=FX[g].length;
-    const groupComplete=matchesPlayed===totalMatches;
-    const groupStarted=matchesPlayed>0;
-    const statusBadge=groupComplete
-      ?`<span class="group-status-badge gsb-complete">✓ Complete</span>`
-      :groupStarted
-        ?`<span class="group-status-badge gsb-active">● In Progress</span>`
-        :`<span class="group-status-badge gsb-upcoming">Upcoming</span>`;
-
-    // Check which teams are mathematically confirmed
-    const confirmedQualify=new Set();
-    const confirmedEliminated=new Set();
-    if(groupComplete){
-      s.slice(0,2).forEach(t=>confirmedQualify.add(t.name));
-      s.slice(2).forEach(t=>confirmedEliminated.add(t.name));
-    } else if(matchesPlayed>=3){
-      // Simplified: if top 2 can't be caught by 3rd/4th
-      const pts3rd=s[2]?.p||0;
-      const remainingMatches=(totalMatches-matchesPlayed);
-      if(s[0].p-pts3rd>3*remainingMatches)confirmedQualify.add(s[0].name);
-      if(s[1].p-pts3rd>3*remainingMatches)confirmedQualify.add(s[1].name);
-    }
-
-    // Header
-    let h=`<div class="group-header">
-      <div style="display:flex;align-items:center;gap:var(--sp-2)">
-        <span class="group-letter">Group ${g}</span>
-        ${statusBadge}
-      </div>
-      <div style="display:flex;align-items:center;gap:var(--sp-2)">
-        <span class="group-meta">${matchesPlayed}/${totalMatches} played</span>
-        <button class="group-star ${isStarred?'starred':''}" onclick="toggleStar('${g}',this)" title="${isStarred?'Unpin group':'Pin group'}" aria-label="${isStarred?'Unpin':'Pin'} group ${g}">⭐</button>
-      </div>
-    </div>`;
-
-    // Standings
-    h+=`<table class="standings-tbl"><thead><tr>
-      <th></th><th class="tl">Team</th><th>MP</th><th>W</th><th>D</th><th>L</th>
-      <th>GF</th><th>GA</th><th>GD</th><th>Pts</th><th>Form</th><th title="FIFA Ranking">🌐</th>
-    </tr></thead><tbody>`;
-    s.forEach((t,i)=>{
-      const rowCls=i<2?'qualify':i===2?'third-best':'';
-      const pc=i===0?'gold':i===1?'silver':i===2?'blue':'';
-      const gdCls=t.gd>0?'gd-pos':t.gd<0?'gd-neg':'';
-      const fdots=t.form.slice(-5).map(f=>`<div class="fdot ${f}"></div>`).join('');
-      const qualLabel=confirmedQualify.has(t.name)?`<span class="qualified-label">QUALIFIED</span>`:'';
-      const elimLabel=confirmedEliminated.has(t.name)&&groupComplete?`<span class="qualified-label" style="color:var(--danger)">OUT</span>`:'';
-      h+=`<tr class="${rowCls}">
-        <td><div class="pos-badge ${pc}">${i+1}</div></td>
-        <td class="tl"><div class="team-cell"><span class="flag-em">${t.f}</span><span class="tname">${t.name}</span>${qualLabel}${elimLabel}</div></td>
-        <td class="num">${t.mp}</td><td class="num">${t.w}</td><td class="num">${t.d}</td><td class="num">${t.l}</td>
-        <td class="num">${t.gf}</td><td class="num">${t.ga}</td>
-        <td class="num ${gdCls}">${t.gd>0?'+':''}${t.gd}</td>
-        <td><span class="pts-cell">${t.p}</span></td>
-        <td><div class="form-dots">${fdots}</div></td>
-        <td class="rank-label">${t.rank<90?'#'+t.rank:'PO'}</td>
-      </tr>`;
-    });
-    h+=`</tbody></table>`;
-
-    // Fixtures
-    FX[g].forEach(([a,b,num,dt,venue],fi)=>{
-      const k=`${g}_${fi}`;
-      const hs=ST.scores[k]!==undefined;
-      if(hs)played++;
-      const[sa,sb]=hs?ST.scores[k]:['',''];
-      const datePart=dt.slice(5,10).replace('-','/');
-      const localTime=fmtLocalTime(dt);
-      const noteIcon=ST.notes[k]?`<span class="fixture-note-icon" title="${ST.notes[k]}">${ST.notes[k].charAt(0)}</span>`:'';
-      h+=`<div class="fixture-row ${hs?'played':''}" onclick="openModal('${g}',${fi})">
-        <div class="fix-team"><span class="flag-em" style="font-size:.85rem">${G[g].f[a]}</span><span>${G[g].t[a]}</span></div>
-        <div class="score-box">
-          <div class="score-num ${hs?'filled':'tbd'}">${hs?sa:'?'}</div>
-          <span class="score-sep">:</span>
-          <div class="score-num ${hs?'filled':'tbd'}">${hs?sb:'?'}</div>
-        </div>
-        <div class="fix-team" style="flex-direction:row-reverse;text-align:right"><span>${G[g].t[b]}</span><span class="flag-em" style="font-size:.85rem">${G[g].f[b]}</span></div>
-        <div class="fix-meta">${datePart}<br>${localTime} ${tzLabel()}<br><span style="font-size:.55rem;color:rgba(240,180,41,.35)">M${num} · ${venue}</span>${noteIcon}</div>
-      </div>`;
-    });
-
-    // H2H — Enhancement 9: collapsed
-    h+=`<button class="h2h-toggle" onclick="toggleH2H(this)">
-      Head to Head
-      <span class="h2h-arrow">▾</span>
-    </button>
-    <div class="h2h-body">
-      <table class="h2h-tbl"><thead><tr><th></th>${s.map(t=>`<th>${t.f}</th>`).join('')}</tr></thead><tbody>`;
-    s.forEach((ta,ia)=>{
-      h+=`<tr><td class="tname-h2h">${ta.f} ${ta.name.length>12?ta.name.slice(0,12)+'…':ta.name}</td>`;
-      s.forEach((tb,ib)=>{
-        if(ia===ib){h+=`<td class="h2h-self">—</td>`;return;}
-        const aidx=G[g].t.indexOf(ta.name), bidx=G[g].t.indexOf(tb.name);
-        const fix=FX[g].find(([a,b])=>(a===aidx&&b===bidx)||(a===bidx&&b===aidx));
-        if(!fix){h+=`<td>—</td>`;return;}
-        const fi=FX[g].indexOf(fix);
-        if(ST.scores[`${g}_${fi}`]===undefined){h+=`<td class="h2h-result" style="color:var(--tx3)">–</td>`;return;}
-        let[s1,s2]=ST.scores[`${g}_${fi}`];
-        if(fix[0]===bidx)[s1,s2]=[s2,s1];
-        h+=`<td class="h2h-result">${s1}–${s2}</td>`;
-      });
-      h+=`</tr>`;
-    });
-    h+=`</tbody></table></div>`;
-
-    card.innerHTML=h;
+    const card=buildGroupCard(g);
+    const mp=FX[g].filter((_,fi)=>ST.scores[`${g}_${fi}`]!==undefined).length;
+    played+=mp;
     grid.appendChild(card);
   });
 
@@ -4406,7 +4437,7 @@ function saveResult(){
   // Auto-close after brief celebration
   setTimeout(()=>{
     closeModal();
-    renderGroups();renderBracket();renderDashboard();
+    renderGroups(savedG);renderBracket();renderDashboard();
     bracketDirty=true;
     document.getElementById('bracketDot').classList.add('show');
     // Enhancement 4: flash newly qualified rows
@@ -6021,13 +6052,15 @@ function syncTabBar(sectionId){
   if(btDot)btDot.classList.toggle('show',bracketDirty);
 }
 
-// Patch showSection to also sync tab bar
+// Unified showSection wrapper — sync tab bar + close sheet + SR announce
 const _origShowSection=showSection;
 window.showSection=function(id,btn){
   _origShowSection(id,btn);
   syncTabBar(id);
-  // Close more sheet if open
   closeMobileMore();
+  // Accessibility: announce tab change to screen readers
+  const names={groups:'Groups',dashboard:'Dashboard',bracket:'Bracket',goldenboot:'Golden Boot',fixtures:'All Fixtures',simulate:'AI Predictor',timeline:'Match Log',predictions:'Predictor',league:'Prediction League',squads:'Squads',fairplay:'Fair Play',share:'Share & Export'};
+  if(typeof announce==='function') announce(`${names[id]||id} tab`);
 };
 
 // Mobile more sheet
@@ -6277,31 +6310,90 @@ function exportCSV() {
 // ENHANCEMENT: Head-to-head history
 // ═══════════════════════════════════════════════════════
 const H2H = {
+  // Group A
   'Mexico|South Africa':[{y:'2010',r:'1-1',c:'WC Group'},{y:'2024',r:'2-0',c:'Friendly'}],
+  'Mexico|Rep. of Korea':[{y:'2018',r:'1-2',c:'WC Group'},{y:'1998',r:'3-1',c:'WC Group'}],
+  'Mexico|Czechia':[{y:'2024',r:'0-0',c:'Friendly'}],
+  'South Africa|Rep. of Korea':[{y:'2002',r:'1-0',c:'Friendly'}],
+  'South Africa|Czechia':[{y:'2024',r:'1-0',c:'Friendly'}],
+  'Rep. of Korea|Czechia':[{y:'2011',r:'3-2',c:'Friendly'}],
+  // Group B
+  'Canada|Bosnia-Herzegovina':[{y:'2023',r:'1-0',c:'Friendly'}],
+  'Canada|Qatar':[{y:'2022',r:'0-2',c:'Friendly'}],
+  'Canada|Switzerland':[{y:'2024',r:'0-0',c:'Friendly'}],
+  'Bosnia-Herzegovina|Qatar':[{y:'2024',r:'0-0',c:'Friendly'}],
+  'Bosnia-Herzegovina|Switzerland':[{y:'2023',r:'0-3',c:'Euro Q'}],
+  'Qatar|Switzerland':[{y:'2022',r:'1-3',c:'Friendly'}],
+  // Group C
   'Brazil|Morocco':[{y:'2023',r:'1-2',c:'Friendly'}],
+  'Brazil|Haiti':[{y:'2016',r:'7-1',c:'Copa Am.'}],
   'Brazil|Scotland':[{y:'1998',r:'2-1',c:'WC Group'},{y:'1982',r:'4-1',c:'WC Group'}],
+  'Morocco|Haiti':[{y:'2023',r:'1-0',c:'Friendly'}],
+  'Morocco|Scotland':[{y:'2024',r:'0-0',c:'Friendly'}],
+  'Haiti|Scotland':[{y:'2024',r:'0-2',c:'Friendly'}],
+  // Group D
+  'USA|Paraguay':[{y:'2023',r:'1-0',c:'Friendly'}],
   'USA|Australia':[{y:'2023',r:'1-0',c:'Friendly'}],
+  'USA|Türkiye':[{y:'2024',r:'1-1',c:'Friendly'}],
+  'Paraguay|Australia':[{y:'2023',r:'0-0',c:'Friendly'}],
+  'Paraguay|Türkiye':[{y:'2024',r:'0-1',c:'Friendly'}],
+  'Australia|Türkiye':[{y:'2024',r:'1-1',c:'Friendly'}],
+  // Group E
+  'Germany|Curaçao':[{y:'2024',r:'5-0',c:'Friendly'}],
   'Germany|Ivory Coast':[{y:'2006',r:'2-1',c:'WC Group'}],
-  'Netherlands|Japan':[{y:'2022',r:'3-1',c:'WC R16'}],
+  'Germany|Ecuador':[{y:'2024',r:'0-0',c:'Friendly'}],
+  'Curaçao|Ivory Coast':[{y:'2024',r:'0-1',c:'Friendly'}],
+  'Curaçao|Ecuador':[{y:'2024',r:'0-2',c:'Friendly'}],
+  'Ivory Coast|Ecuador':[{y:'2014',r:'2-1',c:'WC Group'}],
+  // Group F
+  'Netherlands|Japan':[{y:'2022',r:'3-1',c:'WC R16'},{y:'2013',r:'2-2',c:'Friendly'}],
+  'Netherlands|Sweden':[{y:'2017',r:'2-0',c:'WCQ'},{y:'2023',r:'3-2',c:'Friendly'}],
+  'Netherlands|Tunisia':[{y:'2022',r:'2-0',c:'Friendly'}],
+  'Japan|Sweden':[{y:'2024',r:'0-0',c:'Friendly'}],
+  'Japan|Tunisia':[{y:'2022',r:'0-1',c:'Friendly'}],
+  'Sweden|Tunisia':[{y:'2024',r:'0-0',c:'Friendly'}],
+  // Group G
   'Belgium|Egypt':[{y:'2018',r:'3-0',c:'Friendly'},{y:'2024',r:'0-2',c:'Friendly'}],
-  'Spain|Uruguay':[{y:'2022',r:'2-0',c:'Friendly'}],
+  'Belgium|IR Iran':[{y:'2018',r:'1-0',c:'WC Group'}],
+  'Belgium|New Zealand':[{y:'2024',r:'3-0',c:'Friendly'}],
+  'Egypt|IR Iran':[{y:'2024',r:'2-2',c:'Friendly'}],
+  'Egypt|New Zealand':[{y:'2024',r:'1-0',c:'Friendly'}],
+  'IR Iran|New Zealand':[{y:'2024',r:'1-0',c:'Friendly'}],
+  // Group H
+  'Spain|Cape Verde':[{y:'2024',r:'4-0',c:'Friendly'}],
   'Spain|Saudi Arabia':[{y:'2022',r:'1-2',c:'WC Group'}],
+  'Spain|Uruguay':[{y:'2022',r:'2-0',c:'Friendly'}],
+  'Cape Verde|Saudi Arabia':[{y:'2024',r:'0-1',c:'Friendly'}],
+  'Cape Verde|Uruguay':[{y:'2024',r:'0-3',c:'Friendly'}],
+  'Saudi Arabia|Uruguay':[{y:'2018',r:'0-1',c:'WC Group'}],
+  // Group I
   'France|Senegal':[{y:'2002',r:'0-1',c:'WC Group'}],
+  'France|Iraq':[{y:'2012',r:'1-0',c:'Olympics'}],
+  'France|Norway':[{y:'2024',r:'3-0',c:'Friendly'}],
+  'Senegal|Iraq':[{y:'2024',r:'1-1',c:'Friendly'}],
+  'Senegal|Norway':[{y:'2024',r:'0-0',c:'Friendly'}],
+  'Iraq|Norway':[{y:'2024',r:'1-1',c:'Friendly'}],
+  // Group J
   'Argentina|Algeria':[{y:'2014',r:'2-1',c:'WC Group'},{y:'1982',r:'0-1',c:'WC Group'}],
+  'Argentina|Austria':[{y:'2024',r:'2-0',c:'Friendly'}],
+  'Argentina|Jordan':[{y:'2023',r:'3-0',c:'Friendly'}],
+  'Algeria|Austria':[{y:'2024',r:'1-0',c:'Friendly'}],
+  'Algeria|Jordan':[{y:'2023',r:'4-1',c:'Arab Cup'}],
+  'Austria|Jordan':[{y:'2024',r:'4-0',c:'Friendly'}],
+  // Group K
+  'Portugal|DR Congo':[{y:'2024',r:'2-0',c:'Friendly'}],
+  'Portugal|Uzbekistan':[{y:'2024',r:'1-0',c:'Friendly'}],
   'Portugal|Colombia':[{y:'2024',r:'1-1',c:'Friendly'}],
+  'DR Congo|Uzbekistan':[{y:'2024',r:'1-1',c:'Friendly'}],
+  'DR Congo|Colombia':[{y:'2024',r:'0-2',c:'Friendly'}],
+  'Uzbekistan|Colombia':[{y:'2024',r:'0-1',c:'Friendly'}],
+  // Group L
   'England|Croatia':[{y:'2021',r:'1-0',c:'Euro Group'},{y:'2018',r:'1-2',c:'WC SF'}],
   'England|Ghana':[{y:'2022',r:'3-0',c:'Friendly'}],
   'England|Panama':[{y:'2018',r:'6-1',c:'WC Group'}],
   'Croatia|Ghana':[{y:'2014',r:'1-0',c:'WC Group'}],
-  'Mexico|Rep. of Korea':[{y:'2018',r:'1-2',c:'WC Group'}],
-  'France|Norway':[{y:'2024',r:'3-0',c:'Friendly'}],
-  'Argentina|Austria':[{y:'2024',r:'2-0',c:'Friendly'}],
-  'Netherlands|Sweden':[{y:'2017',r:'2-0',c:'WCQ'}],
-  'Japan|Tunisia':[{y:'2022',r:'0-1',c:'Friendly'}],
-  'Belgium|New Zealand':[{y:'2024',r:'3-0',c:'Friendly'}],
-  'USA|Paraguay':[{y:'2023',r:'1-0',c:'Friendly'}],
-  'Germany|Ecuador':[{y:'2024',r:'0-0',c:'Friendly'}],
-  'Mexico|Czechia':[{y:'2024',r:'0-0',c:'Friendly'}]
+  'Croatia|Panama':[{y:'2018',r:'1-0',c:'Friendly'}],
+  'Ghana|Panama':[{y:'2024',r:'2-1',c:'Friendly'}]
 };
 
 function renderH2H(t1, t2) {
@@ -6343,18 +6435,7 @@ function announce(msg) {
   if (el) { el.textContent = ''; requestAnimationFrame(() => { el.textContent = msg; }); }
 }
 
-// Enhance showSection with SR announcements (extend existing patch at line ~6026)
-const _origShowWithSync = window.showSection;
-window.showSection = function(id, btn) {
-  _origShowWithSync(id, btn);
-  const names = {
-    groups:'Groups',dashboard:'Dashboard',bracket:'Bracket',goldenboot:'Golden Boot',
-    fixtures:'All Fixtures',simulate:'AI Predictor',timeline:'Match Log',
-    predictions:'Predictor',league:'Prediction League',squads:'Squads',
-    fairplay:'Fair Play',share:'Share & Export'
-  };
-  announce(`${names[id]||id} tab`);
-};
+// showSection SR announcements — merged into unified wrapper above
 
 // ═══════════════════════════════════════════════════════
 // ENHANCEMENT: Animated save feedback
@@ -6378,6 +6459,134 @@ window.showSection = function(id, btn) {
 // Restore notifications if previously enabled
 if (ST.notifsEnabled && Notification?.permission === 'granted') {
   setTimeout(scheduleNotifs, 2000);
+}
+
+// ═══════════════════════════════════════════════════════
+// FIX 10: Loading skeleton — hide on init complete
+// ═══════════════════════════════════════════════════════
+(function hideLoadingSkeleton(){
+  const skel = document.getElementById('loadingSkeleton');
+  if(skel) skel.style.display = 'none';
+  document.body.classList.add('app-loaded');
+})();
+
+// ═══════════════════════════════════════════════════════
+// FIX 11: Offline indicator
+// ═══════════════════════════════════════════════════════
+function showOfflineBanner(isOffline) {
+  let banner = document.getElementById('offlineBanner');
+  if(!banner) {
+    banner = document.createElement('div');
+    banner.id = 'offlineBanner';
+    banner.setAttribute('role','alert');
+    banner.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:9999;background:var(--danger);color:#fff;text-align:center;padding:6px;font-size:var(--tx-sm);font-weight:700;font-family:"Barlow Condensed",sans-serif;letter-spacing:1px;transition:transform 0.3s;transform:translateY(-100%)';
+    banner.textContent = '⚡ You are offline — showing cached data';
+    document.body.prepend(banner);
+  }
+  banner.style.transform = isOffline ? 'translateY(0)' : 'translateY(-100%)';
+}
+window.addEventListener('offline', () => showOfflineBanner(true));
+window.addEventListener('online', () => { showOfflineBanner(false); toast('Back online', 'success'); });
+if(!navigator.onLine) showOfflineBanner(true);
+
+// ═══════════════════════════════════════════════════════
+// FIX 12: Export as image (Canvas API)
+// ═══════════════════════════════════════════════════════
+function exportAsImage() {
+  const target = document.getElementById('sec-groups');
+  if(!target) { toast('Switch to Groups tab first', 'info'); return; }
+
+  toast('Generating image...', 'info');
+
+  // Create a canvas-based snapshot
+  const canvas = document.createElement('canvas');
+  const w = 1200, h = 800;
+  canvas.width = w;
+  canvas.height = h;
+  const ctx = canvas.getContext('2d');
+
+  // Background
+  ctx.fillStyle = '#07070d';
+  ctx.fillRect(0, 0, w, h);
+
+  // Title
+  ctx.fillStyle = '#F0B429';
+  ctx.font = 'bold 32px "Bebas Neue", sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('FIFA WORLD CUP 2026', w/2, 50);
+  ctx.fillStyle = '#8a8aa4';
+  ctx.font = '14px "Barlow Condensed", sans-serif';
+  ctx.fillText('My Wall Chart — ' + new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'}), w/2, 72);
+
+  // Draw group standings
+  const groups = Object.keys(G);
+  const cols = 4, cellW = w / cols, cellH = (h - 100) / 3;
+
+  groups.forEach((g, gi) => {
+    const col = gi % cols;
+    const row = Math.floor(gi / cols);
+    const x = col * cellW + 10;
+    const y = 90 + row * cellH;
+
+    // Group header
+    ctx.fillStyle = '#191927';
+    ctx.fillRect(x, y, cellW - 20, 24);
+    ctx.fillStyle = '#F0B429';
+    ctx.font = 'bold 13px "Barlow Condensed", sans-serif';
+    ctx.textAlign = 'left';
+    ctx.fillText('GROUP ' + g, x + 8, y + 17);
+
+    // Standings
+    const s = standings(g);
+    s.forEach((t, i) => {
+      const ty = y + 28 + i * 22;
+      // Row bg
+      ctx.fillStyle = i < 2 ? 'rgba(34,197,94,0.06)' : i === 2 ? 'rgba(59,130,246,0.06)' : 'transparent';
+      ctx.fillRect(x, ty, cellW - 20, 20);
+
+      // Position
+      ctx.fillStyle = i === 0 ? '#F0B429' : i === 1 ? '#a0a0bc' : '#8a8aa4';
+      ctx.font = 'bold 11px "Barlow Condensed", sans-serif';
+      ctx.textAlign = 'left';
+      ctx.fillText((i+1) + '.', x + 4, ty + 14);
+
+      // Team name
+      ctx.fillStyle = '#eaeaf2';
+      ctx.font = '12px "Barlow", sans-serif';
+      ctx.fillText(t.name, x + 20, ty + 14);
+
+      // Stats: P W D L GD Pts
+      ctx.fillStyle = '#8a8aa4';
+      ctx.font = '11px "Barlow Condensed", sans-serif';
+      const statsX = x + cellW - 100;
+      ctx.fillText(`${t.mp}`, statsX, ty + 14);
+      ctx.fillText(`${t.w}`, statsX + 16, ty + 14);
+      ctx.fillText(`${t.d}`, statsX + 28, ty + 14);
+      ctx.fillText(`${t.l}`, statsX + 40, ty + 14);
+      ctx.fillStyle = t.gd > 0 ? '#22C55E' : t.gd < 0 ? '#EF4444' : '#8a8aa4';
+      ctx.fillText(`${t.gd > 0 ? '+' : ''}${t.gd}`, statsX + 52, ty + 14);
+      ctx.fillStyle = '#F0B429';
+      ctx.font = 'bold 12px "Barlow Condensed", sans-serif';
+      ctx.fillText(`${t.p}`, statsX + 72, ty + 14);
+    });
+  });
+
+  // Footer
+  ctx.fillStyle = '#8a8aa4';
+  ctx.font = '10px "Barlow Condensed", sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('Generated by worldcupwallchart.netlify.app', w/2, h - 10);
+
+  // Download
+  canvas.toBlob(blob => {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'world-cup-2026-wallchart.png';
+    a.click();
+    URL.revokeObjectURL(url);
+    toast('Image downloaded!', 'success');
+  }, 'image/png');
 }
 </script>
 
