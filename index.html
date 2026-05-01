@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="WC 2026">
 <meta name="theme-color" content="#07070d">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' https://flagcdn.com data:; connect-src 'self' https://flagcdn.com https://xdrwtsuzytdzcnwjbfvx.supabase.co wss://xdrwtsuzytdzcnwjbfvx.supabase.co; worker-src blob: 'self'; manifest-src data: 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' https://flagcdn.com data:; connect-src 'self' https://flagcdn.com https://xdrwtsuzytdzcnwjbfvx.supabase.co wss://xdrwtsuzytdzcnwjbfvx.supabase.co https://site.api.espn.com https://www.thesportsdb.com https://api.football-data.org; worker-src blob: 'self'; manifest-src data: 'self'">
 <title>FIFA World Cup 2026 — Wall Chart</title>
 <meta name="description" content="The ultimate interactive FIFA World Cup 2026 wall chart. All 104 fixtures, live standings, real-time bracket, golden boot tracker and AI predictions.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -3532,6 +3532,153 @@ input[type=number] { -moz-appearance: textfield; }
 }
 
 #wcl-status-pill.offline { background: rgba(239,68,68,0.15) !important; color: var(--danger) !important; }
+
+/* ═══════════════════════════════════════════════════
+   PHASE 2: MATCH STATUS BADGES + LIVE PANEL (additive)
+   All prefixed wls- (wallchart live status)
+   ═══════════════════════════════════════════════════ */
+
+/* Badge applied to any element with data-wls-status */
+[data-wls-status]::before {
+  content: attr(data-wls-status);
+  display: inline-block;
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 9px;
+  letter-spacing: 1px;
+  padding: 1px 5px;
+  border-radius: 3px;
+  font-weight: 700;
+  z-index: 5;
+  pointer-events: none;
+}
+[data-wls-status="LIVE"] {
+  position: relative;
+}
+[data-wls-status="LIVE"]::before {
+  background: #ef4444;
+  color: #fff;
+  animation: wls-pulse 1.5s ease-in-out infinite;
+  box-shadow: 0 0 0 0 rgba(239,68,68,0.6);
+}
+[data-wls-status="FT"]::before {
+  background: var(--surf3);
+  color: var(--tx2);
+  border: 1px solid var(--bdr);
+}
+[data-wls-status="UPC"]::before {
+  background: rgba(240,180,41,0.15);
+  color: var(--gold);
+  border: 1px solid var(--bdr-gold);
+}
+@keyframes wls-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(239,68,68,0.6); }
+  50% { box-shadow: 0 0 0 6px rgba(239,68,68,0); }
+}
+
+/* Make fixture rows position-relative so badges anchor correctly */
+.fixture-row, .fl-row, .b-match { position: relative; }
+
+/* Countdown indicator on upcoming matches */
+.wls-countdown {
+  position: absolute;
+  bottom: 4px;
+  right: 8px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 10px;
+  color: var(--tx3);
+  font-weight: 700;
+  pointer-events: none;
+  z-index: 5;
+}
+
+/* Live Scores admin panel */
+.wls-admin-card {
+  background: var(--surf1);
+  border: 1px solid var(--bdr);
+  border-radius: var(--r-md);
+  padding: var(--sp-4);
+  margin-top: var(--sp-4);
+}
+.wls-admin-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: var(--sp-3) 0;
+  border-bottom: 1px solid var(--bdr);
+  flex-wrap: wrap;
+}
+.wls-admin-row:last-child { border-bottom: none; }
+.wls-admin-label {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  font-size: var(--tx-sm);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--tx2);
+}
+.wls-admin-value {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: var(--tx-base);
+  color: var(--tx);
+}
+.wls-toggle {
+  position: relative;
+  display: inline-block;
+  width: 44px;
+  height: 24px;
+  background: var(--bg3);
+  border: 1px solid var(--bdr);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.wls-toggle::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 18px;
+  height: 18px;
+  background: var(--tx3);
+  border-radius: 50%;
+  transition: transform 0.2s, background 0.2s;
+}
+.wls-toggle.on {
+  background: var(--qualify-bg);
+  border-color: var(--qualify);
+}
+.wls-toggle.on::after {
+  transform: translateX(20px);
+  background: var(--qualify);
+}
+.wls-status-text {
+  font-size: var(--tx-xs);
+  color: var(--tx3);
+  font-family: 'Barlow Condensed', sans-serif;
+}
+.wls-status-text.ok { color: var(--qualify); }
+.wls-status-text.err { color: var(--danger); }
+.wls-status-text.fetching { color: var(--gold); }
+
+/* Bracket auto-progression indicator */
+.b-match.wls-auto-filled {
+  border-style: dashed;
+  border-color: rgba(34,197,94,0.4);
+}
+.wls-auto-tag {
+  position: absolute;
+  bottom: 2px;
+  left: 4px;
+  font-size: 8px;
+  color: rgba(34,197,94,0.7);
+  font-family: 'Barlow Condensed', sans-serif;
+  letter-spacing: 1px;
+  pointer-events: none;
+}
 </style>
 <!-- PWA Manifest (inline via data URI) -->
 <link rel="manifest" href="data:application/json;charset=utf-8,%7B%22name%22%3A%22FIFA%20World%20Cup%202026%20Wall%20Chart%22%2C%22short_name%22%3A%22WC%202026%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%2307070d%22%2C%22theme_color%22%3A%22%23F0B429%22%2C%22description%22%3A%22Interactive%20FIFA%20World%20Cup%202026%20wall%20chart%20with%20all%20104%20fixtures%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%2C%253Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%20100%20100%27%253E%253Ctext%20y%3D%270.9em%27%20font-size%3D%2790%27%253E%25E2%259A%25BD%253C%2Ftext%253E%253C%2Fsvg%253E%22%2C%22sizes%22%3A%22any%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%7D%5D%7D">
@@ -3928,6 +4075,46 @@ input[type=number] { -moz-appearance: textfield; }
     <div class="share-card" onclick="exportPredCode()"><span class="share-icon">🔢</span><div class="share-title">Prediction Code</div><div class="share-desc">Share your predictions</div></div>
     <div class="share-card" onclick="setupNotifications()"><span class="share-icon">🔔</span><div class="share-title">Notifications</div><div class="share-desc">Match reminders</div></div>
     <div class="share-card" onclick="exportAsImage()"><span class="share-icon">🖼️</span><div class="share-title">Export Image</div><div class="share-desc">Download as PNG</div></div>
+    <div class="share-card" onclick="document.getElementById('wls-panel').scrollIntoView({behavior:'smooth'})"><span class="share-icon">📡</span><div class="share-title">Live Scores</div><div class="share-desc">Auto-fetch results</div></div>
+  </div>
+
+  <!-- Live Scores admin panel -->
+  <div class="wls-admin-card" id="wls-panel" style="margin-top:var(--sp-6)">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--sp-3);flex-wrap:wrap;gap:var(--sp-3)">
+      <div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:var(--tx-md);color:var(--gold);letter-spacing:2px">📡 Live Scores</div>
+        <div style="font-size:var(--tx-xs);color:var(--tx3);margin-top:4px">Fetch results automatically from a public sports API</div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn sm" onclick="wls_fetchNow()">↻ Fetch Now</button>
+      </div>
+    </div>
+    <div class="wls-admin-row">
+      <span class="wls-admin-label">Auto-poll every 60 seconds</span>
+      <div class="wls-toggle" id="wls-poll-toggle" onclick="wls_togglePoll()" role="switch" aria-checked="false" tabindex="0" aria-label="Toggle auto-poll"></div>
+    </div>
+    <div class="wls-admin-row">
+      <span class="wls-admin-label">Source</span>
+      <select id="wls-source" class="wcl-input" style="max-width:180px;min-height:36px;padding:6px 10px" onchange="wls_setSource(this.value)" aria-label="Data source">
+        <option value="espn">ESPN (no auth)</option>
+        <option value="sportsdb">TheSportsDB</option>
+      </select>
+    </div>
+    <div class="wls-admin-row">
+      <span class="wls-admin-label">Last updated</span>
+      <span class="wls-admin-value" id="wls-last-updated">Never</span>
+    </div>
+    <div class="wls-admin-row">
+      <span class="wls-admin-label">Status</span>
+      <span class="wls-status-text" id="wls-status-text">Idle</span>
+    </div>
+    <div class="wls-admin-row">
+      <span class="wls-admin-label">Matches updated this session</span>
+      <span class="wls-admin-value" id="wls-matches-count">0</span>
+    </div>
+    <div style="margin-top:var(--sp-3);padding:var(--sp-3);background:var(--bg3);border-radius:var(--r-sm);font-size:var(--tx-xs);color:var(--tx3);line-height:1.5">
+      <strong style="color:var(--tx2)">Note:</strong> The 2026 World Cup begins on 11 June 2026. Until then, the API will return no matches. Manual score entry remains fully functional. You can also test the connection with the "Fetch Now" button.
+    </div>
   </div>
   <!-- Prediction code import area -->
   <div class="pred-code-box" id="predCodeArea" style="display:none">
@@ -7416,6 +7603,461 @@ window.showSection = function(id, btn){
     else wcl_showLobby();
   }
 };
+
+// ═══════════════════════════════════════════════════════
+// PHASE 2: LIVE STATUS BADGES (additive)
+// Decorates fixture-row, fl-row, b-match elements with
+// LIVE / FT / UPC badges based on current time
+// ═══════════════════════════════════════════════════════
+
+const WLS_LIVE_WINDOW_MS = 110 * 60 * 1000; // 1h50m live window (90 min + buffer)
+
+function wls_status(dtUtc, hasResult){
+  if(!dtUtc) return null;
+  let ko;
+  try { ko = new Date(dtUtc.replace(' ','T') + (dtUtc.includes('Z')?'':'Z')).getTime(); }
+  catch(e){ return null; }
+  if(isNaN(ko)) return null;
+  const now = Date.now();
+  if(hasResult) return 'FT';
+  if(now < ko) return 'UPC';
+  if(now < ko + WLS_LIVE_WINDOW_MS) return 'LIVE';
+  return 'FT';
+}
+
+function wls_formatCountdown(dtUtc){
+  let ko;
+  try { ko = new Date(dtUtc.replace(' ','T') + (dtUtc.includes('Z')?'':'Z')).getTime(); }
+  catch(e){ return ''; }
+  const diff = ko - Date.now();
+  if(diff <= 0) return '';
+  const days = Math.floor(diff / 86400000);
+  const hours = Math.floor((diff % 86400000) / 3600000);
+  const mins = Math.floor((diff % 3600000) / 60000);
+  if(days > 0) return `in ${days}d`;
+  if(hours > 0) return `in ${hours}h ${mins}m`;
+  return `in ${mins}m`;
+}
+
+// Decorate group fixture rows (use onclick="openModal('A',0)" pattern)
+function wls_decorateGroupRows(){
+  document.querySelectorAll('.fixture-row').forEach(row => {
+    const onclick = row.getAttribute('onclick') || '';
+    const m = onclick.match(/openModal\('(\w)',(\d+)\)/);
+    if(!m) return;
+    const g = m[1], fi = parseInt(m[2]);
+    if(!G[g] || !FX[g] || !FX[g][fi]) return;
+    const dt = FX[g][fi][3];
+    const hasResult = ST.scores && ST.scores[`${g}_${fi}`] !== undefined;
+    const status = wls_status(dt, hasResult);
+    if(status){
+      row.dataset.wlsStatus = status;
+      // Add countdown for upcoming
+      let cd = row.querySelector('.wls-countdown');
+      if(status === 'UPC'){
+        const cdText = wls_formatCountdown(dt);
+        if(cdText){
+          if(!cd){ cd = document.createElement('span'); cd.className='wls-countdown'; row.appendChild(cd); }
+          cd.textContent = cdText;
+        } else if(cd) cd.remove();
+      } else if(cd) cd.remove();
+    }
+  });
+}
+
+// Decorate fixture list rows (use data from buildFixtureList)
+function wls_decorateFixtureList(){
+  document.querySelectorAll('.fl-row').forEach(row => {
+    const onclick = row.getAttribute('onclick') || '';
+    let dt = null, hasResult = false;
+    // Group match: openModal('G', fi)
+    const groupMatch = onclick.match(/openModal\('(\w)',(\d+)\)/);
+    if(groupMatch){
+      const g = groupMatch[1], fi = parseInt(groupMatch[2]);
+      if(G[g] && FX[g] && FX[g][fi]){
+        dt = FX[g][fi][3];
+        hasResult = ST.scores && ST.scores[`${g}_${fi}`] !== undefined;
+      }
+    } else {
+      // Bracket match: openBracketModal('id', ...)
+      const koMatch = onclick.match(/openBracketModal\('([^']+)'/);
+      if(koMatch){
+        const id = koMatch[1];
+        hasResult = ST.bScores && ST.bScores[id] && ST.bScores[id].s1 !== undefined;
+        // Find date from R32/R16/QF/SF arrays — best effort
+        const allKo = [...R32, ...R16, ...QF, ...SF, {id:'final_0'}, {id:'third_0'}];
+        const ko = allKo.find(k => k.id === id);
+        if(ko && ko.d) dt = `2026-${ko.d.replace('Jun ','06-').replace('Jul ','07-').padStart(7,'0').slice(0,7)}T20:00:00Z`;
+      }
+    }
+    if(dt){
+      const status = wls_status(dt, hasResult);
+      if(status) row.dataset.wlsStatus = status;
+    }
+  });
+}
+
+// Decorate bracket matches
+function wls_decorateBracket(){
+  document.querySelectorAll('.b-match').forEach(match => {
+    const onclick = match.getAttribute('onclick') || '';
+    const m = onclick.match(/openBracketModal\('([^']+)'/);
+    if(!m) return;
+    const id = m[1];
+    const hasResult = ST.bScores && ST.bScores[id] && ST.bScores[id].s1 !== undefined;
+    if(hasResult) match.dataset.wlsStatus = 'FT';
+  });
+}
+
+function wls_decorateAll(){
+  try {
+    wls_decorateGroupRows();
+    wls_decorateFixtureList();
+    wls_decorateBracket();
+  } catch(e){ console.warn('Status decorate error:', e); }
+}
+
+// Run after any tab switch + every 30s + after score saves
+(function setupStatusDecorator(){
+  // Initial decoration after page settles
+  setTimeout(wls_decorateAll, 800);
+  // Tick every 30s
+  setInterval(wls_decorateAll, 30000);
+  // Hook into showSection for re-decoration after tab switch
+  const _wls_origShow = window.showSection;
+  window.showSection = function(id, btn){
+    _wls_origShow(id, btn);
+    setTimeout(wls_decorateAll, 100);
+  };
+})();
+
+// ═══════════════════════════════════════════════════════
+// PHASE 2: AUTO-BRACKET PROGRESSION (additive)
+// When a knockout match score is saved, advance the winner
+// to the next round automatically
+// ═══════════════════════════════════════════════════════
+
+// Map: matchId -> { nextId, slot } where slot is 'team1' or 'team2'
+// Standard pairing: r32_0 winner + r32_1 winner -> r16_0 (team1, team2)
+function wls_buildBracketMap(){
+  const map = {};
+  // R32 -> R16 (16 R32 matches → 8 R16 matches)
+  for(let i=0; i<16; i+=2){
+    const r16Idx = i/2;
+    map[`r32_${i}`]   = { nextId: `r16_${r16Idx}`, slot: 'team1' };
+    map[`r32_${i+1}`] = { nextId: `r16_${r16Idx}`, slot: 'team2' };
+  }
+  // R16 -> QF
+  for(let i=0; i<8; i+=2){
+    const qfIdx = i/2;
+    map[`r16_${i}`]   = { nextId: `qf_${qfIdx}`, slot: 'team1' };
+    map[`r16_${i+1}`] = { nextId: `qf_${qfIdx}`, slot: 'team2' };
+  }
+  // QF -> SF
+  for(let i=0; i<4; i+=2){
+    const sfIdx = i/2;
+    map[`qf_${i}`]   = { nextId: `sf_${sfIdx}`, slot: 'team1' };
+    map[`qf_${i+1}`] = { nextId: `sf_${sfIdx}`, slot: 'team2' };
+  }
+  // SF -> Final + Third place
+  map['sf_0'] = { nextId: 'final_0', slot: 'team1', loserNext: 'third_0', loserSlot: 'team1' };
+  map['sf_1'] = { nextId: 'final_0', slot: 'team2', loserNext: 'third_0', loserSlot: 'team2' };
+  return map;
+}
+const WLS_BRACKET_MAP = wls_buildBracketMap();
+
+// Resolve the team names from a knockout match (handles R32 with codes like '1A')
+function wls_resolveKoTeams(matchId){
+  // R32 uses codes from R32 array
+  if(matchId.startsWith('r32_')){
+    const idx = parseInt(matchId.slice(4));
+    const r32m = R32[idx];
+    if(!r32m) return null;
+    const t1 = resolveTeam(r32m.t1k);
+    const t2 = resolveTeam(r32m.t2k);
+    return { t1: t1.n, t2: t2.n };
+  }
+  // R16+ use stored team1/team2 from ST.bScores (set by previous round advance, or manually)
+  const d = ST.bScores[matchId] || {};
+  return { t1: d.team1 || 'TBD', t2: d.team2 || 'TBD' };
+}
+
+// Auto-advance: after a knockout score is saved, write winner's name to next round
+function wls_advanceWinner(matchId){
+  const d = ST.bScores[matchId];
+  if(!d || d.s1 === undefined || d.s2 === undefined) return;
+  if(d.s1 === d.s2) return; // No winner yet (would need PK in real life — leave to user)
+  const teams = wls_resolveKoTeams(matchId);
+  if(!teams) return;
+  const winner = d.s1 > d.s2 ? teams.t1 : teams.t2;
+  const loser  = d.s1 > d.s2 ? teams.t2 : teams.t1;
+  if(winner === 'TBD') return;
+  const next = WLS_BRACKET_MAP[matchId];
+  if(!next) return;
+  // Write to next match
+  if(!ST.bScores[next.nextId]) ST.bScores[next.nextId] = {};
+  const nextSlot = next.slot;
+  // Only auto-fill if the slot doesn't already have a manual override
+  if(!ST.bScores[next.nextId][nextSlot] || ST.bScores[next.nextId][nextSlot] === 'TBD'){
+    ST.bScores[next.nextId][nextSlot] = winner;
+    ST.bScores[next.nextId].autoFilled = ST.bScores[next.nextId].autoFilled || {};
+    ST.bScores[next.nextId].autoFilled[nextSlot] = true;
+  }
+  // SF loser also goes to 3rd-place match
+  if(next.loserNext && loser !== 'TBD'){
+    if(!ST.bScores[next.loserNext]) ST.bScores[next.loserNext] = {};
+    if(!ST.bScores[next.loserNext][next.loserSlot] || ST.bScores[next.loserNext][next.loserSlot] === 'TBD'){
+      ST.bScores[next.loserNext][next.loserSlot] = loser;
+    }
+  }
+  save();
+}
+
+// Hook into bracket score save: wrap the existing flow
+// We intercept ST.bScores writes by wrapping setKoScore-style flow.
+// Since we can't modify saveResult, we observe ST.bScores via periodic check
+// after any save. Cleaner: hook into closeModal/saveResult by listening
+// for the modal saved class addition.
+(function setupAutoAdvance(){
+  let lastSnapshot = JSON.stringify(ST.bScores || {});
+  setInterval(() => {
+    const cur = JSON.stringify(ST.bScores || {});
+    if(cur !== lastSnapshot){
+      lastSnapshot = cur;
+      // Walk all knockout matches and advance winners
+      Object.keys(ST.bScores || {}).forEach(id => {
+        if(WLS_BRACKET_MAP[id]) wls_advanceWinner(id);
+      });
+      // Re-render bracket if it's visible
+      if(document.getElementById('sec-bracket')?.classList.contains('active')){
+        if(typeof renderBracket === 'function') renderBracket();
+      }
+    }
+  }, 1500);
+})();
+
+// Visual marker for auto-filled bracket slots
+function wls_markAutoFilled(){
+  document.querySelectorAll('.b-match').forEach(match => {
+    const onclick = match.getAttribute('onclick') || '';
+    const m = onclick.match(/openBracketModal\('([^']+)'/);
+    if(!m) return;
+    const id = m[1];
+    const d = ST.bScores[id];
+    if(d && d.autoFilled && (d.autoFilled.team1 || d.autoFilled.team2)){
+      match.classList.add('wls-auto-filled');
+      if(!match.querySelector('.wls-auto-tag')){
+        const tag = document.createElement('span');
+        tag.className = 'wls-auto-tag';
+        tag.textContent = '↑ AUTO';
+        match.appendChild(tag);
+      }
+    }
+  });
+}
+setInterval(wls_markAutoFilled, 2000);
+
+// ═══════════════════════════════════════════════════════
+// PHASE 2: LIVE DATA API INTEGRATION (additive)
+// Fetches results from public sports API, maps to internal
+// match IDs by team name + date
+// ═══════════════════════════════════════════════════════
+
+let wlsConfig = (()=>{
+  try { return JSON.parse(localStorage.getItem('wc26_live')||'{}'); }
+  catch { return {}; }
+})();
+wlsConfig.source = wlsConfig.source || 'espn';
+wlsConfig.autoPoll = !!wlsConfig.autoPoll;
+let wlsPollTimer = null;
+let wlsMatchesUpdated = 0;
+
+function wls_saveConfig(){
+  try { localStorage.setItem('wc26_live', JSON.stringify(wlsConfig)); } catch(e){}
+}
+
+// Team name normalisation: API returns may differ from our names
+const WLS_TEAM_ALIASES = {
+  'United States': 'USA',
+  'United States of America': 'USA',
+  'US': 'USA',
+  'South Korea': 'Rep. of Korea',
+  'Korea Republic': 'Rep. of Korea',
+  'Korea Rep.': 'Rep. of Korea',
+  'Iran': 'IR Iran',
+  'Iran Islamic Republic': 'IR Iran',
+  "Côte d'Ivoire": 'Ivory Coast',
+  "Cote d'Ivoire": 'Ivory Coast',
+  'Türkiye': 'Türkiye',
+  'Turkey': 'Türkiye',
+  'Bosnia and Herzegovina': 'Bosnia-Herzegovina',
+  'Bosnia & Herzegovina': 'Bosnia-Herzegovina',
+  'Cabo Verde': 'Cape Verde',
+  'DR Congo': 'DR Congo',
+  'Democratic Republic of the Congo': 'DR Congo',
+  'Congo DR': 'DR Congo'
+};
+
+function wls_normaliseTeam(name){
+  if(!name) return null;
+  if(WLS_TEAM_ALIASES[name]) return WLS_TEAM_ALIASES[name];
+  // Try direct match against G data
+  for(const g of Object.keys(G)){
+    for(const t of G[g].t){
+      if(t === name) return t;
+      if(t.toLowerCase() === name.toLowerCase()) return t;
+    }
+  }
+  return null;
+}
+
+// Find our internal match key (g_fi) by matching teams + date
+function wls_findMatch(t1Norm, t2Norm, dtIso){
+  if(!t1Norm || !t2Norm) return null;
+  const dateStr = dtIso ? dtIso.slice(0,10) : null;
+  for(const g of Object.keys(G)){
+    for(let fi=0; fi<FX[g].length; fi++){
+      const [a, b, num, dt] = FX[g][fi];
+      const home = G[g].t[a], away = G[g].t[b];
+      // Match in either order
+      if((home===t1Norm && away===t2Norm) || (home===t2Norm && away===t1Norm)){
+        // Optional: verify date is within ±1 day
+        if(dateStr && !dt.startsWith(dateStr.slice(0,7))) continue; // Same year-month
+        return { key: `${g}_${fi}`, g, fi, swap: home===t2Norm };
+      }
+    }
+  }
+  return null;
+}
+
+function wls_setStatus(text, cls){
+  const el = document.getElementById('wls-status-text');
+  if(el){
+    el.textContent = text;
+    el.className = 'wls-status-text ' + (cls||'');
+  }
+}
+
+async function wls_fetchEspn(){
+  const url = 'https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard';
+  const res = await fetch(url, { mode: 'cors' });
+  if(!res.ok) throw new Error('ESPN HTTP '+res.status);
+  const data = await res.json();
+  const matches = [];
+  (data.events || []).forEach(ev => {
+    const comp = ev.competitions?.[0];
+    if(!comp) return;
+    const teams = comp.competitors || [];
+    if(teams.length < 2) return;
+    const home = teams.find(t => t.homeAway === 'home') || teams[0];
+    const away = teams.find(t => t.homeAway === 'away') || teams[1];
+    matches.push({
+      home: home.team?.displayName || home.team?.name,
+      away: away.team?.displayName || away.team?.name,
+      homeScore: parseInt(home.score) || 0,
+      awayScore: parseInt(away.score) || 0,
+      status: ev.status?.type?.state || 'pre',
+      completed: ev.status?.type?.completed || false,
+      date: ev.date
+    });
+  });
+  return matches;
+}
+
+async function wls_fetchSportsdb(){
+  // Free, no auth — World Cup events
+  const url = 'https://www.thesportsdb.com/api/v1/json/3/eventsround.php?id=4429&r=1&s=2026';
+  const res = await fetch(url, { mode: 'cors' });
+  if(!res.ok) throw new Error('SportsDB HTTP '+res.status);
+  const data = await res.json();
+  const matches = [];
+  (data.events || []).forEach(ev => {
+    matches.push({
+      home: ev.strHomeTeam,
+      away: ev.strAwayTeam,
+      homeScore: parseInt(ev.intHomeScore) || 0,
+      awayScore: parseInt(ev.intAwayScore) || 0,
+      status: ev.strStatus || 'pre',
+      completed: ev.strStatus === 'Match Finished' || ev.strStatus === 'FT',
+      date: ev.dateEvent + 'T' + (ev.strTime||'00:00:00')
+    });
+  });
+  return matches;
+}
+
+async function wls_fetchNow(){
+  wls_setStatus('Fetching...', 'fetching');
+  let matches = [];
+  try {
+    if(wlsConfig.source === 'sportsdb') matches = await wls_fetchSportsdb();
+    else matches = await wls_fetchEspn();
+  } catch(e){
+    console.error('Live fetch error:', e);
+    wls_setStatus('Failed: '+e.message, 'err');
+    return 0;
+  }
+  let updates = 0;
+  matches.forEach(m => {
+    const t1 = wls_normaliseTeam(m.home);
+    const t2 = wls_normaliseTeam(m.away);
+    const matched = wls_findMatch(t1, t2, m.date);
+    if(!matched) return;
+    if(!m.completed && m.status !== 'FT' && m.status !== 'post') return; // Only persist completed
+    let h = m.homeScore, a = m.awayScore;
+    if(matched.swap){ [h, a] = [a, h]; }
+    const existing = ST.scores[matched.key];
+    if(!existing || existing[0] !== h || existing[1] !== a){
+      ST.scores[matched.key] = [h, a];
+      updates++;
+    }
+  });
+  if(updates > 0){
+    save();
+    if(typeof renderGroups === 'function') renderGroups();
+    if(typeof renderBracket === 'function') renderBracket();
+    if(typeof renderDashboard === 'function') renderDashboard();
+    toast(`${updates} match${updates===1?'':'es'} updated from live feed`, 'success');
+  }
+  wlsMatchesUpdated += updates;
+  const cnt = document.getElementById('wls-matches-count'); if(cnt) cnt.textContent = wlsMatchesUpdated;
+  const lu = document.getElementById('wls-last-updated'); if(lu) lu.textContent = new Date().toLocaleTimeString();
+  wls_setStatus(updates > 0 ? `Updated ${updates}` : 'OK — no new results', 'ok');
+  return updates;
+}
+
+function wls_togglePoll(){
+  wlsConfig.autoPoll = !wlsConfig.autoPoll;
+  wls_saveConfig();
+  const t = document.getElementById('wls-poll-toggle');
+  if(t){ t.classList.toggle('on', wlsConfig.autoPoll); t.setAttribute('aria-checked', wlsConfig.autoPoll); }
+  if(wlsConfig.autoPoll){
+    wls_fetchNow();
+    wlsPollTimer = setInterval(wls_fetchNow, 60000);
+    toast('Auto-poll enabled (every 60s)', 'info');
+  } else {
+    if(wlsPollTimer){ clearInterval(wlsPollTimer); wlsPollTimer = null; }
+    toast('Auto-poll disabled', 'info');
+  }
+}
+function wls_setSource(src){
+  wlsConfig.source = src;
+  wls_saveConfig();
+  toast(`Source: ${src}`, 'info');
+}
+
+// Restore config on load
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    const sel = document.getElementById('wls-source');
+    if(sel) sel.value = wlsConfig.source;
+    const tog = document.getElementById('wls-poll-toggle');
+    if(tog && wlsConfig.autoPoll){
+      tog.classList.add('on');
+      tog.setAttribute('aria-checked', 'true');
+      wlsPollTimer = setInterval(wls_fetchNow, 60000);
+    }
+  }, 1000);
+});
 </script>
 
 <!-- ═══════════════════════════════════════════════════
