@@ -3679,6 +3679,270 @@ input[type=number] { -moz-appearance: textfield; }
   letter-spacing: 1px;
   pointer-events: none;
 }
+
+/* ═══════════════════════════════════════════════════
+   PHASE 3: MOBILE SWIPE + PWA INSTALL (additive)
+   All overrides scoped to mobile breakpoint
+   ═══════════════════════════════════════════════════ */
+
+/* ─── Swipeable group cards on mobile ─── */
+@media (max-width: 600px) {
+  /* Wrap the existing grid in horizontal swipe container — body[data-mobile-mode="swipe"] */
+  body[data-mobile-mode="swipe"] .groups-grid {
+    display: flex !important;
+    overflow-x: auto;
+    overflow-y: visible;
+    scroll-snap-type: x mandatory;
+    scroll-padding: 0 var(--sp-4);
+    -webkit-overflow-scrolling: touch;
+    gap: var(--sp-3);
+    padding: var(--sp-2) var(--sp-2) var(--sp-5);
+    margin: 0 calc(-1 * var(--sp-2));
+    scrollbar-width: none;
+  }
+  body[data-mobile-mode="swipe"] .groups-grid::-webkit-scrollbar { display: none; }
+  body[data-mobile-mode="swipe"] .group-card {
+    flex: 0 0 calc(100vw - var(--sp-4) * 2);
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+    max-width: calc(100vw - var(--sp-4) * 2);
+  }
+  /* Hide normal mobile single-column override when in swipe mode */
+  body[data-mobile-mode="swipe"] .groups-grid { grid-template-columns: none !important; }
+}
+
+/* Pagination dots above the swipeable groups */
+.mob-pager {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: var(--sp-3) 0 var(--sp-2);
+  flex-wrap: wrap;
+}
+.mob-pager-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--bdr2);
+  transition: background 0.2s, width 0.2s;
+  flex-shrink: 0;
+}
+.mob-pager-dot.active {
+  background: var(--gold);
+  width: 18px;
+  border-radius: 3px;
+}
+.mob-pager-dot.starred::after {
+  content: '★';
+  position: absolute;
+  margin-top: -10px;
+  margin-left: -2px;
+  font-size: 8px;
+  color: var(--gold);
+}
+.mob-mode-toggle {
+  display: none;
+  align-items: center;
+  gap: 4px;
+  background: var(--surf1);
+  border: 1px solid var(--bdr);
+  border-radius: 20px;
+  padding: 2px;
+  margin-left: auto;
+}
+.mob-mode-btn {
+  background: none;
+  border: none;
+  color: var(--tx3);
+  padding: 6px 10px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  border-radius: 16px;
+  min-height: 32px;
+  cursor: pointer;
+}
+.mob-mode-btn.active {
+  background: var(--gold);
+  color: #000;
+}
+
+@media (max-width: 600px) {
+  .mob-pager { display: flex; }
+  .mob-mode-toggle { display: inline-flex; }
+}
+
+/* ─── Bracket horizontal scroll with snap per round ─── */
+.bracket-wrap {
+  scroll-snap-type: x proximity;
+  scroll-padding: var(--sp-4);
+  -webkit-overflow-scrolling: touch;
+}
+@media (max-width: 600px) {
+  .bracket-frame {
+    min-width: 0 !important;
+  }
+  .bracket-col {
+    flex: 0 0 80vw !important;
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+    min-width: 80vw;
+  }
+  .bracket-col.final-col {
+    flex: 0 0 90vw !important;
+    min-width: 90vw;
+  }
+  .bcol-title {
+    position: sticky;
+    top: 0;
+    background: var(--bg);
+    z-index: 2;
+    padding: var(--sp-2);
+  }
+}
+
+/* Round indicator dots for bracket on mobile */
+.bracket-pager {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: var(--sp-2) 0;
+}
+.bracket-pager-label {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: var(--tx-xs);
+  color: var(--tx3);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin: 0 var(--sp-2);
+}
+@media (max-width: 600px) {
+  .bracket-pager { display: flex; }
+}
+
+/* ─── Mobile-optimised score entry modal ─── */
+@media (max-width: 600px) {
+  /* Bigger touch targets for score input */
+  .big-inp {
+    width: 80px !important;
+    height: 80px !important;
+    font-size: 2.4rem !important;
+  }
+  /* Larger flags */
+  .m-flag .flag-img {
+    width: 56px !important;
+    height: 40px !important;
+  }
+  .m-name {
+    font-size: var(--tx-md) !important;
+  }
+  /* Quick score chips: ensure 44px min touch target */
+  .qs-chip {
+    min-height: 44px;
+    min-width: 56px;
+    padding: var(--sp-2) var(--sp-3);
+    font-size: var(--tx-base);
+  }
+  /* Modal action buttons full-width and large */
+  .modal .btn,
+  .modal-btn-row .btn {
+    min-height: 48px;
+    font-size: var(--tx-md);
+    padding: var(--sp-3) var(--sp-4);
+  }
+  /* Modal padding */
+  .modal {
+    padding: var(--sp-5) var(--sp-4) calc(var(--sp-6) + env(safe-area-inset-bottom)) !important;
+  }
+  /* Note input larger */
+  .note-inp {
+    min-height: 48px;
+    font-size: var(--tx-md);
+  }
+  .note-emoji {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+
+/* ─── PWA Install Prompt ─── */
+.pwa-install-banner {
+  position: fixed;
+  left: var(--sp-4);
+  right: var(--sp-4);
+  bottom: 80px;
+  background: linear-gradient(135deg, var(--gold-hi), var(--gold));
+  color: #000;
+  padding: var(--sp-3) var(--sp-4);
+  border-radius: var(--r-md);
+  box-shadow: 0 8px 32px rgba(240,180,41,0.4);
+  display: none;
+  align-items: center;
+  gap: var(--sp-3);
+  z-index: 9000;
+  animation: pwa-slide-in 0.4s var(--ease-spring);
+}
+.pwa-install-banner.show { display: flex; }
+@keyframes pwa-slide-in {
+  from { transform: translateY(120%); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+.pwa-install-icon {
+  font-size: 1.6rem;
+  flex-shrink: 0;
+}
+.pwa-install-text {
+  flex: 1;
+  font-size: var(--tx-sm);
+  font-weight: 700;
+  font-family: 'Barlow', sans-serif;
+}
+.pwa-install-text small {
+  display: block;
+  font-weight: 500;
+  opacity: 0.8;
+  font-size: var(--tx-xs);
+}
+.pwa-install-btn {
+  background: #000;
+  color: var(--gold);
+  border: none;
+  padding: var(--sp-2) var(--sp-3);
+  border-radius: var(--r-sm);
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  font-size: var(--tx-sm);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  cursor: pointer;
+  min-height: 36px;
+}
+.pwa-install-close {
+  background: none;
+  border: none;
+  color: rgba(0,0,0,0.6);
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 4px 8px;
+  min-height: 32px;
+}
+
+/* iOS install hint (different flow) */
+.ios-install-hint {
+  background: var(--surf1);
+  border: 1px solid var(--bdr-gold);
+  color: var(--tx);
+  padding: var(--sp-3) var(--sp-4);
+  border-radius: var(--r-md);
+  margin: var(--sp-3) 0;
+  font-size: var(--tx-sm);
+  display: none;
+}
+.ios-install-hint.show { display: block; }
 </style>
 <!-- PWA Manifest (inline via data URI) -->
 <link rel="manifest" href="data:application/json;charset=utf-8,%7B%22name%22%3A%22FIFA%20World%20Cup%202026%20Wall%20Chart%22%2C%22short_name%22%3A%22WC%202026%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%2307070d%22%2C%22theme_color%22%3A%22%23F0B429%22%2C%22description%22%3A%22Interactive%20FIFA%20World%20Cup%202026%20wall%20chart%20with%20all%20104%20fixtures%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%2C%253Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%20100%20100%27%253E%253Ctext%20y%3D%270.9em%27%20font-size%3D%2790%27%253E%25E2%259A%25BD%253C%2Ftext%253E%253C%2Fsvg%253E%22%2C%22sizes%22%3A%22any%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%7D%5D%7D">
@@ -3698,6 +3962,13 @@ input[type=number] { -moz-appearance: textfield; }
 <a href="#sec-groups" class="skip-link">Skip to main content</a>
 <!-- Screen reader live region for dynamic updates -->
 <div id="srLive" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>
+<!-- PWA install banner (shown by JS when beforeinstallprompt fires) -->
+<div class="pwa-install-banner" id="pwaInstallBanner" role="dialog" aria-label="Install app prompt">
+  <span class="pwa-install-icon" aria-hidden="true">📱</span>
+  <div class="pwa-install-text">Install Wall Chart<small>Add to home screen for quick access</small></div>
+  <button class="pwa-install-btn" onclick="pwa_install()">Install</button>
+  <button class="pwa-install-close" onclick="pwa_dismiss()" aria-label="Dismiss">✕</button>
+</div>
 
 <!-- ═══════════════════════════════════════════════
      HEADER
@@ -3802,7 +4073,14 @@ input[type=number] { -moz-appearance: textfield; }
     <div class="legend-item"><div class="ldot" style="background:var(--third-c)"></div> Potential best 3rd</div>
     <div class="legend-item"><div class="ldot" style="background:var(--gold)"></div> FIFA rank in standings</div>
   </div>
-  <div class="filter-bar" id="groupFilter"></div>
+  <div class="filter-bar" id="groupFilter">
+    <div class="mob-mode-toggle" role="tablist" aria-label="View mode">
+      <button class="mob-mode-btn" id="mob-mode-stack" onclick="setMobileMode('stack')" role="tab" aria-label="Stack view">Stack</button>
+      <button class="mob-mode-btn active" id="mob-mode-swipe" onclick="setMobileMode('swipe')" role="tab" aria-label="Swipe view">Swipe</button>
+    </div>
+  </div>
+  <!-- Mobile pagination dots (only visible at small breakpoint) -->
+  <div class="mob-pager" id="groupPager" aria-hidden="true"></div>
   <div class="groups-grid" id="groupsGrid"></div>
 </section>
 
@@ -3856,6 +4134,7 @@ input[type=number] { -moz-appearance: textfield; }
   </div>
   <div class="bracket-scroll-hint">← Swipe left to see all rounds →</div>
   <div class="bracket-update-note" id="bracketNote">⚡ Auto-updates from group results — enter group scores to populate R32</div>
+  <div class="bracket-pager" id="bracketPager" aria-hidden="true"></div>
   <div class="bracket-wrap"><div class="bracket-frame" id="bracketFrame"></div></div>
 </section>
 
@@ -8057,6 +8336,214 @@ window.addEventListener('load', () => {
       wlsPollTimer = setInterval(wls_fetchNow, 60000);
     }
   }, 1000);
+});
+
+// ═══════════════════════════════════════════════════════
+// PHASE 3: MOBILE SWIPE NAVIGATION (additive)
+// All prefixed mob_ — switches between stack and swipe view
+// ═══════════════════════════════════════════════════════
+
+let mobConfig = (()=>{
+  try { return JSON.parse(localStorage.getItem('wc26_mob')||'{}'); }
+  catch { return {}; }
+})();
+mobConfig.mode = mobConfig.mode || 'swipe'; // Default to swipe per spec
+
+function setMobileMode(mode){
+  mobConfig.mode = mode;
+  document.body.dataset.mobileMode = mode;
+  try { localStorage.setItem('wc26_mob', JSON.stringify(mobConfig)); } catch(e){}
+  // Update toggle UI
+  const stackBtn = document.getElementById('mob-mode-stack');
+  const swipeBtn = document.getElementById('mob-mode-swipe');
+  if(stackBtn) stackBtn.classList.toggle('active', mode==='stack');
+  if(swipeBtn) swipeBtn.classList.toggle('active', mode==='swipe');
+  // Update pager visibility (still respects @media query)
+  buildGroupPager();
+}
+
+// Build pagination dots for groups
+function buildGroupPager(){
+  const pager = document.getElementById('groupPager');
+  if(!pager) return;
+  if(mobConfig.mode !== 'swipe'){ pager.innerHTML = ''; return; }
+  const groups = Object.keys(G);
+  pager.innerHTML = groups.map((g, i) =>
+    `<div class="mob-pager-dot ${i===0?'active':''} ${ST.starredGroups?.includes(g)?'starred':''}" data-pager-idx="${i}" data-group="${g}" aria-label="Group ${g}"></div>`
+  ).join('');
+
+  // Listen for scroll on the groups grid to update active dot
+  const grid = document.getElementById('groupsGrid');
+  if(!grid || grid._mobScrollAttached) return;
+  grid._mobScrollAttached = true;
+  let scrollTimeout;
+  grid.addEventListener('scroll', () => {
+    clearTimeout(scrollTimeout);
+    scrollTimeout = setTimeout(() => {
+      const cards = grid.querySelectorAll('.group-card');
+      const gridRect = grid.getBoundingClientRect();
+      let activeIdx = 0;
+      let minDist = Infinity;
+      cards.forEach((card, i) => {
+        const r = card.getBoundingClientRect();
+        const dist = Math.abs(r.left - gridRect.left);
+        if(dist < minDist){ minDist = dist; activeIdx = i; }
+      });
+      pager.querySelectorAll('.mob-pager-dot').forEach((d, i) => {
+        d.classList.toggle('active', i === activeIdx);
+      });
+    }, 80);
+  }, { passive: true });
+
+  // Click dot to scroll to that group
+  pager.addEventListener('click', e => {
+    const dot = e.target.closest('.mob-pager-dot');
+    if(!dot) return;
+    const idx = parseInt(dot.dataset.pagerIdx);
+    const cards = grid.querySelectorAll('.group-card');
+    if(cards[idx]) cards[idx].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'start' });
+  });
+}
+
+// Build round indicator for bracket on mobile
+function buildBracketPager(){
+  const pager = document.getElementById('bracketPager');
+  if(!pager) return;
+  const labels = ['R32','R16','QF','SF','FINAL','SF','QF','R16','R32'];
+  pager.innerHTML = labels.map((l, i) =>
+    `<button class="mob-pager-dot" data-bracket-idx="${i}" aria-label="${l}" style="position:relative"></button>`
+  ).join('') + `<span class="bracket-pager-label" id="bracketPagerLabel">R32</span>`;
+
+  const wrap = document.querySelector('.bracket-wrap');
+  if(!wrap || wrap._mobScrollAttached) return;
+  wrap._mobScrollAttached = true;
+
+  let bScrollTimeout;
+  wrap.addEventListener('scroll', () => {
+    clearTimeout(bScrollTimeout);
+    bScrollTimeout = setTimeout(() => {
+      const cols = wrap.querySelectorAll('.bracket-col');
+      const wrapRect = wrap.getBoundingClientRect();
+      let activeIdx = 0;
+      let minDist = Infinity;
+      cols.forEach((col, i) => {
+        const r = col.getBoundingClientRect();
+        const dist = Math.abs(r.left - wrapRect.left);
+        if(dist < minDist){ minDist = dist; activeIdx = i; }
+      });
+      pager.querySelectorAll('.mob-pager-dot').forEach((d, i) => {
+        d.classList.toggle('active', i === activeIdx);
+      });
+      const lbl = document.getElementById('bracketPagerLabel');
+      if(lbl) lbl.textContent = labels[activeIdx] || '';
+    }, 80);
+  }, { passive: true });
+
+  pager.addEventListener('click', e => {
+    const dot = e.target.closest('.mob-pager-dot');
+    if(!dot) return;
+    const idx = parseInt(dot.dataset.bracketIdx);
+    const cols = wrap.querySelectorAll('.bracket-col');
+    if(cols[idx]) cols[idx].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'start' });
+  });
+}
+
+// Hook into renderGroups/renderBracket completion to rebuild pagers
+const _mob_observePagerTargets = () => {
+  // Use a debounced rebuild after any visible change to the grid
+  const grid = document.getElementById('groupsGrid');
+  const bracket = document.getElementById('bracketFrame');
+  if(grid){
+    new MutationObserver(() => buildGroupPager())
+      .observe(grid, { childList: true });
+  }
+  if(bracket){
+    new MutationObserver(() => buildBracketPager())
+      .observe(bracket, { childList: true });
+  }
+};
+
+// Apply mobile mode on load
+window.addEventListener('load', () => {
+  document.body.dataset.mobileMode = mobConfig.mode;
+  // Update toggle visual state
+  setTimeout(() => {
+    const stackBtn = document.getElementById('mob-mode-stack');
+    const swipeBtn = document.getElementById('mob-mode-swipe');
+    if(stackBtn) stackBtn.classList.toggle('active', mobConfig.mode==='stack');
+    if(swipeBtn) swipeBtn.classList.toggle('active', mobConfig.mode==='swipe');
+    buildGroupPager();
+    buildBracketPager();
+    _mob_observePagerTargets();
+  }, 600);
+});
+
+// ═══════════════════════════════════════════════════════
+// PHASE 3: PWA INSTALL PROMPT (additive)
+// Captures beforeinstallprompt and shows custom UI
+// Handles iOS Safari (no native prompt — show hint)
+// ═══════════════════════════════════════════════════════
+
+let pwaDeferredPrompt = null;
+const PWA_DISMISS_KEY = 'wc26_pwa_dismissed';
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  pwaDeferredPrompt = e;
+  // Only show if not dismissed in last 7 days
+  const dismissed = parseInt(localStorage.getItem(PWA_DISMISS_KEY) || '0');
+  if(Date.now() - dismissed < 7 * 86400000) return;
+  // Show after 30s on page (don't be annoying immediately)
+  setTimeout(() => {
+    const banner = document.getElementById('pwaInstallBanner');
+    if(banner && !window.matchMedia('(display-mode: standalone)').matches){
+      banner.classList.add('show');
+    }
+  }, 30000);
+});
+
+function pwa_install(){
+  const banner = document.getElementById('pwaInstallBanner');
+  if(!pwaDeferredPrompt){
+    // iOS Safari fallback — show instructions
+    alert('To install:\n\n1. Tap the Share button (square with up arrow)\n2. Scroll down and tap "Add to Home Screen"\n3. Tap "Add"');
+    if(banner) banner.classList.remove('show');
+    return;
+  }
+  pwaDeferredPrompt.prompt();
+  pwaDeferredPrompt.userChoice.then(choice => {
+    if(choice.outcome === 'accepted'){
+      toast('Wall Chart installed!', 'success');
+    }
+    pwaDeferredPrompt = null;
+    if(banner) banner.classList.remove('show');
+  });
+}
+
+function pwa_dismiss(){
+  const banner = document.getElementById('pwaInstallBanner');
+  if(banner) banner.classList.remove('show');
+  try { localStorage.setItem(PWA_DISMISS_KEY, String(Date.now())); } catch(e){}
+}
+
+// iOS Safari doesn't fire beforeinstallprompt — show install hint manually
+window.addEventListener('load', () => {
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+  const isStandalone = window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches;
+  if(isIOS && !isStandalone){
+    const dismissed = parseInt(localStorage.getItem(PWA_DISMISS_KEY) || '0');
+    if(Date.now() - dismissed < 7 * 86400000) return;
+    setTimeout(() => {
+      const banner = document.getElementById('pwaInstallBanner');
+      if(banner) banner.classList.add('show');
+    }, 30000);
+  }
+});
+
+// Detect successful install
+window.addEventListener('appinstalled', () => {
+  toast('Wall Chart installed — open from your home screen!', 'success');
+  pwaDeferredPrompt = null;
 });
 </script>
 
