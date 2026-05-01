@@ -3943,6 +3943,385 @@ input[type=number] { -moz-appearance: textfield; }
   display: none;
 }
 .ios-install-hint.show { display: block; }
+
+/* ═══════════════════════════════════════════════════
+   PHASE 4: TOURNAMENT EXPERIENCE (additive)
+   Today's Matches, Wales spotlight, Venue guide, Stats
+   ═══════════════════════════════════════════════════ */
+
+/* ─── Today's Matches landing view ─── */
+.today-section {
+  background: linear-gradient(135deg, var(--surf1), var(--surf2));
+  border: 1px solid var(--bdr-gold);
+  border-radius: var(--r-lg);
+  padding: var(--sp-5);
+  margin-bottom: var(--sp-5);
+}
+.today-section-empty {
+  text-align: center;
+  color: var(--tx3);
+  padding: var(--sp-6) 0;
+  font-family: 'Barlow Condensed', sans-serif;
+}
+.today-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--sp-4);
+  flex-wrap: wrap;
+  gap: var(--sp-3);
+}
+.today-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.8rem;
+  color: var(--gold);
+  letter-spacing: 3px;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+}
+.today-date {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: var(--tx-sm);
+  color: var(--tx2);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+.today-list {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--sp-3);
+}
+.today-match {
+  background: var(--bg2);
+  border: 1px solid var(--bdr);
+  border-radius: var(--r-md);
+  padding: var(--sp-4);
+  display: grid;
+  grid-template-columns: 80px 1fr 80px 1fr 100px;
+  align-items: center;
+  gap: var(--sp-3);
+  cursor: pointer;
+  transition: border-color 0.2s, transform 0.15s;
+  position: relative;
+}
+.today-match:hover { border-color: var(--gold); transform: translateY(-1px); }
+.today-match.live {
+  border-color: var(--danger);
+  background: linear-gradient(135deg, rgba(239,68,68,0.05), var(--bg2));
+}
+.today-match.live::before {
+  content: 'LIVE NOW';
+  position: absolute;
+  top: -8px;
+  left: 12px;
+  background: var(--danger);
+  color: #fff;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 11px;
+  letter-spacing: 1.5px;
+  padding: 2px 8px;
+  border-radius: 3px;
+  animation: wls-pulse 1.5s ease-in-out infinite;
+}
+.today-match.finished { opacity: 0.7; }
+.today-match.finished::before {
+  content: 'FT';
+  position: absolute;
+  top: -8px;
+  left: 12px;
+  background: var(--surf3);
+  color: var(--tx2);
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 11px;
+  letter-spacing: 1.5px;
+  padding: 2px 8px;
+  border-radius: 3px;
+  border: 1px solid var(--bdr);
+}
+.today-time-col {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.2rem;
+  color: var(--tx);
+}
+.today-time-tz {
+  font-size: var(--tx-xs);
+  color: var(--tx3);
+  font-family: 'Barlow Condensed', sans-serif;
+}
+.today-team {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+}
+.today-team.home { justify-content: flex-end; }
+.today-team-name {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  font-size: var(--tx-md);
+}
+.today-score {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.6rem;
+  color: var(--gold);
+  text-align: center;
+  letter-spacing: 2px;
+}
+.today-score.upcoming { color: var(--tx3); font-size: 1rem; }
+.today-meta {
+  text-align: right;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: var(--tx-xs);
+  color: var(--tx3);
+}
+.today-tv-badge {
+  display: inline-block;
+  padding: 1px 6px;
+  border-radius: 3px;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  margin-top: 4px;
+}
+.today-tv-bbc { background: rgba(255,255,255,0.06); color: #fff; }
+.today-tv-itv { background: rgba(0,120,200,0.15); color: #4da3e0; }
+
+@media (max-width: 600px) {
+  .today-match { grid-template-columns: 60px 1fr 60px 1fr; gap: 4px; padding: var(--sp-3); }
+  .today-meta { display: none; }
+  .today-team-name { font-size: var(--tx-sm); }
+  .today-score { font-size: 1.2rem; }
+}
+
+/* ─── Wales spotlight ─── */
+.wales-spotlight {
+  background: linear-gradient(135deg, #c8102e 0%, #00603a 100%);
+  border-radius: var(--r-lg);
+  padding: var(--sp-5);
+  color: #fff;
+  position: relative;
+  overflow: hidden;
+  margin-bottom: var(--sp-5);
+}
+.wales-spotlight::before {
+  content: '';
+  position: absolute;
+  top: 0; right: 0;
+  width: 200px; height: 100%;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 60'%3E%3Cpath fill='rgba(255,255,255,0.08)' d='M50 30 L40 25 L40 15 L50 10 L60 15 L60 25 Z'/%3E%3C/svg%3E") no-repeat center;
+  background-size: contain;
+  pointer-events: none;
+  opacity: 0.4;
+}
+.wales-spotlight-header {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  margin-bottom: var(--sp-4);
+}
+.wales-flag-large {
+  font-size: 2.5rem;
+  filter: drop-shadow(0 2px 6px rgba(0,0,0,0.5));
+}
+.wales-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 2rem;
+  letter-spacing: 4px;
+  color: #fff;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.4);
+}
+.wales-subtitle {
+  font-size: var(--tx-sm);
+  color: rgba(255,255,255,0.85);
+  font-family: 'Barlow Condensed', sans-serif;
+  letter-spacing: 1px;
+  margin-top: 2px;
+}
+.wales-content {
+  position: relative;
+  z-index: 1;
+}
+.wales-status-card {
+  background: rgba(0,0,0,0.3);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: var(--r-md);
+  padding: var(--sp-4);
+  margin-bottom: var(--sp-3);
+  backdrop-filter: blur(8px);
+}
+.wales-status-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: var(--tx-md);
+  color: #ffd700;
+  letter-spacing: 2px;
+  margin-bottom: var(--sp-2);
+}
+.wales-history-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 4px 0;
+  font-size: var(--tx-sm);
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+.wales-history-row:last-child { border-bottom: none; }
+.wales-history-year {
+  font-family: 'Bebas Neue', sans-serif;
+  color: #ffd700;
+  letter-spacing: 1px;
+}
+.wales-cy-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  background: rgba(0,0,0,0.3);
+  border: 1px solid rgba(255,255,255,0.2);
+  color: #fff;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: var(--tx-xs);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  cursor: pointer;
+  margin-top: var(--sp-3);
+}
+.wales-cy-toggle:hover { background: rgba(0,0,0,0.5); }
+.wales-cy-toggle.active { background: #ffd700; color: #000; border-color: #ffd700; }
+
+/* Welsh language overrides — when body has data-lang="cy" */
+body[data-lang="cy"] .group-letter { font-family: inherit; }
+body[data-lang="cy"] .lbl-group::before { content: 'Grŵp '; }
+body[data-lang="cy"] .lbl-group .en-text { display: none; }
+
+.wales-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: linear-gradient(135deg, #c8102e, #00603a);
+  color: #fff;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 16px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  font-size: var(--tx-xs);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  cursor: pointer;
+  min-height: 32px;
+  margin-left: var(--sp-2);
+}
+.wales-toggle-btn.active {
+  background: linear-gradient(135deg, #ffd700, #ffa500);
+  color: #000;
+}
+
+/* ─── Venue guide ─── */
+.venue-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--sp-4);
+  margin-top: var(--sp-4);
+}
+.venue-card {
+  background: var(--surf1);
+  border: 1px solid var(--bdr);
+  border-radius: var(--r-md);
+  padding: var(--sp-4);
+  transition: border-color 0.2s, transform 0.15s;
+}
+.venue-card:hover { border-color: var(--gold); transform: translateY(-2px); }
+.venue-flag {
+  font-size: 1.4rem;
+  margin-bottom: var(--sp-2);
+}
+.venue-name {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.3rem;
+  color: var(--gold);
+  letter-spacing: 2px;
+  margin-bottom: 2px;
+}
+.venue-city {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: var(--tx-sm);
+  color: var(--tx2);
+  letter-spacing: 1px;
+}
+.venue-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--sp-2);
+  margin-top: var(--sp-3);
+  padding-top: var(--sp-3);
+  border-top: 1px solid var(--bdr);
+}
+.venue-stat {
+  display: flex;
+  flex-direction: column;
+}
+.venue-stat-label {
+  font-size: 9px;
+  color: var(--tx3);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+}
+.venue-stat-val {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: var(--tx-md);
+  color: var(--tx);
+  letter-spacing: 1px;
+}
+.venue-matches-count {
+  margin-top: var(--sp-3);
+  padding-top: var(--sp-3);
+  border-top: 1px solid var(--bdr);
+  font-size: var(--tx-xs);
+  color: var(--tx3);
+  font-family: 'Barlow Condensed', sans-serif;
+}
+.venue-matches-count strong { color: var(--gold); font-size: var(--tx-sm); }
+
+/* ─── Tournament stats expansion ─── */
+.tstats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: var(--sp-3);
+  margin-top: var(--sp-4);
+}
+.tstat-card {
+  background: var(--surf1);
+  border: 1px solid var(--bdr);
+  border-radius: var(--r-md);
+  padding: var(--sp-4);
+}
+.tstat-icon { font-size: 1.4rem; margin-bottom: var(--sp-2); display: block; }
+.tstat-label {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: var(--tx-xs);
+  color: var(--tx3);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  font-weight: 700;
+}
+.tstat-value {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.6rem;
+  color: var(--gold);
+  letter-spacing: 1px;
+  margin: var(--sp-2) 0 4px;
+}
+.tstat-detail {
+  font-size: var(--tx-xs);
+  color: var(--tx2);
+  font-family: 'Barlow Condensed', sans-serif;
+}
+.tstat-empty {
+  color: var(--tx3);
+  font-style: italic;
+}
 </style>
 <!-- PWA Manifest (inline via data URI) -->
 <link rel="manifest" href="data:application/json;charset=utf-8,%7B%22name%22%3A%22FIFA%20World%20Cup%202026%20Wall%20Chart%22%2C%22short_name%22%3A%22WC%202026%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%2307070d%22%2C%22theme_color%22%3A%22%23F0B429%22%2C%22description%22%3A%22Interactive%20FIFA%20World%20Cup%202026%20wall%20chart%20with%20all%20104%20fixtures%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%2C%253Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%20100%20100%27%253E%253Ctext%20y%3D%270.9em%27%20font-size%3D%2790%27%253E%25E2%259A%25BD%253C%2Ftext%253E%253C%2Fsvg%253E%22%2C%22sizes%22%3A%22any%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%7D%5D%7D">
@@ -4036,6 +4415,7 @@ input[type=number] { -moz-appearance: textfield; }
         <button class="more-item" onclick="showSection('timeline',null);toggleMoreMenu()" role="menuitem"><span class="mi-icon">📋</span> Match Log</button>
         <button class="more-item" onclick="showSection('league',null);toggleMoreMenu()" role="menuitem"><span class="mi-icon">🏅</span> Pred League</button>
         <button class="more-item" onclick="showSection('wcl',null);toggleMoreMenu()" role="menuitem"><span class="mi-icon">🌐</span> Multiplayer League</button>
+        <button class="more-item" onclick="showSection('venues',null);toggleMoreMenu()" role="menuitem"><span class="mi-icon">🏟️</span> Venue Guide</button>
         <button class="more-item" onclick="showSection('squads',null);toggleMoreMenu()" role="menuitem"><span class="mi-icon">👥</span> Squads</button>
         <button class="more-item" onclick="showSection('fairplay',null);toggleMoreMenu()" role="menuitem"><span class="mi-icon">🟨</span> Fair Play</button>
         <button class="more-item" onclick="showSection('share',null);toggleMoreMenu()" role="menuitem"><span class="mi-icon">🔗</span> Share</button>
@@ -4057,6 +4437,10 @@ input[type=number] { -moz-appearance: textfield; }
 
 <!-- GROUPS — Enhancement 2: Today's Matches hero -->
 <section class="section active" id="sec-groups">
+  <!-- Phase 4.11: Today's Matches landing view (auto-shown during tournament) -->
+  <div id="todaySection"></div>
+  <!-- Phase 4.12: Wales spotlight (auto-shown when Follow Wales toggled) -->
+  <div id="walesSpotlight"></div>
   <div id="todayHero"></div>
   <div class="section-header">
     <div>
@@ -4065,6 +4449,7 @@ input[type=number] { -moz-appearance: textfield; }
     </div>
     <div class="section-actions">
       <span class="pill gold" id="playedPill">0 / 72 played</span>
+      <button class="wales-toggle-btn" id="walesToggleBtn" onclick="toggleWales()" title="Show Wales spotlight" aria-pressed="false">🏴󠁧󠁢󠁷󠁬󠁳󠁿 Follow Wales</button>
       <button class="btn secondary sm" onclick="resetAllScores()">↺ Reset</button>
     </div>
   </div>
@@ -4114,6 +4499,11 @@ input[type=number] { -moz-appearance: textfield; }
     <div>
       <div class="section-sub" style="margin-bottom:var(--sp-3);font-family:'Bebas Neue',sans-serif;font-size:var(--tx-md);color:var(--gold);letter-spacing:2px">Group Leaders</div>
       <div class="dash-leaders-grid" id="dashLeaders"></div>
+      <!-- Phase 4.14: Tournament stats expansion -->
+      <div style="margin-top:var(--sp-5)">
+        <div class="section-sub" style="margin-bottom:var(--sp-3);font-family:'Bebas Neue',sans-serif;font-size:var(--tx-md);color:var(--gold);letter-spacing:2px">Tournament Highlights</div>
+        <div class="tstats-grid" id="tournamentStats"></div>
+      </div>
     </div>
   </div>
 </section>
@@ -4517,6 +4907,20 @@ input[type=number] { -moz-appearance: textfield; }
       <div id="wcl-leaderboard-list"></div>
     </div>
   </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════
+     PHASE 4.13: VENUE GUIDE
+     ═══════════════════════════════════════════════════════ -->
+<section class="section" id="sec-venues">
+  <div class="section-header">
+    <div>
+      <div class="section-title">Venue Guide</div>
+      <div class="section-sub">All 16 host stadiums across USA, Canada and Mexico</div>
+    </div>
+    <span class="pill blue">3 nations · 16 cities</span>
+  </div>
+  <div class="venue-grid" id="venueGrid"></div>
 </section>
 
 </main>
@@ -8545,6 +8949,480 @@ window.addEventListener('appinstalled', () => {
   toast('Wall Chart installed — open from your home screen!', 'success');
   pwaDeferredPrompt = null;
 });
+
+// ═══════════════════════════════════════════════════════
+// PHASE 4.11: TODAY'S MATCHES LANDING VIEW (additive)
+// Auto-shows matches kicking off today / live now
+// ═══════════════════════════════════════════════════════
+
+function renderTodaySection(){
+  const el = document.getElementById('todaySection');
+  if(!el) return;
+
+  const now = new Date();
+  const todayStr = now.toISOString().slice(0,10);
+
+  // Collect today's matches across group + knockout
+  const matches = [];
+  Object.keys(G).forEach(g => {
+    FX[g].forEach(([a, b, num, dt, venue], fi) => {
+      if(!dt.startsWith(todayStr)) return;
+      const ko = new Date(dt.replace(' ','T') + 'Z').getTime();
+      const status = wls_status(dt, ST.scores && ST.scores[`${g}_${fi}`] !== undefined);
+      const score = ST.scores && ST.scores[`${g}_${fi}`];
+      matches.push({
+        type: 'group', g, fi, num,
+        t1: G[g].t[a], t2: G[g].t[b],
+        f1: G[g].f[a], f2: G[g].f[b],
+        ko, dt, venue, status,
+        s1: score ? score[0] : null, s2: score ? score[1] : null,
+        tv: (typeof UK_TV !== 'undefined' && UK_TV[num]) ? UK_TV[num].tv : null
+      });
+    });
+  });
+
+  // Sort by kick-off time
+  matches.sort((a, b) => a.ko - b.ko);
+
+  // If no matches today, render minimal "Next matches in X days" panel only during tournament window
+  const tournamentStart = new Date('2026-06-11T00:00:00Z').getTime();
+  const tournamentEnd = new Date('2026-07-20T00:00:00Z').getTime();
+  const nowMs = Date.now();
+
+  if(matches.length === 0){
+    if(nowMs < tournamentStart){
+      // Pre-tournament — don't clutter the groups page
+      el.innerHTML = '';
+      return;
+    }
+    if(nowMs > tournamentEnd){
+      el.innerHTML = '';
+      return;
+    }
+    // During tournament but no matches today — show rest day panel
+    el.innerHTML = `<div class="today-section">
+      <div class="today-header">
+        <div class="today-title">⚽ Today</div>
+        <div class="today-date">${now.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'})}</div>
+      </div>
+      <div class="today-section-empty">No matches today — rest day. Predictions still open for upcoming fixtures.</div>
+    </div>`;
+    return;
+  }
+
+  // Build today's matches panel
+  const dateLabel = now.toLocaleDateString('en-GB', { weekday:'long', day:'numeric', month:'long' });
+  const liveCount = matches.filter(m => m.status === 'LIVE').length;
+  const ftCount = matches.filter(m => m.status === 'FT').length;
+
+  const headerBadge = liveCount > 0
+    ? `<span class="pill" style="background:rgba(239,68,68,0.15);color:var(--danger);animation:wls-pulse 1.5s ease-in-out infinite">${liveCount} LIVE NOW</span>`
+    : ftCount === matches.length
+      ? `<span class="pill" style="background:var(--surf3);color:var(--tx2)">All finished</span>`
+      : `<span class="pill gold">${matches.length} match${matches.length===1?'':'es'} today</span>`;
+
+  let html = `<div class="today-section">
+    <div class="today-header">
+      <div class="today-title">⚽ Today's Matches</div>
+      <div style="display:flex;align-items:center;gap:var(--sp-3)">
+        ${headerBadge}
+        <span class="today-date">${dateLabel}</span>
+      </div>
+    </div>
+    <div class="today-list">`;
+
+  matches.forEach(m => {
+    const statusClass = m.status === 'LIVE' ? 'live' : m.status === 'FT' ? 'finished' : '';
+    const localTime = (typeof fmtLocalTime === 'function') ? fmtLocalTime(m.dt) : m.dt.slice(11,16);
+    const tzL = (typeof tzLabel === 'function') ? tzLabel() : 'UTC';
+    const scoreHtml = m.s1 !== null && m.s2 !== null
+      ? `<div class="today-score">${m.s1} – ${m.s2}</div>`
+      : `<div class="today-score upcoming">vs</div>`;
+    const tvBadge = m.tv === 'BBC' ? '<span class="today-tv-badge today-tv-bbc">BBC</span>'
+      : m.tv === 'ITV' ? '<span class="today-tv-badge today-tv-itv">ITV</span>'
+      : m.tv === 'BBC+ITV' ? '<span class="today-tv-badge today-tv-bbc">BBC</span><span class="today-tv-badge today-tv-itv" style="margin-left:2px">ITV</span>'
+      : '';
+    html += `<div class="today-match ${statusClass}" onclick="openModal('${m.g}',${m.fi})" role="button" tabindex="0" aria-label="${m.t1} versus ${m.t2}">
+      <div class="today-time-col">
+        ${localTime}
+        <div class="today-time-tz">${tzL}</div>
+      </div>
+      <div class="today-team home"><span class="today-team-name">${m.t1}</span><span>${m.f1}</span></div>
+      ${scoreHtml}
+      <div class="today-team"><span>${m.f2}</span><span class="today-team-name">${m.t2}</span></div>
+      <div class="today-meta">
+        ${m.venue}
+        <br>${tvBadge || `<span style="color:var(--tx3);font-size:9px">M${m.num}</span>`}
+      </div>
+    </div>`;
+  });
+
+  html += `</div></div>`;
+  el.innerHTML = html;
+
+  // Keyboard support
+  el.querySelectorAll('.today-match').forEach(row => {
+    row.addEventListener('keydown', e => { if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); row.click(); } });
+  });
+}
+
+// Render Today section after page load and every 60s
+window.addEventListener('load', () => {
+  setTimeout(renderTodaySection, 800);
+  setInterval(renderTodaySection, 60000);
+});
+
+// ═══════════════════════════════════════════════════════
+// PHASE 4.12: WALES SPOTLIGHT (additive)
+// Wales did not qualify for 2026 — graceful heritage panel
+// Uses localStorage key wc26_wales (separate from ST)
+// ═══════════════════════════════════════════════════════
+
+let walesConfig = (()=>{
+  try { return JSON.parse(localStorage.getItem('wc26_wales')||'{}'); }
+  catch { return {}; }
+})();
+
+const WALES_HISTORY = [
+  { y: 2022, r: 'GS', c: 'Qatar', note: 'First WC since 1958' },
+  { y: 2018, r: '-', c: '-', note: 'Did not qualify (lost playoff to Republic of Ireland)' },
+  { y: 2014, r: '-', c: '-', note: 'Did not qualify' },
+  { y: 1958, r: 'QF', c: 'Sweden', note: 'Best ever — quarter-final, lost 1-0 to Brazil (Pelé)' }
+];
+
+// Check if Wales is in any group (in case data is updated for inter-confederation playoff result)
+function walesInTournament(){
+  for(const g of Object.keys(G)){
+    if(G[g].t.some(t => t === 'Wales' || t === 'Cymru')) return g;
+  }
+  return null;
+}
+
+function toggleWales(){
+  walesConfig.enabled = !walesConfig.enabled;
+  try { localStorage.setItem('wc26_wales', JSON.stringify(walesConfig)); } catch(e){}
+  const btn = document.getElementById('walesToggleBtn');
+  if(btn){
+    btn.classList.toggle('active', walesConfig.enabled);
+    btn.setAttribute('aria-pressed', walesConfig.enabled);
+  }
+  renderWalesSpotlight();
+}
+
+function renderWalesSpotlight(){
+  const el = document.getElementById('walesSpotlight');
+  if(!el) return;
+  if(!walesConfig.enabled){ el.innerHTML = ''; return; }
+
+  const inTournament = walesInTournament();
+  const cyEnabled = walesConfig.welsh;
+
+  // Welsh / English label pairs
+  const L = cyEnabled
+    ? { spotlight: 'Sylw ar Gymru', historic: 'Hanesyddol', games: 'Gemau', group: 'Grŵp', score: 'Sgôr', table: 'Tabl', notQualified: 'Heb gymhwyso ar gyfer Cwpan y Byd 2026', note: 'Gobeithio am 2030!' }
+    : { spotlight: 'Wales Spotlight', historic: 'World Cup History', games: 'Fixtures', group: 'Group', score: 'Score', table: 'Standings', notQualified: 'Wales did not qualify for the 2026 World Cup', note: 'Hopes for 2030!' };
+
+  let bodyHtml;
+  if(inTournament){
+    // If Wales somehow made it via playoff — show fixtures (future-proof)
+    const wG = inTournament;
+    const wIdx = G[wG].t.indexOf(G[wG].t.find(t => t === 'Wales' || t === 'Cymru'));
+    const fixtures = FX[wG].filter(([a, b]) => a === wIdx || b === wIdx);
+    bodyHtml = `<div class="wales-status-card">
+      <div class="wales-status-title">${cyEnabled?'Yng Ngrŵp':'In Group'} ${wG}</div>
+      <p style="font-size:var(--tx-sm);margin-bottom:var(--sp-3)">${cyEnabled?'Mae Cymru wedi cymhwyso ar gyfer Cwpan y Byd 2026!':'Wales has qualified for the 2026 World Cup!'}</p>
+      ${fixtures.map(([a, b, num, dt, venue]) => {
+        const opp = a === wIdx ? G[wG].t[b] : G[wG].t[a];
+        const oppFlag = a === wIdx ? G[wG].f[b] : G[wG].f[a];
+        return `<div class="wales-history-row">
+          <span class="wales-history-year">M${num}</span>
+          <span>vs ${oppFlag} ${opp}</span>
+          <span style="font-size:var(--tx-xs);color:rgba(255,255,255,0.6)">${dt.slice(5,10).replace('-','/')} · ${venue}</span>
+        </div>`;
+      }).join('')}
+    </div>`;
+  } else {
+    bodyHtml = `<div class="wales-status-card">
+      <div class="wales-status-title">${L.notQualified}</div>
+      <p style="font-size:var(--tx-sm);line-height:1.5;margin-bottom:var(--sp-2)">${cyEnabled
+        ? 'Methodd Cymru gymhwyso ar gyfer Cwpan y Byd FIFA 2026 yng Ngogledd America. Roedd Cwpan y Byd 2022 yn Qatar yn nodi eu hymddangosiad cyntaf ers 1958.'
+        : 'Wales failed to qualify for the 2026 FIFA World Cup in North America. The 2022 World Cup in Qatar marked their first appearance since 1958.'}</p>
+      <p style="font-size:var(--tx-sm);color:#ffd700;font-family:'Bebas Neue',sans-serif;letter-spacing:2px">${L.note}</p>
+    </div>
+    <div class="wales-status-card">
+      <div class="wales-status-title">${L.historic}</div>
+      ${WALES_HISTORY.map(h => `<div class="wales-history-row">
+        <span class="wales-history-year">${h.y}</span>
+        <span>${h.r==='-'?'—':h.r}${h.c!=='-'?' · '+h.c:''}</span>
+        <span style="font-size:var(--tx-xs);color:rgba(255,255,255,0.6);max-width:200px;text-align:right">${h.note}</span>
+      </div>`).join('')}
+    </div>`;
+  }
+
+  el.innerHTML = `<div class="wales-spotlight">
+    <div class="wales-spotlight-header">
+      <span class="wales-flag-large">🏴󠁧󠁢󠁷󠁬󠁳󠁿</span>
+      <div>
+        <div class="wales-title">${cyEnabled?'CYMRU':'WALES'}</div>
+        <div class="wales-subtitle">${cyEnabled?'Pêl-droed Cymru':'Welsh Football'} · ${L.spotlight}</div>
+      </div>
+    </div>
+    <div class="wales-content">${bodyHtml}</div>
+    <button class="wales-cy-toggle ${cyEnabled?'active':''}" onclick="toggleWalesWelsh()" aria-pressed="${!!cyEnabled}">
+      ${cyEnabled?'🇬🇧 English':'🏴󠁧󠁢󠁷󠁬󠁳󠁿 Cymraeg'}
+    </button>
+  </div>`;
+}
+
+function toggleWalesWelsh(){
+  walesConfig.welsh = !walesConfig.welsh;
+  try { localStorage.setItem('wc26_wales', JSON.stringify(walesConfig)); } catch(e){}
+  document.body.dataset.lang = walesConfig.welsh ? 'cy' : 'en';
+  renderWalesSpotlight();
+}
+
+// Restore Wales toggle state on load
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    if(walesConfig.enabled){
+      const btn = document.getElementById('walesToggleBtn');
+      if(btn){ btn.classList.add('active'); btn.setAttribute('aria-pressed', 'true'); }
+    }
+    if(walesConfig.welsh){ document.body.dataset.lang = 'cy'; }
+    renderWalesSpotlight();
+  }, 800);
+});
+
+// ═══════════════════════════════════════════════════════
+// PHASE 4.13: VENUE GUIDE (additive)
+// 16 host venues with stadium info, capacity, timezone, matches
+// ═══════════════════════════════════════════════════════
+
+const VENUE_DATA = [
+  { name: 'MetLife Stadium', city: 'East Rutherford, NJ', country: 'USA', flag: '🇺🇸', cap: 82500, tz: '-5', tzLabel: 'EDT' },
+  { name: 'SoFi Stadium', city: 'Inglewood (LA)', country: 'USA', flag: '🇺🇸', cap: 70240, tz: '-8', tzLabel: 'PDT' },
+  { name: 'AT&T Stadium', city: 'Arlington (Dallas)', country: 'USA', flag: '🇺🇸', cap: 80000, tz: '-6', tzLabel: 'CDT' },
+  { name: 'Hard Rock Stadium', city: 'Miami Gardens', country: 'USA', flag: '🇺🇸', cap: 65326, tz: '-5', tzLabel: 'EDT' },
+  { name: 'Mercedes-Benz Stadium', city: 'Atlanta', country: 'USA', flag: '🇺🇸', cap: 71000, tz: '-5', tzLabel: 'EDT' },
+  { name: 'Gillette Stadium', city: 'Foxborough (Boston)', country: 'USA', flag: '🇺🇸', cap: 65878, tz: '-5', tzLabel: 'EDT' },
+  { name: 'NRG Stadium', city: 'Houston', country: 'USA', flag: '🇺🇸', cap: 72220, tz: '-6', tzLabel: 'CDT' },
+  { name: 'Arrowhead Stadium', city: 'Kansas City', country: 'USA', flag: '🇺🇸', cap: 76416, tz: '-6', tzLabel: 'CDT' },
+  { name: 'Lumen Field', city: 'Seattle', country: 'USA', flag: '🇺🇸', cap: 68740, tz: '-8', tzLabel: 'PDT' },
+  { name: "Levi's Stadium", city: 'Santa Clara (SF Bay)', country: 'USA', flag: '🇺🇸', cap: 68500, tz: '-8', tzLabel: 'PDT' },
+  { name: 'Lincoln Financial Field', city: 'Philadelphia', country: 'USA', flag: '🇺🇸', cap: 67594, tz: '-5', tzLabel: 'EDT' },
+  { name: 'Estadio Akron', city: 'Guadalajara', country: 'Mexico', flag: '🇲🇽', cap: 49850, tz: '-7', tzLabel: 'MDT' },
+  { name: 'Estadio Azteca', city: 'Mexico City', country: 'Mexico', flag: '🇲🇽', cap: 87000, tz: '-7', tzLabel: 'MDT' },
+  { name: 'Estadio BBVA', city: 'Monterrey', country: 'Mexico', flag: '🇲🇽', cap: 53500, tz: '-7', tzLabel: 'MDT' },
+  { name: 'BMO Field', city: 'Toronto', country: 'Canada', flag: '🇨🇦', cap: 45736, tz: '-5', tzLabel: 'EDT' },
+  { name: 'BC Place', city: 'Vancouver', country: 'Canada', flag: '🇨🇦', cap: 54500, tz: '-8', tzLabel: 'PDT' }
+];
+
+// City keywords used in FX[g][fi][4] venue strings
+const VENUE_CITY_MAP = {
+  'New York/NJ': 'MetLife Stadium',
+  'Los Angeles': 'SoFi Stadium',
+  'Dallas': 'AT&T Stadium',
+  'Miami': 'Hard Rock Stadium',
+  'Atlanta': 'Mercedes-Benz Stadium',
+  'Boston': 'Gillette Stadium',
+  'Houston': 'NRG Stadium',
+  'Kansas City': 'Arrowhead Stadium',
+  'Seattle': 'Lumen Field',
+  'San Francisco': "Levi's Stadium",
+  'Philadelphia': 'Lincoln Financial Field',
+  'Guadalajara': 'Estadio Akron',
+  'Mexico City': 'Estadio Azteca',
+  'Monterrey': 'Estadio BBVA',
+  'Toronto': 'BMO Field',
+  'Vancouver': 'BC Place'
+};
+
+function countMatchesAtVenue(venueName){
+  let count = 0;
+  Object.keys(G).forEach(g => {
+    FX[g].forEach(([a, b, num, dt, venue]) => {
+      if(VENUE_CITY_MAP[venue] === venueName) count++;
+    });
+  });
+  return count;
+}
+
+function renderVenueGuide(){
+  const grid = document.getElementById('venueGrid');
+  if(!grid) return;
+  grid.innerHTML = VENUE_DATA.map(v => {
+    const matchCount = countMatchesAtVenue(v.name);
+    const capFmt = v.cap.toLocaleString('en-GB');
+    return `<div class="venue-card">
+      <div class="venue-flag">${v.flag}</div>
+      <div class="venue-name">${v.name}</div>
+      <div class="venue-city">${v.city} · ${v.country}</div>
+      <div class="venue-stats">
+        <div class="venue-stat">
+          <span class="venue-stat-label">Capacity</span>
+          <span class="venue-stat-val">${capFmt}</span>
+        </div>
+        <div class="venue-stat">
+          <span class="venue-stat-label">Timezone</span>
+          <span class="venue-stat-val">${v.tzLabel} ${v.tz}</span>
+        </div>
+      </div>
+      <div class="venue-matches-count">
+        <strong>${matchCount}</strong> group match${matchCount===1?'':'es'} scheduled
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// Render venues when section is opened
+const _ph4_origShow = window.showSection;
+window.showSection = function(id, btn){
+  _ph4_origShow(id, btn);
+  if(id === 'venues') renderVenueGuide();
+  if(id === 'dashboard') renderTournamentStats();
+  if(id === 'groups'){ renderTodaySection(); renderWalesSpotlight(); }
+};
+
+// ═══════════════════════════════════════════════════════
+// PHASE 4.14: TOURNAMENT STATS EXPANSION (additive)
+// Most goals in match, biggest upset, hat-tricks, own goals
+// ═══════════════════════════════════════════════════════
+
+function renderTournamentStats(){
+  const el = document.getElementById('tournamentStats');
+  if(!el) return;
+
+  // Most goals in single match
+  let topMatch = null;
+  let totalMatches = 0;
+  Object.keys(G).forEach(g => {
+    FX[g].forEach(([a, b, num, dt, venue], fi) => {
+      const sc = ST.scores && ST.scores[`${g}_${fi}`];
+      if(!sc) return;
+      totalMatches++;
+      const total = sc[0] + sc[1];
+      if(!topMatch || total > topMatch.total){
+        topMatch = { total, t1: G[g].t[a], t2: G[g].t[b], s1: sc[0], s2: sc[1], g, num, f1: G[g].f[a], f2: G[g].f[b] };
+      }
+    });
+  });
+
+  // Biggest upset (lower-ranked team beats higher-ranked, biggest gap wins)
+  let biggestUpset = null;
+  Object.keys(G).forEach(g => {
+    FX[g].forEach(([a, b, num], fi) => {
+      const sc = ST.scores && ST.scores[`${g}_${fi}`];
+      if(!sc || sc[0] === sc[1]) return;
+      const winner = sc[0] > sc[1] ? G[g].t[a] : G[g].t[b];
+      const loser = sc[0] > sc[1] ? G[g].t[b] : G[g].t[a];
+      const winnerRank = (typeof rank === 'function') ? rank(winner) : 50;
+      const loserRank = (typeof rank === 'function') ? rank(loser) : 50;
+      const gap = winnerRank - loserRank; // positive if winner is lower-ranked (upset)
+      if(gap > 0 && (!biggestUpset || gap > biggestUpset.gap)){
+        biggestUpset = { winner, loser, gap, winnerRank, loserRank, score: `${sc[0]}-${sc[1]}`, g, num };
+      }
+    });
+  });
+
+  // Hat-tricks from scorers data
+  const hatTricks = (ST.scorers || []).filter(s => (s.goals || 0) >= 3);
+
+  // Own goals + Goal timing from timeline
+  let earliestGoalMin = null, latestGoalMin = null, ownGoals = 0;
+  if(ST.timeline){
+    Object.values(ST.timeline).forEach(matchEvents => {
+      if(!Array.isArray(matchEvents)) return;
+      matchEvents.forEach(ev => {
+        if(ev.type === 'goal' || ev.type === 'og'){
+          const min = parseInt(ev.minute || ev.min || 0);
+          if(min > 0){
+            if(earliestGoalMin === null || min < earliestGoalMin) earliestGoalMin = min;
+            if(latestGoalMin === null || min > latestGoalMin) latestGoalMin = min;
+          }
+          if(ev.type === 'og' || ev.own) ownGoals++;
+        }
+      });
+    });
+  }
+
+  const cards = [];
+
+  // Most goals
+  if(topMatch){
+    cards.push(`<div class="tstat-card">
+      <span class="tstat-icon">⚽</span>
+      <div class="tstat-label">Highest-scoring match</div>
+      <div class="tstat-value">${topMatch.total} goals</div>
+      <div class="tstat-detail">${topMatch.f1} ${topMatch.t1} ${topMatch.s1}–${topMatch.s2} ${topMatch.t2} ${topMatch.f2}</div>
+    </div>`);
+  } else {
+    cards.push(`<div class="tstat-card"><span class="tstat-icon">⚽</span><div class="tstat-label">Highest-scoring match</div><div class="tstat-value tstat-empty">—</div><div class="tstat-detail">No matches played yet</div></div>`);
+  }
+
+  // Biggest upset
+  if(biggestUpset){
+    cards.push(`<div class="tstat-card">
+      <span class="tstat-icon">🤯</span>
+      <div class="tstat-label">Biggest upset</div>
+      <div class="tstat-value">${biggestUpset.score}</div>
+      <div class="tstat-detail">${biggestUpset.winner} (#${biggestUpset.winnerRank}) beat ${biggestUpset.loser} (#${biggestUpset.loserRank})</div>
+    </div>`);
+  } else {
+    cards.push(`<div class="tstat-card"><span class="tstat-icon">🤯</span><div class="tstat-label">Biggest upset</div><div class="tstat-value tstat-empty">—</div><div class="tstat-detail">Awaiting results</div></div>`);
+  }
+
+  // Hat-tricks
+  if(hatTricks.length > 0){
+    const top = hatTricks.sort((a, b) => b.goals - a.goals)[0];
+    cards.push(`<div class="tstat-card">
+      <span class="tstat-icon">🎩</span>
+      <div class="tstat-label">Hat-tricks</div>
+      <div class="tstat-value">${hatTricks.length}</div>
+      <div class="tstat-detail">${typeof top.flag === 'string' ? top.flag : ''} ${top.name} — ${top.goals} goals</div>
+    </div>`);
+  } else {
+    cards.push(`<div class="tstat-card"><span class="tstat-icon">🎩</span><div class="tstat-label">Hat-tricks</div><div class="tstat-value tstat-empty">0</div><div class="tstat-detail">None scored yet</div></div>`);
+  }
+
+  // Earliest goal
+  cards.push(`<div class="tstat-card">
+    <span class="tstat-icon">⚡</span>
+    <div class="tstat-label">Earliest goal</div>
+    <div class="tstat-value">${earliestGoalMin !== null ? `${earliestGoalMin}'` : '—'}</div>
+    <div class="tstat-detail">${earliestGoalMin !== null ? 'From match log' : 'Log goals in Match Log tab'}</div>
+  </div>`);
+
+  // Latest goal
+  cards.push(`<div class="tstat-card">
+    <span class="tstat-icon">⏱️</span>
+    <div class="tstat-label">Latest goal</div>
+    <div class="tstat-value">${latestGoalMin !== null ? `${latestGoalMin}'` : '—'}</div>
+    <div class="tstat-detail">${latestGoalMin !== null ? 'From match log' : 'Log goals in Match Log tab'}</div>
+  </div>`);
+
+  // Own goals
+  cards.push(`<div class="tstat-card">
+    <span class="tstat-icon">🤦</span>
+    <div class="tstat-label">Own goals</div>
+    <div class="tstat-value">${ownGoals}</div>
+    <div class="tstat-detail">${ownGoals === 0 ? 'Track via Match Log' : 'Across tournament'}</div>
+  </div>`);
+
+  // Matches played
+  cards.push(`<div class="tstat-card">
+    <span class="tstat-icon">📊</span>
+    <div class="tstat-label">Matches with results</div>
+    <div class="tstat-value">${totalMatches} / 72</div>
+    <div class="tstat-detail">${Math.round(totalMatches/72*100)}% of group stage</div>
+  </div>`);
+
+  el.innerHTML = cards.join('');
+}
+
+// Render stats on dashboard load
+window.addEventListener('load', () => {
+  setTimeout(renderTournamentStats, 1000);
+});
 </script>
 
 <!-- ═══════════════════════════════════════════════════
@@ -8602,6 +9480,10 @@ window.addEventListener('appinstalled', () => {
     <button class="more-sheet-item" onclick="showSection('wcl',this)" aria-label="Multiplayer League">
       <span class="msi-icon">🌐</span>
       <span class="msi-label">Multiplayer</span>
+    </button>
+    <button class="more-sheet-item" onclick="showSection('venues',this)" aria-label="Venue Guide">
+      <span class="msi-icon">🏟️</span>
+      <span class="msi-label">Venues</span>
     </button>
     <button class="more-sheet-item" onclick="showSection('squads',this)" aria-label="Squads">
       <span class="msi-icon">👥</span>
