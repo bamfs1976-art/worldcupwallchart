@@ -3127,6 +3127,99 @@ input[type=number] { -moz-appearance: textfield; }
 }
 
 /* ═══════════════════════════════════════════════════
+   PHASE 5.15: ENHANCED PRINT VIEW (additive)
+   A3 landscape wallchart layout — Groups + Bracket on one page
+   Uses body[data-print-mode] to override default print styles
+   ═══════════════════════════════════════════════════ */
+@media print {
+  body[data-print-mode="wallchart"] @page { size: A3 landscape; margin: 8mm; }
+
+  /* When in wallchart print mode, force ALL sections visible together */
+  body[data-print-mode="wallchart"] .section { display: block !important; opacity: 1 !important; }
+  body[data-print-mode="wallchart"] .section-title { page-break-before: auto !important; }
+
+  /* Hide everything except groups + bracket sections */
+  body[data-print-mode="wallchart"] #sec-dashboard,
+  body[data-print-mode="wallchart"] #sec-goldenboot,
+  body[data-print-mode="wallchart"] #sec-fixtures,
+  body[data-print-mode="wallchart"] #sec-simulate,
+  body[data-print-mode="wallchart"] #sec-timeline,
+  body[data-print-mode="wallchart"] #sec-predictions,
+  body[data-print-mode="wallchart"] #sec-league,
+  body[data-print-mode="wallchart"] #sec-wcl,
+  body[data-print-mode="wallchart"] #sec-squads,
+  body[data-print-mode="wallchart"] #sec-fairplay,
+  body[data-print-mode="wallchart"] #sec-share,
+  body[data-print-mode="wallchart"] #sec-venues { display: none !important; }
+
+  /* Force bracket visible in wallchart mode */
+  body[data-print-mode="wallchart"] #sec-bracket { display: block !important; page-break-before: always; }
+
+  /* Compact group cards: 4 columns × 3 rows on A3 landscape */
+  body[data-print-mode="wallchart"] .groups-grid {
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 4pt !important;
+  }
+  body[data-print-mode="wallchart"] .group-card {
+    padding: 4pt !important;
+    page-break-inside: avoid;
+    font-size: 7pt;
+  }
+  body[data-print-mode="wallchart"] .group-letter {
+    font-size: 11pt !important;
+  }
+  body[data-print-mode="wallchart"] .standings-tbl {
+    font-size: 6.5pt !important;
+  }
+  body[data-print-mode="wallchart"] .standings-tbl th,
+  body[data-print-mode="wallchart"] .standings-tbl td {
+    padding: 1pt 2pt !important;
+  }
+  /* Hide fixtures within groups in wallchart mode (just standings) */
+  body[data-print-mode="wallchart"] .fixture-row,
+  body[data-print-mode="wallchart"] .h2h-toggle,
+  body[data-print-mode="wallchart"] .h2h-body,
+  body[data-print-mode="wallchart"] #todaySection,
+  body[data-print-mode="wallchart"] #walesSpotlight,
+  body[data-print-mode="wallchart"] #todayHero,
+  body[data-print-mode="wallchart"] .group-status-badge,
+  body[data-print-mode="wallchart"] .form-dots,
+  body[data-print-mode="wallchart"] .group-meta,
+  body[data-print-mode="wallchart"] .group-star { display: none !important; }
+
+  /* Compact bracket — fit on A3 */
+  body[data-print-mode="wallchart"] .bracket-frame {
+    min-width: 0 !important;
+    transform: scale(0.45) !important;
+    transform-origin: top left;
+    width: 222%;
+  }
+  body[data-print-mode="wallchart"] .b-match {
+    font-size: 8pt !important;
+  }
+  body[data-print-mode="wallchart"] .bracket-scroll-hint,
+  body[data-print-mode="wallchart"] .bracket-update-note,
+  body[data-print-mode="wallchart"] .bracket-pager,
+  body[data-print-mode="wallchart"] .third-panel { display: none !important; }
+
+  /* Wallchart header */
+  body[data-print-mode="wallchart"]::before {
+    content: 'FIFA WORLD CUP 2026 · USA · CANADA · MEXICO';
+    display: block;
+    text-align: center;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 18pt;
+    letter-spacing: 6pt;
+    color: #c8a94a !important;
+    background: #0b1e3d !important;
+    padding: 6pt;
+    margin-bottom: 6pt;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}
+
+/* ═══════════════════════════════════════════════════
    ENHANCEMENT: Animated tab transitions
    ═══════════════════════════════════════════════════ */
 .section {
@@ -4745,6 +4838,8 @@ body[data-lang="cy"] .lbl-group .en-text { display: none; }
     <div class="share-card" onclick="setupNotifications()"><span class="share-icon">🔔</span><div class="share-title">Notifications</div><div class="share-desc">Match reminders</div></div>
     <div class="share-card" onclick="exportAsImage()"><span class="share-icon">🖼️</span><div class="share-title">Export Image</div><div class="share-desc">Download as PNG</div></div>
     <div class="share-card" onclick="document.getElementById('wls-panel').scrollIntoView({behavior:'smooth'})"><span class="share-icon">📡</span><div class="share-title">Live Scores</div><div class="share-desc">Auto-fetch results</div></div>
+    <div class="share-card" onclick="printWallchart()"><span class="share-icon">📰</span><div class="share-title">Print A3 Wallchart</div><div class="share-desc">Groups + bracket, one page</div></div>
+    <div class="share-card" onclick="openSocialCardBuilder()"><span class="share-icon">📱</span><div class="share-title">Social Card</div><div class="share-desc">WhatsApp / Instagram</div></div>
   </div>
 
   <!-- Live Scores admin panel -->
@@ -4990,6 +5085,51 @@ body[data-lang="cy"] .lbl-group .en-text { display: none; }
     <div class="modal-actions">
       <button class="btn ghost sm" onclick="document.getElementById('addPlayerModal').classList.remove('open')">Cancel</button>
       <button class="btn sm" onclick="addLeaguePlayer()">+ Add to League</button>
+    </div>
+  </div>
+</div>
+
+<!-- Social card builder modal (Phase 5.16) -->
+<div class="overlay" id="socialCardModal">
+  <div class="modal" style="max-width:520px">
+    <button class="modal-close-x" onclick="document.getElementById('socialCardModal').classList.remove('open')" aria-label="Close">✕</button>
+    <div class="modal-title">📱 Generate Social Card</div>
+    <div class="modal-sub">1080×1920 portrait — perfect for WhatsApp status & Instagram stories</div>
+
+    <div style="margin:var(--sp-4) 0">
+      <label class="wls-admin-label" style="display:block;margin-bottom:var(--sp-2)">Card type</label>
+      <select id="socialCardType" class="wcl-input" onchange="updateSocialCardOptions()" aria-label="Card type">
+        <option value="group">My Group prediction</option>
+        <option value="bracket">My knockout bracket</option>
+        <option value="league">My league standings</option>
+        <option value="champion">My predicted champion</option>
+      </select>
+    </div>
+
+    <div id="socialCardGroupOpts" style="margin-bottom:var(--sp-4)">
+      <label class="wls-admin-label" style="display:block;margin-bottom:var(--sp-2)">Group</label>
+      <select id="socialCardGroup" class="wcl-input" aria-label="Group">
+        <option value="A">Group A</option><option value="B">Group B</option>
+        <option value="C">Group C</option><option value="D">Group D</option>
+        <option value="E">Group E</option><option value="F">Group F</option>
+        <option value="G">Group G</option><option value="H">Group H</option>
+        <option value="I">Group I</option><option value="J">Group J</option>
+        <option value="K">Group K</option><option value="L">Group L</option>
+      </select>
+    </div>
+
+    <div style="margin-bottom:var(--sp-4)">
+      <label class="wls-admin-label" style="display:block;margin-bottom:var(--sp-2)">Your name (optional)</label>
+      <input id="socialCardName" class="wcl-input" type="text" placeholder="e.g. Anthony" maxlength="20" aria-label="Your name">
+    </div>
+
+    <div id="socialCardPreview" style="text-align:center;margin:var(--sp-4) 0;background:var(--bg3);border-radius:var(--r-md);padding:var(--sp-3);min-height:200px"></div>
+
+    <div class="modal-actions" style="display:flex;gap:var(--sp-3);flex-wrap:wrap">
+      <button class="btn ghost sm" onclick="document.getElementById('socialCardModal').classList.remove('open')">Cancel</button>
+      <button class="btn sm" onclick="generateSocialCard(true)">↻ Preview</button>
+      <button class="btn" onclick="downloadSocialCard()">💾 Download PNG</button>
+      <button class="btn btn-outline" onclick="shareSocialCard()">📤 Share</button>
     </div>
   </div>
 </div>
@@ -9423,6 +9563,602 @@ function renderTournamentStats(){
 window.addEventListener('load', () => {
   setTimeout(renderTournamentStats, 1000);
 });
+
+// ═══════════════════════════════════════════════════════
+// PHASE 5.15: WALLCHART PRINT MODE (additive)
+// Toggles body[data-print-mode="wallchart"] then triggers print
+// CSS @media print rules handle layout
+// ═══════════════════════════════════════════════════════
+function printWallchart(){
+  document.body.dataset.printMode = 'wallchart';
+  // Force the bracket to render before print
+  if(typeof renderBracket === 'function') renderBracket();
+  setTimeout(() => {
+    window.print();
+    // Clean up after print dialog closes
+    setTimeout(() => { delete document.body.dataset.printMode; }, 500);
+  }, 200);
+}
+window.addEventListener('afterprint', () => {
+  delete document.body.dataset.printMode;
+});
+
+// ═══════════════════════════════════════════════════════
+// PHASE 5.16: SOCIAL SHARING CARDS (additive)
+// Canvas-based 1080x1920 portrait images for social media
+// All prefixed soc_ to avoid collisions
+// ═══════════════════════════════════════════════════════
+
+const SOC_W = 1080, SOC_H = 1920;
+let socLastBlob = null;
+
+function openSocialCardBuilder(){
+  document.getElementById('socialCardModal').classList.add('open');
+  setTimeout(() => generateSocialCard(true), 200);
+}
+
+function updateSocialCardOptions(){
+  const type = document.getElementById('socialCardType').value;
+  const groupOpts = document.getElementById('socialCardGroupOpts');
+  if(groupOpts) groupOpts.style.display = (type === 'group') ? 'block' : 'none';
+  generateSocialCard(true);
+}
+
+function soc_drawBackground(ctx){
+  // Deep navy gradient with subtle gold radial
+  const grad = ctx.createLinearGradient(0, 0, 0, SOC_H);
+  grad.addColorStop(0, '#0b1428');
+  grad.addColorStop(0.5, '#0a0a1a');
+  grad.addColorStop(1, '#070713');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, SOC_W, SOC_H);
+
+  // Subtle radial glow top-right
+  const radial = ctx.createRadialGradient(SOC_W*0.85, 200, 0, SOC_W*0.85, 200, 600);
+  radial.addColorStop(0, 'rgba(240,180,41,0.18)');
+  radial.addColorStop(1, 'rgba(240,180,41,0)');
+  ctx.fillStyle = radial;
+  ctx.fillRect(0, 0, SOC_W, SOC_H);
+
+  // Top stripe — gold
+  ctx.fillStyle = '#F0B429';
+  ctx.fillRect(0, 0, SOC_W, 8);
+
+  // Bottom stripe — gold
+  ctx.fillStyle = '#F0B429';
+  ctx.fillRect(0, SOC_H - 8, SOC_W, 8);
+}
+
+function soc_drawHeader(ctx, subtitle){
+  ctx.textAlign = 'center';
+  ctx.fillStyle = '#F0B429';
+  ctx.font = 'bold 64px "Bebas Neue", sans-serif';
+  ctx.fillText('FIFA WORLD CUP', SOC_W/2, 140);
+  ctx.font = 'bold 100px "Bebas Neue", sans-serif';
+  ctx.fillText('2026', SOC_W/2, 240);
+  ctx.fillStyle = '#8a8aa4';
+  ctx.font = '500 36px "Barlow", sans-serif';
+  ctx.fillText('USA · CANADA · MEXICO', SOC_W/2, 290);
+
+  if(subtitle){
+    ctx.fillStyle = '#fff';
+    ctx.font = 'bold 44px "Bebas Neue", sans-serif';
+    ctx.fillText(subtitle, SOC_W/2, 380);
+  }
+}
+
+function soc_drawFooter(ctx, name){
+  ctx.textAlign = 'center';
+  ctx.fillStyle = '#8a8aa4';
+  ctx.font = '500 28px "Barlow Condensed", sans-serif';
+  if(name) ctx.fillText('— ' + name + ' —', SOC_W/2, SOC_H - 100);
+  ctx.font = '500 24px "Barlow Condensed", sans-serif';
+  ctx.fillText('Make your predictions:', SOC_W/2, SOC_H - 60);
+  ctx.fillStyle = '#F0B429';
+  ctx.font = 'bold 30px "Barlow Condensed", sans-serif';
+  ctx.fillText('worldcupwallchart.netlify.app', SOC_W/2, SOC_H - 25);
+}
+
+async function soc_drawFlag(ctx, flagHTML, x, y, size){
+  // Extract URL from the flag HTML (it's an img tag)
+  const m = (flagHTML||'').match(/src="([^"]+)"/);
+  if(!m){
+    // Draw placeholder
+    ctx.fillStyle = '#1e1e2e';
+    ctx.fillRect(x, y, size, size*0.7);
+    return;
+  }
+  return new Promise(resolve => {
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => {
+      ctx.drawImage(img, x, y, size, size*0.7);
+      resolve();
+    };
+    img.onerror = () => {
+      ctx.fillStyle = '#1e1e2e';
+      ctx.fillRect(x, y, size, size*0.7);
+      resolve();
+    };
+    // Use higher-res from flagcdn for crisp print
+    const upscaled = m[1].replace(/\/w(\d+)\//, '/w160/');
+    img.src = upscaled;
+  });
+}
+
+async function soc_drawGroupCard(ctx, group, name){
+  soc_drawBackground(ctx);
+  soc_drawHeader(ctx, 'GROUP ' + group + ' PREDICTION');
+
+  if(!G[group]) return;
+  const standings_g = (typeof standings === 'function') ? standings(group) : null;
+  const teams = standings_g || G[group].t.map((t, i) => ({ name: t, f: G[group].f[i], p: 0, w: 0, d: 0, l: 0, gd: 0 }));
+
+  // Headers
+  let y = 480;
+  ctx.fillStyle = '#1e1e2e';
+  ctx.fillRect(80, y, SOC_W - 160, 60);
+  ctx.fillStyle = '#F0B429';
+  ctx.font = 'bold 28px "Barlow Condensed", sans-serif';
+  ctx.textAlign = 'left';
+  ctx.fillText('TEAM', 200, y + 38);
+  ctx.textAlign = 'center';
+  ['P', 'W', 'D', 'L', 'GD', 'PTS'].forEach((h, i) => {
+    ctx.fillText(h, SOC_W - 540 + i*80, y + 38);
+  });
+
+  y += 80;
+  for(let i = 0; i < teams.length; i++){
+    const t = teams[i];
+    // Row bg
+    if(i < 2){ ctx.fillStyle = 'rgba(34,197,94,0.08)'; ctx.fillRect(80, y - 40, SOC_W - 160, 90); }
+    if(i === 2){ ctx.fillStyle = 'rgba(59,130,246,0.08)'; ctx.fillRect(80, y - 40, SOC_W - 160, 90); }
+
+    // Position badge
+    const colors = ['#F0B429', '#c0c0c0', '#cd7f32', '#444'];
+    ctx.fillStyle = colors[i] || '#444';
+    ctx.beginPath();
+    ctx.arc(120, y, 22, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#000';
+    ctx.font = 'bold 28px "Bebas Neue", sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(String(i + 1), 120, y + 10);
+
+    // Flag
+    await soc_drawFlag(ctx, t.f, 160, y - 18, 50);
+
+    // Team name
+    ctx.fillStyle = '#fff';
+    ctx.font = 'bold 32px "Barlow Condensed", sans-serif';
+    ctx.textAlign = 'left';
+    let tname = t.name;
+    if(tname.length > 18) tname = tname.slice(0, 17) + '…';
+    ctx.fillText(tname, 230, y + 10);
+
+    // Stats
+    ctx.fillStyle = '#a0a0bc';
+    ctx.font = '500 26px "Barlow Condensed", sans-serif';
+    ctx.textAlign = 'center';
+    [t.mp || 0, t.w || 0, t.d || 0, t.l || 0].forEach((v, idx) => {
+      ctx.fillText(String(v), SOC_W - 540 + idx*80, y + 10);
+    });
+    ctx.fillStyle = (t.gd || 0) > 0 ? '#22C55E' : (t.gd || 0) < 0 ? '#EF4444' : '#a0a0bc';
+    ctx.fillText(((t.gd || 0) > 0 ? '+' : '') + (t.gd || 0), SOC_W - 220, y + 10);
+    ctx.fillStyle = '#F0B429';
+    ctx.font = 'bold 28px "Bebas Neue", sans-serif';
+    ctx.fillText(String(t.p || 0), SOC_W - 140, y + 10);
+
+    y += 100;
+  }
+
+  soc_drawFooter(ctx, name);
+}
+
+async function soc_drawBracketCard(ctx, name){
+  soc_drawBackground(ctx);
+  soc_drawHeader(ctx, 'MY KNOCKOUT BRACKET');
+
+  // Champion banner
+  const finalScores = ST.bScores && ST.bScores['final_0'];
+  let champion = null;
+  if(finalScores && finalScores.s1 !== undefined && finalScores.s2 !== undefined){
+    champion = finalScores.s1 > finalScores.s2 ? finalScores.team1 : finalScores.team2;
+  }
+
+  if(champion){
+    ctx.fillStyle = 'rgba(240,180,41,0.12)';
+    ctx.fillRect(80, 460, SOC_W - 160, 200);
+    ctx.fillStyle = '#F0B429';
+    ctx.font = 'bold 80px "Bebas Neue", sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('🏆', SOC_W/2 - 200, 540);
+    ctx.font = 'bold 36px "Barlow Condensed", sans-serif';
+    ctx.fillText('PREDICTED CHAMPION', SOC_W/2 + 50, 510);
+    ctx.fillStyle = '#fff';
+    ctx.font = 'bold 64px "Bebas Neue", sans-serif';
+    ctx.fillText(champion, SOC_W/2 + 50, 590);
+  } else {
+    ctx.fillStyle = '#8a8aa4';
+    ctx.font = '500 32px "Barlow Condensed", sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('Bracket in progress...', SOC_W/2, 540);
+  }
+
+  // List filled rounds
+  let y = 750;
+  const rounds = [
+    { id: 'qf', label: 'QUARTER FINALS', matches: 4 },
+    { id: 'sf', label: 'SEMI FINALS', matches: 2 }
+  ];
+  rounds.forEach(r => {
+    ctx.fillStyle = '#F0B429';
+    ctx.font = 'bold 36px "Bebas Neue", sans-serif';
+    ctx.textAlign = 'left';
+    ctx.fillText(r.label, 80, y);
+    y += 50;
+    for(let i = 0; i < r.matches; i++){
+      const id = r.id + '_' + i;
+      const d = ST.bScores && ST.bScores[id];
+      if(!d){
+        ctx.fillStyle = '#444';
+        ctx.font = '500 28px "Barlow Condensed", sans-serif';
+        ctx.fillText('TBD vs TBD', 100, y);
+      } else {
+        const t1 = d.team1 || 'TBD', t2 = d.team2 || 'TBD';
+        const s1 = d.s1 !== undefined ? d.s1 : '?';
+        const s2 = d.s2 !== undefined ? d.s2 : '?';
+        ctx.fillStyle = '#fff';
+        ctx.font = '500 28px "Barlow Condensed", sans-serif';
+        const tName1 = t1.length > 14 ? t1.slice(0,13)+'…' : t1;
+        const tName2 = t2.length > 14 ? t2.slice(0,13)+'…' : t2;
+        ctx.fillText(`${tName1} ${s1}–${s2} ${tName2}`, 100, y);
+      }
+      y += 42;
+    }
+    y += 30;
+  });
+
+  soc_drawFooter(ctx, name);
+}
+
+async function soc_drawLeagueCard(ctx, name){
+  soc_drawBackground(ctx);
+  soc_drawHeader(ctx, 'LEAGUE STANDINGS');
+
+  // Pull from wclState
+  if(typeof wclState === 'undefined' || !wclState.leagueId){
+    ctx.fillStyle = '#8a8aa4';
+    ctx.font = '500 32px "Barlow Condensed", sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('Join a Multiplayer League', SOC_W/2, 600);
+    ctx.fillText('to share your standings', SOC_W/2, 650);
+    soc_drawFooter(ctx, name);
+    return;
+  }
+
+  ctx.fillStyle = '#fff';
+  ctx.font = 'bold 38px "Bebas Neue", sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText(wclState.leagueName || 'My League', SOC_W/2, 460);
+  ctx.fillStyle = '#F0B429';
+  ctx.font = 'bold 32px "Bebas Neue", sans-serif';
+  ctx.fillText('CODE: ' + (wclState.code || '------'), SOC_W/2, 510);
+
+  // Try fetch leaderboard from Supabase
+  try {
+    const supa = (typeof wcl_init === 'function') ? wcl_init() : null;
+    if(supa){
+      const [{ data: members }, { data: results }] = await Promise.all([
+        supa.from('wc_league_members').select('*').eq('league_id', wclState.leagueId),
+        supa.from('wc_results').select('*')
+      ]);
+      const resultsMap = {};
+      (results || []).forEach(r => { resultsMap[r.match_id] = [r.home_score, r.away_score]; });
+      Object.keys(ST.scores || {}).forEach(k => { if(!resultsMap[k]) resultsMap[k] = ST.scores[k]; });
+      const scored = (members || []).map(m => ({
+        ...m,
+        ...wcl_scorePredictions(m.predictions, resultsMap)
+      })).sort((a, b) => b.pts - a.pts);
+
+      let y = 620;
+      scored.slice(0, 10).forEach((p, i) => {
+        const colors = ['#F0B429', '#c0c0c0', '#cd7f32', '#444'];
+        ctx.fillStyle = colors[i] || '#1e1e2e';
+        ctx.beginPath();
+        ctx.arc(140, y, 28, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = i < 3 ? '#000' : '#fff';
+        ctx.font = 'bold 32px "Bebas Neue", sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(String(i + 1), 140, y + 12);
+
+        ctx.fillStyle = '#fff';
+        ctx.font = 'bold 36px "Barlow Condensed", sans-serif';
+        ctx.textAlign = 'left';
+        ctx.fillText(p.player_name.slice(0, 20), 200, y + 12);
+
+        ctx.fillStyle = '#F0B429';
+        ctx.font = 'bold 36px "Bebas Neue", sans-serif';
+        ctx.textAlign = 'right';
+        ctx.fillText(String(p.pts || 0) + ' pts', SOC_W - 80, y + 12);
+
+        y += 90;
+      });
+    }
+  } catch(e){
+    ctx.fillStyle = '#8a8aa4';
+    ctx.font = '500 28px "Barlow", sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('Could not load leaderboard', SOC_W/2, 700);
+  }
+
+  soc_drawFooter(ctx, name);
+}
+
+async function soc_drawChampionCard(ctx, name){
+  soc_drawBackground(ctx);
+  soc_drawHeader(ctx, 'MY PREDICTED CHAMPION');
+
+  const finalScores = ST.bScores && ST.bScores['final_0'];
+  let champion = null;
+  if(finalScores && finalScores.s1 !== undefined && finalScores.s2 !== undefined){
+    champion = finalScores.s1 > finalScores.s2 ? finalScores.team1 : finalScores.team2;
+  }
+
+  // Trophy
+  ctx.font = '300px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('🏆', SOC_W/2, 800);
+
+  if(champion){
+    ctx.fillStyle = '#F0B429';
+    ctx.font = 'bold 100px "Bebas Neue", sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(champion.toUpperCase(), SOC_W/2, 1000);
+
+    const finalLine = `${finalScores.team1 || ''} ${finalScores.s1}–${finalScores.s2} ${finalScores.team2 || ''}`;
+    ctx.fillStyle = '#fff';
+    ctx.font = '500 40px "Barlow", sans-serif';
+    ctx.fillText('FINAL: ' + finalLine, SOC_W/2, 1080);
+
+    ctx.fillStyle = '#8a8aa4';
+    ctx.font = '500 32px "Barlow Condensed", sans-serif';
+    ctx.fillText('MetLife Stadium · NJ', SOC_W/2, 1140);
+    ctx.fillText('19 July 2026', SOC_W/2, 1180);
+  } else {
+    ctx.fillStyle = '#8a8aa4';
+    ctx.font = '500 36px "Barlow", sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('Pick your champion in the Bracket tab', SOC_W/2, 1000);
+  }
+
+  soc_drawFooter(ctx, name);
+}
+
+async function generateSocialCard(showInPreview){
+  const type = document.getElementById('socialCardType').value;
+  const group = document.getElementById('socialCardGroup').value;
+  const name = document.getElementById('socialCardName').value.trim();
+
+  const canvas = document.createElement('canvas');
+  canvas.width = SOC_W;
+  canvas.height = SOC_H;
+  const ctx = canvas.getContext('2d');
+
+  if(type === 'group') await soc_drawGroupCard(ctx, group, name);
+  else if(type === 'bracket') await soc_drawBracketCard(ctx, name);
+  else if(type === 'league') await soc_drawLeagueCard(ctx, name);
+  else if(type === 'champion') await soc_drawChampionCard(ctx, name);
+
+  return new Promise(resolve => {
+    canvas.toBlob(blob => {
+      socLastBlob = blob;
+      if(showInPreview){
+        const preview = document.getElementById('socialCardPreview');
+        if(preview){
+          const url = URL.createObjectURL(blob);
+          preview.innerHTML = `<img src="${url}" alt="Social card preview" style="max-width:100%;max-height:300px;border-radius:8px;box-shadow:0 4px 20px rgba(0,0,0,0.4)">`;
+        }
+      }
+      resolve(blob);
+    }, 'image/png', 0.95);
+  });
+}
+
+async function downloadSocialCard(){
+  toast('Generating image…', 'info');
+  const blob = await generateSocialCard(false);
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  const type = document.getElementById('socialCardType').value;
+  a.download = `wc2026-${type}-card.png`;
+  a.click();
+  URL.revokeObjectURL(url);
+  toast('Image downloaded', 'success');
+}
+
+async function shareSocialCard(){
+  if(!socLastBlob) await generateSocialCard(true);
+  if(!socLastBlob) return toast('Generate the card first', 'error');
+
+  const file = new File([socLastBlob], 'wc2026-card.png', { type: 'image/png' });
+  if(navigator.canShare && navigator.canShare({ files: [file] })){
+    try {
+      await navigator.share({
+        files: [file],
+        title: 'My WC 2026 prediction',
+        text: 'My World Cup 2026 wallchart prediction!'
+      });
+    } catch(e){ /* user cancelled */ }
+  } else {
+    // Fallback: copy URL
+    await downloadSocialCard();
+    toast('Image downloaded — share it from your gallery', 'info');
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+// PHASE 5.17: ACCESSIBILITY ENHANCEMENTS (additive)
+// - ARIA live region for score updates
+// - Enhanced keyboard nav for prediction inputs
+// - Screen reader announcements for bracket advancement
+// ═══════════════════════════════════════════════════════
+
+// Enhanced live region: separate polite + assertive channels
+function ensureA11yRegions(){
+  if(!document.getElementById('a11yPolite')){
+    const polite = document.createElement('div');
+    polite.id = 'a11yPolite';
+    polite.className = 'sr-only';
+    polite.setAttribute('role', 'status');
+    polite.setAttribute('aria-live', 'polite');
+    polite.setAttribute('aria-atomic', 'true');
+    document.body.appendChild(polite);
+  }
+  if(!document.getElementById('a11yAssertive')){
+    const assertive = document.createElement('div');
+    assertive.id = 'a11yAssertive';
+    assertive.className = 'sr-only';
+    assertive.setAttribute('role', 'alert');
+    assertive.setAttribute('aria-live', 'assertive');
+    assertive.setAttribute('aria-atomic', 'true');
+    document.body.appendChild(assertive);
+  }
+}
+ensureA11yRegions();
+
+function a11yAnnounce(msg, urgent){
+  const el = document.getElementById(urgent ? 'a11yAssertive' : 'a11yPolite');
+  if(!el) return;
+  el.textContent = '';
+  requestAnimationFrame(() => { el.textContent = msg; });
+}
+
+// Hook into score saves: detect changes to ST.scores and announce
+(function watchScoreChanges(){
+  let lastSnapshot = JSON.stringify(ST.scores || {});
+  setInterval(() => {
+    const cur = JSON.stringify(ST.scores || {});
+    if(cur === lastSnapshot) return;
+    const oldScores = JSON.parse(lastSnapshot);
+    const newScores = ST.scores || {};
+    Object.keys(newScores).forEach(k => {
+      if(JSON.stringify(oldScores[k]) === JSON.stringify(newScores[k])) return;
+      const [g, fi] = k.split('_');
+      if(G[g] && FX[g] && FX[g][fi]){
+        const [a, b] = FX[g][fi];
+        const t1 = G[g].t[a], t2 = G[g].t[b];
+        const [s1, s2] = newScores[k];
+        a11yAnnounce(`Score recorded: ${t1} ${s1}, ${t2} ${s2}`);
+      }
+    });
+    lastSnapshot = cur;
+  }, 800);
+})();
+
+// Hook into bracket advance: announce winners
+(function watchBracketAdvance(){
+  let lastBSnap = JSON.stringify(ST.bScores || {});
+  setInterval(() => {
+    const cur = JSON.stringify(ST.bScores || {});
+    if(cur === lastBSnap) return;
+    const oldB = JSON.parse(lastBSnap);
+    const newB = ST.bScores || {};
+    Object.keys(newB).forEach(id => {
+      const o = oldB[id] || {};
+      const n = newB[id];
+      // Detect newly-set winner (auto-fill)
+      if(n.team1 && n.team1 !== o.team1 && n.autoFilled?.team1){
+        a11yAnnounce(`${n.team1} advances to ${id.startsWith('r16')?'Round of 16':id.startsWith('qf')?'Quarter Final':id.startsWith('sf')?'Semi Final':id.startsWith('final')?'Final':'next round'}`);
+      }
+      if(n.team2 && n.team2 !== o.team2 && n.autoFilled?.team2){
+        a11yAnnounce(`${n.team2} advances to ${id.startsWith('r16')?'Round of 16':id.startsWith('qf')?'Quarter Final':id.startsWith('sf')?'Semi Final':id.startsWith('final')?'Final':'next round'}`);
+      }
+    });
+    lastBSnap = cur;
+  }, 1500);
+})();
+
+// Enhanced keyboard navigation for prediction inputs
+// Tab through inputs naturally; Enter advances to next; Esc closes modals
+document.addEventListener('keydown', (e) => {
+  // Esc closes any open modal
+  if(e.key === 'Escape'){
+    document.querySelectorAll('.overlay.open').forEach(o => o.classList.remove('open'));
+  }
+  // Enter on a number input advances to the next sibling input
+  if(e.key === 'Enter' && e.target.matches('input[type="number"]')){
+    e.preventDefault();
+    const all = Array.from(document.querySelectorAll('input[type="number"]:not([disabled])'));
+    const idx = all.indexOf(e.target);
+    if(idx >= 0 && idx < all.length - 1){
+      // Move to next visible input
+      for(let i = idx + 1; i < all.length; i++){
+        const next = all[i];
+        if(next.offsetParent !== null){ next.focus(); next.select(); break; }
+      }
+    } else {
+      e.target.blur();
+    }
+  }
+  // Arrow up/down on number inputs change value (already native, but ensure no conflict)
+});
+
+// Add aria-live attribute to existing srLive if not present
+const _existingSrLive = document.getElementById('srLive');
+if(_existingSrLive && !_existingSrLive.hasAttribute('aria-live')){
+  _existingSrLive.setAttribute('aria-live', 'polite');
+}
+
+// Add roles to bracket matches for screen reader navigation
+function enhanceBracketAccessibility(){
+  document.querySelectorAll('.b-match').forEach(m => {
+    if(!m.hasAttribute('role')) m.setAttribute('role', 'button');
+    if(!m.hasAttribute('tabindex')) m.setAttribute('tabindex', '0');
+    // Build aria-label from contents
+    const teams = m.querySelectorAll('.b-tname');
+    if(teams.length === 2 && !m.hasAttribute('aria-label')){
+      const t1 = teams[0].textContent.trim();
+      const t2 = teams[1].textContent.trim();
+      m.setAttribute('aria-label', `Match: ${t1} versus ${t2}. Press Enter to enter score.`);
+    }
+  });
+  document.querySelectorAll('.b-match[tabindex]').forEach(m => {
+    if(m._a11yKbd) return;
+    m._a11yKbd = true;
+    m.addEventListener('keydown', e => {
+      if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); m.click(); }
+    });
+  });
+}
+setInterval(enhanceBracketAccessibility, 2000);
+
+// Add aria-label to the "Live Now" badge container when LIVE matches present
+function enhanceLiveBadgeAccessibility(){
+  document.querySelectorAll('[data-wls-status="LIVE"]').forEach(el => {
+    if(el.getAttribute('aria-label') && el.getAttribute('aria-label').includes('Live')) return;
+    const existing = el.getAttribute('aria-label') || '';
+    el.setAttribute('aria-label', existing + ' (Live now)');
+  });
+}
+setInterval(enhanceLiveBadgeAccessibility, 5000);
+
+// Reduced-motion preference respect
+if(window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+  document.documentElement.style.setProperty('--ease-spring', 'ease-out');
+  // Disable confetti and pulse animations via inline style
+  const style = document.createElement('style');
+  style.textContent = `
+    *, *::before, *::after {
+      animation-duration: 0.001s !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001s !important;
+    }
+  `;
+  document.head.appendChild(style);
+}
 </script>
 
 <!-- ═══════════════════════════════════════════════════
