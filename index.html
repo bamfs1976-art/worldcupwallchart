@@ -7,12 +7,12 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="WC 2026">
 <meta name="theme-color" content="#07070d">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' https://flagcdn.com data:; connect-src 'self' https://flagcdn.com https://xdrwtsuzytdzcnwjbfvx.supabase.co wss://xdrwtsuzytdzcnwjbfvx.supabase.co https://site.api.espn.com https://www.thesportsdb.com https://api.football-data.org; worker-src blob: 'self'; manifest-src data: 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' https://flagcdn.com data:; connect-src 'self' https://flagcdn.com https://knodunjnsxelmpziupwk.supabase.co wss://knodunjnsxelmpziupwk.supabase.co https://xdrwtsuzytdzcnwjbfvx.supabase.co wss://xdrwtsuzytdzcnwjbfvx.supabase.co https://site.api.espn.com https://www.thesportsdb.com https://api.football-data.org; worker-src blob: 'self'; manifest-src data: 'self'">
 <title>FIFA World Cup 2026 — Wall Chart</title>
 <meta name="description" content="The ultimate interactive FIFA World Cup 2026 wall chart. All 104 fixtures, live standings, real-time bracket, golden boot tracker and AI predictions.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://flagcdn.com" crossorigin>
-<link rel="preconnect" href="https://xdrwtsuzytdzcnwjbfvx.supabase.co" crossorigin>
+<link rel="preconnect" href="https://knodunjnsxelmpziupwk.supabase.co" crossorigin>
 <link rel="dns-prefetch" href="https://flagcdn.com">
 <!-- Supabase JS SDK for League features (additive, optional) -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js" defer></script>
@@ -4828,6 +4828,7 @@ body[data-lang="cy"] .lbl-group .en-text { display: none; }
 <section class="section" id="sec-share">
   <div class="section-header"><div><div class="section-title">Share & Export</div><div class="section-sub">Share your wall chart, generate a results card or export your data</div></div></div>
   <div class="share-grid">
+    <div class="share-card" onclick="openCloudSync()" id="cloudSyncCard"><span class="share-icon">☁️</span><div class="share-title">Cloud Sync</div><div class="share-desc" id="cloudSyncCardDesc">Keep scores on every device</div></div>
     <div class="share-card" onclick="copyLink()"><span class="share-icon">🔗</span><div class="share-title">Copy Link</div><div class="share-desc">Share with friends</div></div>
     <div class="share-card" onclick="window.print()"><span class="share-icon">🖨️</span><div class="share-title">Print / PDF</div><div class="share-desc">A3 printable chart</div></div>
     <div class="share-card" onclick="exportData()"><span class="share-icon">💾</span><div class="share-title">Export Data</div><div class="share-desc">Download as JSON</div></div>
@@ -5085,6 +5086,40 @@ body[data-lang="cy"] .lbl-group .en-text { display: none; }
     <div class="modal-actions">
       <button class="btn ghost sm" onclick="document.getElementById('addPlayerModal').classList.remove('open')">Cancel</button>
       <button class="btn sm" onclick="addLeaguePlayer()">+ Add to League</button>
+    </div>
+  </div>
+</div>
+
+<!-- Cloud Sync modal — cross-device score persistence -->
+<div class="overlay" id="cloudSyncModal" role="dialog" aria-modal="true" aria-labelledby="cloudSyncTitle">
+  <div class="modal" style="max-width:460px">
+    <button class="modal-close-x" onclick="document.getElementById('cloudSyncModal').classList.remove('open')" aria-label="Close">✕</button>
+    <div class="modal-title" id="cloudSyncTitle">☁️ Cloud Sync</div>
+    <div class="modal-sub">Keep your scores and predictions on every device — no account needed.</div>
+
+    <!-- Status line -->
+    <div id="cloud-status" style="margin:var(--sp-4) 0;font-size:var(--tx-sm);color:var(--tx3)" role="status" aria-live="polite"></div>
+
+    <!-- NOT LINKED: create or link -->
+    <div id="cloud-setup">
+      <button class="btn" style="width:100%;margin-bottom:var(--sp-4)" onclick="cloudCreate()" id="cloud-btn-create">＋ Create a sync code</button>
+      <div style="text-align:center;font-size:var(--tx-xs);color:var(--tx3);margin-bottom:var(--sp-3)">— or link this device to an existing code —</div>
+      <input class="inp" type="text" id="cloud-code-input" placeholder="e.g. K7Q4 M2PX" maxlength="9" autocomplete="off" autocapitalize="characters" spellcheck="false" style="margin-bottom:var(--sp-3);text-align:center;letter-spacing:2px;text-transform:uppercase" aria-label="Enter your 8-character sync code">
+      <button class="btn ghost" style="width:100%" onclick="cloudLink()" id="cloud-btn-link">🔗 Link this device</button>
+    </div>
+
+    <!-- LINKED: show code + controls -->
+    <div id="cloud-linked" style="display:none">
+      <div style="background:var(--bg2,#161622);border:1px solid var(--bdr,#252535);border-radius:12px;padding:var(--sp-4);text-align:center;margin-bottom:var(--sp-4)">
+        <div style="font-size:var(--tx-xs);color:var(--tx3);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px">Your sync code</div>
+        <div id="cloud-code-display" style="font-family:'Bebas Neue','Barlow Condensed',sans-serif;font-size:2rem;letter-spacing:6px;color:var(--gold,#22c55e)">––––––––</div>
+        <button class="btn sm" style="margin-top:var(--sp-3)" onclick="cloudCopyCode()">📋 Copy code</button>
+      </div>
+      <div style="font-size:var(--tx-xs);color:var(--tx3);margin-bottom:var(--sp-4);line-height:1.5">Enter this code on any other device (Cloud Sync → Link this device) to see the same scores. Changes sync automatically — the most recent edit wins.</div>
+      <div class="modal-actions">
+        <button class="btn ghost sm" onclick="cloudUnlink()">Turn off sync here</button>
+        <button class="btn sm" onclick="cloudForcePush()">↻ Sync now</button>
+      </div>
     </div>
   </div>
 </div>
@@ -10191,6 +10226,188 @@ if(window.matchMedia('(prefers-reduced-motion: reduce)').matches){
   `;
   document.head.appendChild(style);
 }
+
+// ═══════════════════════════════════════════════════════
+// CLOUD SYNC — cross-device score persistence (no login)
+// Backed by Supabase project knodunjnsxelmpziupwk via
+// SECURITY DEFINER RPCs (wc_create / wc_pull / wc_push).
+// State is whole-blob, last-write-wins by server timestamp.
+// ═══════════════════════════════════════════════════════
+(function cloudSync(){
+  const CS_URL = 'https://knodunjnsxelmpziupwk.supabase.co';
+  const CS_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imtub2R1bmpuc3hlbG1weml1cHdrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAxMjYxNDMsImV4cCI6MjA4NTcwMjE0M30.KxrWezv-S72P5x9mfkVc1gSY2i5yF5L0ylIg16yOQ1I';
+  const META_KEY = 'wc26_cloud';
+
+  let supa = null, pushTimer = null, pollTimer = null, applying = false, booting = true;
+  let meta = (()=>{ try { return JSON.parse(localStorage.getItem(META_KEY)||'{}'); } catch { return {}; } })();
+  const saveMeta = ()=>{ try { localStorage.setItem(META_KEY, JSON.stringify(meta)); } catch(e){} };
+
+  function client(){
+    if(supa) return supa;
+    if(typeof window.supabase === 'undefined') return null;
+    try { supa = window.supabase.createClient(CS_URL, CS_KEY); } catch(e){ console.error('Cloud sync init failed', e); return null; }
+    return supa;
+  }
+
+  const fmtCode = c => c ? c.slice(0,4) + ' ' + c.slice(4) : '––––––––';
+
+  function relTime(ts){
+    if(!ts) return '';
+    const diff = Date.now() - new Date(ts).getTime();
+    if(diff < 45000) return 'just now';
+    if(diff < 3600000) return Math.round(diff/60000) + ' min ago';
+    if(diff < 86400000) return Math.round(diff/3600000) + ' hr ago';
+    return Math.round(diff/86400000) + ' days ago';
+  }
+
+  function renderCloudUI(){
+    const setup = document.getElementById('cloud-setup');
+    const linked = document.getElementById('cloud-linked');
+    const status = document.getElementById('cloud-status');
+    const cardDesc = document.getElementById('cloudSyncCardDesc');
+    if(!setup || !linked) return;
+    if(meta.code){
+      setup.style.display = 'none';
+      linked.style.display = 'block';
+      const disp = document.getElementById('cloud-code-display');
+      if(disp) disp.textContent = fmtCode(meta.code);
+      if(status) status.textContent = meta.lastTs ? ('On · last synced ' + relTime(meta.lastTs)) : 'On · syncing…';
+      if(cardDesc) cardDesc.textContent = 'On · code ' + fmtCode(meta.code);
+    } else {
+      setup.style.display = 'block';
+      linked.style.display = 'none';
+      if(status) status.textContent = 'Off on this device.';
+      if(cardDesc) cardDesc.textContent = 'Keep scores on every device';
+    }
+  }
+
+  // Replace local state with a pulled blob, keeping the ST reference intact.
+  function cloudAdopt(state){
+    if(!state || typeof state !== 'object') return;
+    applying = true;
+    try {
+      Object.keys(ST).forEach(k => { delete ST[k]; });
+      Object.assign(ST, state);
+      // Re-apply the same defaults the app sets on init
+      ST.scores = ST.scores||{}; ST.scorers = ST.scorers||[]; ST.timeline = ST.timeline||{};
+      ST.bScores = ST.bScores||{}; ST.leaguePlayers = ST.leaguePlayers||[]; ST.predictions = ST.predictions||{};
+      ST.fairPlay = ST.fairPlay||{}; ST.theme = ST.theme||'dark'; ST.notes = ST.notes||{};
+      ST.starredGroups = ST.starredGroups||[]; ST.simPreds = ST.simPreds||{};
+      save();
+    } finally { applying = false; }
+    try {
+      renderGroups(); renderBracket(); renderScorers(); renderDashboard();
+      if(typeof renderLeague === 'function') renderLeague();
+      if(typeof renderFP === 'function') renderFP();
+      if(typeof applyTheme === 'function') applyTheme();
+    } catch(e){ console.warn('Cloud re-render issue', e); }
+  }
+
+  async function cloudPush(){
+    if(!meta.code) return;
+    const c = client(); if(!c) return;
+    try {
+      const { data, error } = await c.rpc('wc_push', { p_code: meta.code, p_state: ST });
+      if(error){ console.warn('Cloud push failed', error); return; }
+      if(data){ meta.lastTs = data; saveMeta(); renderCloudUI(); }
+    } catch(e){ console.warn('Cloud push error', e); }
+  }
+
+  async function cloudPull(silent){
+    if(!meta.code) return;
+    const c = client(); if(!c) return;
+    try {
+      const { data, error } = await c.rpc('wc_pull', { p_code: meta.code });
+      if(error){ console.warn('Cloud pull failed', error); return; }
+      const row = Array.isArray(data) ? data[0] : data;
+      if(!row){ return; }
+      if(!meta.lastTs || new Date(row.updated_at) > new Date(meta.lastTs)){
+        meta.lastTs = row.updated_at; saveMeta();
+        cloudAdopt(row.state);
+        if(!silent && typeof toast === 'function') toast('Updated from another device','info');
+      }
+      renderCloudUI();
+    } catch(e){ console.warn('Cloud pull error', e); }
+  }
+
+  function schedulePush(){
+    if(applying || booting || !meta.code) return;
+    clearTimeout(pushTimer);
+    pushTimer = setTimeout(cloudPush, 1500);
+  }
+
+  function startPolling(){
+    clearInterval(pollTimer);
+    if(!meta.code) return;
+    pollTimer = setInterval(()=>{ if(document.visibilityState === 'visible') cloudPull(true); }, 25000);
+  }
+
+  // Hook every wc26v4 save so edits push to the cloud (debounced).
+  (function hookSave(){
+    const orig = localStorage.setItem.bind(localStorage);
+    localStorage.setItem = function(k, v){ orig(k, v); if(k === 'wc26v4') schedulePush(); };
+  })();
+
+  document.addEventListener('visibilitychange', ()=>{ if(document.visibilityState === 'visible') cloudPull(true); });
+  window.addEventListener('focus', ()=> cloudPull(true));
+
+  // Public actions (called from the modal / share card)
+  window.openCloudSync = function(){ renderCloudUI(); const m = document.getElementById('cloudSyncModal'); if(m) m.classList.add('open'); };
+  window.cloudCopyCode = function(){ if(meta.code && navigator.clipboard) navigator.clipboard.writeText(meta.code).then(()=> toast('Code copied','success')); };
+  window.cloudForcePush = function(){ cloudPush().then(()=> toast('Synced','success')); };
+
+  window.cloudUnlink = function(){
+    meta = {}; saveMeta(); clearInterval(pollTimer); renderCloudUI();
+    toast('Sync turned off on this device','info');
+  };
+
+  window.cloudCreate = async function(){
+    const c = client(); if(!c){ toast('Sync not ready — refresh and try again','error'); return; }
+    const btn = document.getElementById('cloud-btn-create');
+    if(btn){ btn.disabled = true; btn.textContent = 'Creating…'; }
+    try {
+      const { data, error } = await c.rpc('wc_create', { p_state: ST });
+      if(error || !data){ console.warn(error); toast('Could not create a sync code','error'); return; }
+      meta.code = data; meta.lastTs = null; saveMeta();
+      await cloudPull(true);   // capture the server timestamp
+      startPolling();
+      renderCloudUI();
+      toast('Cloud sync is on — code ' + fmtCode(data),'success');
+    } finally {
+      if(btn){ btn.disabled = false; btn.textContent = '＋ Create a sync code'; }
+    }
+  };
+
+  window.cloudLink = async function(){
+    const input = document.getElementById('cloud-code-input');
+    const raw = (input ? input.value : '').toUpperCase().replace(/[^A-Z0-9]/g,'');
+    if(raw.length !== 8){ toast('Enter the full 8-character code','error'); return; }
+    const c = client(); if(!c){ toast('Sync not ready — refresh and try again','error'); return; }
+    const btn = document.getElementById('cloud-btn-link');
+    if(btn){ btn.disabled = true; btn.textContent = 'Linking…'; }
+    try {
+      const { data, error } = await c.rpc('wc_pull', { p_code: raw });
+      if(error){ console.warn(error); toast('Sync error — try again','error'); return; }
+      const row = Array.isArray(data) ? data[0] : data;
+      if(!row){ toast('Code not found — check it and retry','error'); return; }
+      meta.code = raw; meta.lastTs = row.updated_at; saveMeta();
+      cloudAdopt(row.state);
+      startPolling();
+      renderCloudUI();
+      toast('Linked — your scores are loaded','success');
+    } finally {
+      if(btn){ btn.disabled = false; btn.textContent = '🔗 Link this device'; }
+    }
+  };
+
+  // Boot once the Supabase SDK is available
+  (function boot(){
+    if(typeof window.supabase === 'undefined'){ return setTimeout(boot, 300); }
+    renderCloudUI();
+    if(meta.code){ cloudPull(true).finally(()=>{ booting = false; }); startPolling(); }
+    else { booting = false; }
+  })();
+})();
 </script>
 
 <!-- ═══════════════════════════════════════════════════
