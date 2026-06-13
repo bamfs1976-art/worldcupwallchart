@@ -2893,7 +2893,6 @@ main { max-width: var(--max-w); margin: 0 auto; padding: var(--sp-6) var(--sp-6)
 .fl-row.has-result { border-left: 3px solid var(--qualify); }
 .fl-row.england-game { border-left: 3px solid #cf0a20; }
 .fl-row.scotland-game { border-left: 3px solid #005EB8; }
-.fl-row.wales-game { border-left: 3px solid #c8102e; }
 .fl-row.ni-game { border-left: 3px solid var(--gold); }
 .fl-time-col {
   display: flex;
@@ -3180,7 +3179,6 @@ input[type=number] { -moz-appearance: textfield; }
   body[data-print-mode="wallchart"] .h2h-toggle,
   body[data-print-mode="wallchart"] .h2h-body,
   body[data-print-mode="wallchart"] #todaySection,
-  body[data-print-mode="wallchart"] #walesSpotlight,
   body[data-print-mode="wallchart"] #todayHero,
   body[data-print-mode="wallchart"] .group-status-badge,
   body[data-print-mode="wallchart"] .form-dots,
@@ -4039,7 +4037,7 @@ input[type=number] { -moz-appearance: textfield; }
 
 /* ═══════════════════════════════════════════════════
    PHASE 4: TOURNAMENT EXPERIENCE (additive)
-   Today's Matches, Wales spotlight, Venue guide, Stats
+   Today's Matches, Venue guide, Stats
    ═══════════════════════════════════════════════════ */
 
 /* ─── Today's Matches landing view ─── */
@@ -4184,129 +4182,6 @@ input[type=number] { -moz-appearance: textfield; }
   .today-meta { display: none; }
   .today-team-name { font-size: var(--tx-sm); }
   .today-score { font-size: 1.2rem; }
-}
-
-/* ─── Wales spotlight ─── */
-.wales-spotlight {
-  background: linear-gradient(135deg, #c8102e 0%, #00603a 100%);
-  border-radius: var(--r-lg);
-  padding: var(--sp-5);
-  color: #fff;
-  position: relative;
-  overflow: hidden;
-  margin-bottom: var(--sp-5);
-}
-.wales-spotlight::before {
-  content: '';
-  position: absolute;
-  top: 0; right: 0;
-  width: 200px; height: 100%;
-  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 60'%3E%3Cpath fill='rgba(255,255,255,0.08)' d='M50 30 L40 25 L40 15 L50 10 L60 15 L60 25 Z'/%3E%3C/svg%3E") no-repeat center;
-  background-size: contain;
-  pointer-events: none;
-  opacity: 0.4;
-}
-.wales-spotlight-header {
-  display: flex;
-  align-items: center;
-  gap: var(--sp-3);
-  margin-bottom: var(--sp-4);
-}
-.wales-flag-large {
-  font-size: 2.5rem;
-  filter: drop-shadow(0 2px 6px rgba(0,0,0,0.5));
-}
-.wales-title {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 2rem;
-  letter-spacing: 4px;
-  color: #fff;
-  text-shadow: 0 2px 8px rgba(0,0,0,0.4);
-}
-.wales-subtitle {
-  font-size: var(--tx-sm);
-  color: rgba(255,255,255,0.85);
-  font-family: 'Barlow Condensed', sans-serif;
-  letter-spacing: 1px;
-  margin-top: 2px;
-}
-.wales-content {
-  position: relative;
-  z-index: 1;
-}
-.wales-status-card {
-  background: rgba(0,0,0,0.3);
-  border: 1px solid rgba(255,255,255,0.15);
-  border-radius: var(--r-md);
-  padding: var(--sp-4);
-  margin-bottom: var(--sp-3);
-  backdrop-filter: blur(8px);
-}
-.wales-status-title {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: var(--tx-md);
-  color: #ffd700;
-  letter-spacing: 2px;
-  margin-bottom: var(--sp-2);
-}
-.wales-history-row {
-  display: flex;
-  justify-content: space-between;
-  padding: 4px 0;
-  font-size: var(--tx-sm);
-  border-bottom: 1px solid rgba(255,255,255,0.08);
-}
-.wales-history-row:last-child { border-bottom: none; }
-.wales-history-year {
-  font-family: 'Bebas Neue', sans-serif;
-  color: #ffd700;
-  letter-spacing: 1px;
-}
-.wales-cy-toggle {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--sp-2);
-  background: rgba(0,0,0,0.3);
-  border: 1px solid rgba(255,255,255,0.2);
-  color: #fff;
-  padding: 6px 12px;
-  border-radius: 20px;
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: var(--tx-xs);
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  cursor: pointer;
-  margin-top: var(--sp-3);
-}
-.wales-cy-toggle:hover { background: rgba(0,0,0,0.5); }
-.wales-cy-toggle.active { background: #ffd700; color: #000; border-color: #ffd700; }
-
-/* Welsh language overrides — when body has data-lang="cy" */
-body[data-lang="cy"] .group-letter { font-family: inherit; }
-body[data-lang="cy"] .lbl-group::before { content: 'Grŵp '; }
-body[data-lang="cy"] .lbl-group .en-text { display: none; }
-
-.wales-toggle-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  background: linear-gradient(135deg, #c8102e, #00603a);
-  color: #fff;
-  border: none;
-  padding: 6px 12px;
-  border-radius: 16px;
-  font-family: 'Barlow Condensed', sans-serif;
-  font-weight: 700;
-  font-size: var(--tx-xs);
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  cursor: pointer;
-  min-height: 32px;
-  margin-left: var(--sp-2);
-}
-.wales-toggle-btn.active {
-  background: linear-gradient(135deg, #ffd700, #ffa500);
-  color: #000;
 }
 
 /* ─── Venue guide ─── */
@@ -4532,8 +4407,6 @@ body[data-lang="cy"] .lbl-group .en-text { display: none; }
 <section class="section active" id="sec-groups">
   <!-- Phase 4.11: Today's Matches landing view (auto-shown during tournament) -->
   <div id="todaySection"></div>
-  <!-- Phase 4.12: Wales spotlight (auto-shown when Follow Wales toggled) -->
-  <div id="walesSpotlight"></div>
   <div id="todayHero"></div>
   <div class="section-header">
     <div>
@@ -4542,7 +4415,6 @@ body[data-lang="cy"] .lbl-group .en-text { display: none; }
     </div>
     <div class="section-actions">
       <span class="pill gold" id="playedPill">0 / 72 played</span>
-      <button class="wales-toggle-btn" id="walesToggleBtn" onclick="toggleWales()" title="Show Wales spotlight" aria-pressed="false">🏴󠁧󠁢󠁷󠁬󠁳󠁿 Follow Wales</button>
       <button class="btn secondary sm" onclick="resetAllScores()">↺ Reset</button>
     </div>
   </div>
@@ -9280,127 +9152,6 @@ window.addEventListener('load', () => {
 });
 
 // ═══════════════════════════════════════════════════════
-// PHASE 4.12: WALES SPOTLIGHT (additive)
-// Wales did not qualify for 2026 — graceful heritage panel
-// Uses localStorage key wc26_wales (separate from ST)
-// ═══════════════════════════════════════════════════════
-
-let walesConfig = (()=>{
-  try { return JSON.parse(localStorage.getItem('wc26_wales')||'{}'); }
-  catch { return {}; }
-})();
-
-const WALES_HISTORY = [
-  { y: 2022, r: 'GS', c: 'Qatar', note: 'First WC since 1958' },
-  { y: 2018, r: '-', c: '-', note: 'Did not qualify (lost playoff to Republic of Ireland)' },
-  { y: 2014, r: '-', c: '-', note: 'Did not qualify' },
-  { y: 1958, r: 'QF', c: 'Sweden', note: 'Best ever — quarter-final, lost 1-0 to Brazil (Pelé)' }
-];
-
-// Check if Wales is in any group (in case data is updated for inter-confederation playoff result)
-function walesInTournament(){
-  for(const g of Object.keys(G)){
-    if(G[g].t.some(t => t === 'Wales' || t === 'Cymru')) return g;
-  }
-  return null;
-}
-
-function toggleWales(){
-  walesConfig.enabled = !walesConfig.enabled;
-  try { localStorage.setItem('wc26_wales', JSON.stringify(walesConfig)); } catch(e){}
-  const btn = document.getElementById('walesToggleBtn');
-  if(btn){
-    btn.classList.toggle('active', walesConfig.enabled);
-    btn.setAttribute('aria-pressed', walesConfig.enabled);
-  }
-  renderWalesSpotlight();
-}
-
-function renderWalesSpotlight(){
-  const el = document.getElementById('walesSpotlight');
-  if(!el) return;
-  if(!walesConfig.enabled){ el.innerHTML = ''; return; }
-
-  const inTournament = walesInTournament();
-  const cyEnabled = walesConfig.welsh;
-
-  // Welsh / English label pairs
-  const L = cyEnabled
-    ? { spotlight: 'Sylw ar Gymru', historic: 'Hanesyddol', games: 'Gemau', group: 'Grŵp', score: 'Sgôr', table: 'Tabl', notQualified: 'Heb gymhwyso ar gyfer Cwpan y Byd 2026', note: 'Gobeithio am 2030!' }
-    : { spotlight: 'Wales Spotlight', historic: 'World Cup History', games: 'Fixtures', group: 'Group', score: 'Score', table: 'Standings', notQualified: 'Wales did not qualify for the 2026 World Cup', note: 'Hopes for 2030!' };
-
-  let bodyHtml;
-  if(inTournament){
-    // If Wales somehow made it via playoff — show fixtures (future-proof)
-    const wG = inTournament;
-    const wIdx = G[wG].t.indexOf(G[wG].t.find(t => t === 'Wales' || t === 'Cymru'));
-    const fixtures = FX[wG].filter(([a, b]) => a === wIdx || b === wIdx);
-    bodyHtml = `<div class="wales-status-card">
-      <div class="wales-status-title">${cyEnabled?'Yng Ngrŵp':'In Group'} ${wG}</div>
-      <p style="font-size:var(--tx-sm);margin-bottom:var(--sp-3)">${cyEnabled?'Mae Cymru wedi cymhwyso ar gyfer Cwpan y Byd 2026!':'Wales has qualified for the 2026 World Cup!'}</p>
-      ${fixtures.map(([a, b, num, dt, venue]) => {
-        const opp = a === wIdx ? G[wG].t[b] : G[wG].t[a];
-        const oppFlag = a === wIdx ? G[wG].f[b] : G[wG].f[a];
-        return `<div class="wales-history-row">
-          <span class="wales-history-year">M${num}</span>
-          <span>vs ${oppFlag} ${opp}</span>
-          <span style="font-size:var(--tx-xs);color:rgba(255,255,255,0.6)">${dt.slice(5,10).replace('-','/')} · ${venue}</span>
-        </div>`;
-      }).join('')}
-    </div>`;
-  } else {
-    bodyHtml = `<div class="wales-status-card">
-      <div class="wales-status-title">${L.notQualified}</div>
-      <p style="font-size:var(--tx-sm);line-height:1.5;margin-bottom:var(--sp-2)">${cyEnabled
-        ? 'Methodd Cymru gymhwyso ar gyfer Cwpan y Byd FIFA 2026 yng Ngogledd America. Roedd Cwpan y Byd 2022 yn Qatar yn nodi eu hymddangosiad cyntaf ers 1958.'
-        : 'Wales failed to qualify for the 2026 FIFA World Cup in North America. The 2022 World Cup in Qatar marked their first appearance since 1958.'}</p>
-      <p style="font-size:var(--tx-sm);color:#ffd700;font-family:'Bebas Neue',sans-serif;letter-spacing:2px">${L.note}</p>
-    </div>
-    <div class="wales-status-card">
-      <div class="wales-status-title">${L.historic}</div>
-      ${WALES_HISTORY.map(h => `<div class="wales-history-row">
-        <span class="wales-history-year">${h.y}</span>
-        <span>${h.r==='-'?'—':h.r}${h.c!=='-'?' · '+h.c:''}</span>
-        <span style="font-size:var(--tx-xs);color:rgba(255,255,255,0.6);max-width:200px;text-align:right">${h.note}</span>
-      </div>`).join('')}
-    </div>`;
-  }
-
-  el.innerHTML = `<div class="wales-spotlight">
-    <div class="wales-spotlight-header">
-      <span class="wales-flag-large">🏴󠁧󠁢󠁷󠁬󠁳󠁿</span>
-      <div>
-        <div class="wales-title">${cyEnabled?'CYMRU':'WALES'}</div>
-        <div class="wales-subtitle">${cyEnabled?'Pêl-droed Cymru':'Welsh Football'} · ${L.spotlight}</div>
-      </div>
-    </div>
-    <div class="wales-content">${bodyHtml}</div>
-    <button class="wales-cy-toggle ${cyEnabled?'active':''}" onclick="toggleWalesWelsh()" aria-pressed="${!!cyEnabled}">
-      ${cyEnabled?'🇬🇧 English':'🏴󠁧󠁢󠁷󠁬󠁳󠁿 Cymraeg'}
-    </button>
-  </div>`;
-}
-
-function toggleWalesWelsh(){
-  walesConfig.welsh = !walesConfig.welsh;
-  try { localStorage.setItem('wc26_wales', JSON.stringify(walesConfig)); } catch(e){}
-  document.body.dataset.lang = walesConfig.welsh ? 'cy' : 'en';
-  renderWalesSpotlight();
-}
-
-// Restore Wales toggle state on load
-window.addEventListener('load', () => {
-  setTimeout(() => {
-    if(walesConfig.enabled){
-      const btn = document.getElementById('walesToggleBtn');
-      if(btn){ btn.classList.add('active'); btn.setAttribute('aria-pressed', 'true'); }
-    }
-    if(walesConfig.welsh){ document.body.dataset.lang = 'cy'; }
-    renderWalesSpotlight();
-  }, 800);
-});
-
-// ═══════════════════════════════════════════════════════
 // PHASE 4.13: VENUE GUIDE (additive)
 // 16 host venues with stadium info, capacity, timezone, matches
 // ═══════════════════════════════════════════════════════
@@ -9487,7 +9238,7 @@ window.showSection = function(id, btn){
   _ph4_origShow(id, btn);
   if(id === 'venues') renderVenueGuide();
   if(id === 'dashboard') renderTournamentStats();
-  if(id === 'groups'){ renderTodaySection(); renderWalesSpotlight(); }
+  if(id === 'groups'){ renderTodaySection(); }
 };
 
 // ═══════════════════════════════════════════════════════
