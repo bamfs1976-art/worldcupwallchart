@@ -4497,7 +4497,10 @@ input[type=number] { -moz-appearance: textfield; }
 <section class="section" id="sec-goldenboot">
   <div class="section-header">
     <div><div class="section-title">Golden Boot</div><div class="section-sub">Track top scorers and assists throughout the tournament</div></div>
-    <span class="pill gold" id="goalsPill">0 goals logged</span>
+    <div style="display:flex;align-items:center;gap:var(--sp-3);flex-wrap:wrap">
+      <button class="btn sm" id="fetchScorersBtn" onclick="wls_fetchScorers()" title="Fetch the latest goalscorers from live results">⚽ Fetch latest</button>
+      <span class="pill gold" id="goalsPill">0 goals logged</span>
+    </div>
   </div>
   <div class="boot-grid">
     <div class="card">
@@ -8747,6 +8750,90 @@ async function wls_fetchSportsdb(){
   return matches;
 }
 
+// ── Goalscorers: aggregate real scorers from ESPN into the Golden Boot tab ──
+// ESPN team displayName -> app FLAG_CODES key (only where they differ)
+const WLS_TEAM_ALIAS = {
+  'United States':'USA','South Korea':'Rep. of Korea','Korea Republic':'Rep. of Korea',
+  'Iran':'IR Iran','Turkey':'Türkiye','Turkiye':'Türkiye',"Cote d'Ivoire":'Ivory Coast',
+  'Côte d’Ivoire':'Ivory Coast','Congo DR':'DR Congo','Cabo Verde':'Cape Verde',
+  'Curacao':'Curaçao','Czech Republic':'Czechia','Bosnia and Herzegovina':'Bosnia-Herzegovina'
+};
+function wls_mapTeam(name){
+  if(!name) return '';
+  if(FLAG_CODES[name]) return name;
+  if(WLS_TEAM_ALIAS[name]) return WLS_TEAM_ALIAS[name];
+  const hit = Object.keys(FLAG_CODES).find(k => k.toLowerCase() === name.toLowerCase());
+  return hit || name; // unknown -> raw name (renders a neutral flag placeholder)
+}
+
+async function wls_fetchScorers(){
+  const btn = document.getElementById('fetchScorersBtn');
+  if(btn){ btn.disabled = true; btn.textContent = '⚽ Fetching…'; }
+  wls_setStatus('Fetching goalscorers…', 'fetching');
+  try {
+    const now = new Date();
+    const end = `${now.getUTCFullYear()}${String(now.getUTCMonth()+1).padStart(2,'0')}${String(now.getUTCDate()+1).padStart(2,'0')}`;
+    const url = `https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard?dates=20260611-${end}`;
+    const res = await fetch(url, { mode: 'cors' });
+    if(!res.ok) throw new Error('ESPN HTTP '+res.status);
+    const data = await res.json();
+
+    // Tally goals per player (exclude own goals — they aren't credited for the Golden Boot)
+    const tally = {};
+    (data.events || []).forEach(ev => {
+      if(ev.status?.type?.state !== 'post') return;
+      const comp = ev.competitions?.[0];
+      if(!comp) return;
+      (comp.details || []).forEach(d => {
+        if(!d.scoringPlay) return;
+        const typeText = d.type?.text || '';
+        if(d.ownGoal === true || /own goal/i.test(typeText)) return;
+        const ath = (d.athletesInvolved || [])[0];
+        if(!ath || !ath.displayName) return;
+        const espnTeam = (comp.competitors || []).find(c => c.team?.id === d.team?.id)?.team?.displayName;
+        const team = wls_mapTeam(espnTeam);
+        const key = ath.displayName + '||' + team;
+        if(!tally[key]) tally[key] = { name: ath.displayName, team, goals: 0 };
+        tally[key].goals++;
+      });
+    });
+
+    const tallied = Object.values(tally);
+    if(!tallied.length){
+      wls_setStatus('No completed matches with goals yet', 'ok');
+      toast('No goalscorers found yet', 'info');
+      return 0;
+    }
+
+    // Merge: ESPN is authoritative for goals; preserve manual entries and any manual assists.
+    ST.scorers = ST.scorers || [];
+    const tallyKeys = new Set(tallied.map(p => p.name + '||' + p.team));
+    // Drop previously fetched players that are no longer in the data (e.g. a correction)
+    ST.scorers = ST.scorers.filter(s => !(s.src === 'espn' && !tallyKeys.has(s.name + '||' + s.team)));
+    tallied.forEach(p => {
+      const flag = FLAG_CODES[p.team] ? flagHTML(p.team, 20) : '🏴';
+      const ex = ST.scorers.find(s => s.name === p.name && s.team === p.team);
+      if(ex){ ex.goals = p.goals; ex.flag = flag; ex.src = 'espn'; if(ex.assists == null) ex.assists = 0; }
+      else ST.scorers.push({ name: p.name, team: p.team, flag, goals: p.goals, assists: 0, src: 'espn' });
+    });
+
+    save();
+    renderScorers();
+    if(typeof renderDashboard === 'function') renderDashboard();
+    const totalGoals = tallied.reduce((a, p) => a + p.goals, 0);
+    wls_setStatus(`Updated ${tallied.length} scorers (${totalGoals} goals)`, 'ok');
+    toast(`Goalscorers updated — ${tallied.length} player${tallied.length!==1?'s':''}`, 'success');
+    return tallied.length;
+  } catch(e){
+    console.error('Scorer fetch failed', e);
+    wls_setStatus('Goalscorer fetch failed: ' + e.message, 'err');
+    toast('Could not fetch goalscorers — try again', 'error');
+    return 0;
+  } finally {
+    if(btn){ btn.disabled = false; btn.textContent = '⚽ Fetch latest'; }
+  }
+}
+
 async function wls_fetchNow(){
   wls_setStatus('Fetching...', 'fetching');
   let matches = [];
@@ -9239,6 +9326,12 @@ window.showSection = function(id, btn){
   if(id === 'venues') renderVenueGuide();
   if(id === 'dashboard') renderTournamentStats();
   if(id === 'groups'){ renderTodaySection(); }
+  // First time the Golden Boot tab is opened with no scorers logged, pull the
+  // latest goalscorers automatically (silent — never disturbs manual entries).
+  if(id === 'goldenboot' && !window._scorersAutoTried && (!ST.scorers || ST.scorers.length === 0)){
+    window._scorersAutoTried = true;
+    if(typeof wls_fetchScorers === 'function') wls_fetchScorers().catch(()=>{});
+  }
 };
 
 // ═══════════════════════════════════════════════════════
