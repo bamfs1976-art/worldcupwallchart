@@ -4216,6 +4216,12 @@ input[type=number] { -moz-appearance: textfield; }
 .ko-fix{color:var(--tx2,#cdd6e0);font-family:'Barlow Condensed',sans-serif}
 .ko-venue{text-align:right;display:flex;flex-direction:column;line-height:1.2;font-weight:700;font-family:'Barlow Condensed',sans-serif}
 .ko-country{font-size:var(--tx-xs);color:var(--tx3);font-weight:400}
+.ko-row.clickable{cursor:pointer;transition:background .15s ease, transform .15s ease}
+.ko-row.clickable:hover{background:rgba(240,180,41,0.06)}
+.ko-row.clickable:active{transform:scale(0.997)}
+.ko-row.has-score{background:rgba(34,197,94,0.04)}
+.ko-row.has-score .ko-fix{color:var(--tx,#f1f5f9)}
+.ko-score-pill{display:inline-block;margin-left:8px;padding:2px 8px;border-radius:10px;background:var(--gold);color:#0c0c14;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;font-size:var(--tx-xs);font-weight:700;vertical-align:middle}
 @media(max-width:560px){.ko-row{grid-template-columns:38px 78px 1fr;row-gap:2px}.ko-venue{grid-column:2/4;text-align:left;flex-direction:row;gap:6px;font-size:var(--tx-xs)}}
 
 /* ─── Venue guide ─── */
@@ -5530,50 +5536,75 @@ function renderTodayHero(){
   const el=document.getElementById('todayHero');
   if(!el)return;
   const now=new Date();
-  const todayStr=now.toISOString().slice(0,10);
-  // Get next 5 days of matches sorted by datetime
   const upcoming=[];
+
+  // Group-stage fixtures
   Object.keys(G).forEach(g=>{
     FX[g].forEach(([a,b,num,dt,venue],fi)=>{
-      const matchDate=dt.slice(0,10);
       const msUtc=new Date(dt.replace(' ','T')+'Z').getTime();
-      upcoming.push({g,fi,a,b,num,dt,venue,matchDate,msUtc});
+      const key=`${g}_${fi}`;
+      const hasScore=ST.scores[key]!==undefined;
+      const sd=hasScore?ST.scores[key]:null;
+      upcoming.push({
+        type:'group', msUtc, dt, venue, num,
+        t1:G[g].t[a], t2:G[g].t[b], f1:G[g].f[a], f2:G[g].f[b],
+        s1:sd?sd[0]:'', s2:sd?sd[1]:'', hasScore,
+        badge:`Grp ${g}`, onclick:`openModal('${g}',${fi})`
+      });
     });
   });
+
+  // Knockout fixtures (KO_SCHEDULE times are UK/BST)
+  const roundShort={'Round of 32':'R32','Round of 16':'R16','Quarter-final':'QF','Semi-final':'SF','Third-place play-off':'3rd','Final':'Final'};
+  KO_SCHEDULE.forEach(k=>{
+    const msUtc=new Date(`${k.date}T${k.ko}:00+01:00`).getTime();
+    const r=resolveKoMatch(k.m);
+    const sd=(r.id && ST.bScores[r.id]) ? ST.bScores[r.id] : null;
+    const hasScore=sd && sd.s1!==undefined && sd.s2!==undefined;
+    upcoming.push({
+      type:'ko', msUtc, dt:`${k.date} ${k.ko}`, venue:k.venue, num:k.m,
+      t1:r.t1, t2:r.t2, f1:getFlag(r.t1), f2:getFlag(r.t2),
+      s1:hasScore?sd.s1:'', s2:hasScore?sd.s2:'', hasScore,
+      badge:roundShort[k.round]||k.round, onclick:`openKoMatch(${k.m})`
+    });
+  });
+
   upcoming.sort((x,y)=>x.msUtc-y.msUtc);
 
-  // Show fixtures from today onwards (or if all done, last 5)
+  // Show fixtures from ~3h before now onwards (so live games stay visible)
   const future=upcoming.filter(m=>m.msUtc>now.getTime()-3*3600000);
   const toShow=future.length>0?future.slice(0,8):upcoming.slice(-8);
-
   if(toShow.length===0){el.innerHTML='';return;}
 
-  // Find "next" match
   const nextIdx=toShow.findIndex(m=>m.msUtc>now.getTime());
 
-  let cards=toShow.map((m,i)=>{
-    const key=`${m.g}_${m.fi}`;
-    const hasScore=ST.scores[key]!==undefined;
-    const[sa,sb]=hasScore?ST.scores[key]:['',''];
+  // Render kick-off time in the user's selected timezone from each match's UTC ms.
+  const fmtLocalFromMs=ms=>{
+    const localMs=ms+(ST.tzOffset*3600000);
+    const d=new Date(localMs);
+    return String(d.getUTCHours()).padStart(2,'0')+':'+String(d.getUTCMinutes()).padStart(2,'0')+' '+tzLabel();
+  };
+
+  const cards=toShow.map((m,i)=>{
     const isNext=i===nextIdx;
     const dateLabel=m.dt.slice(5,10).replace('-','/');
-    const timeLabel=fmtLocalTime(m.dt)+' '+tzLabel();
-
-    return`<div class="today-match-card ${hasScore?'has-score':''} ${isNext?'next-up':''}" onclick="openModal('${m.g}',${m.fi})">
-      <div class="tm-badge ${isNext?'next':''}">${isNext?'▶ Next Up':''} ${hasScore?'✓ Full Time':''}M${m.num} · Grp ${m.g}</div>
+    const timeLabel=fmtLocalFromMs(m.msUtc);
+    const mLabel='M'+m.num;
+    return `<div class="today-match-card ${m.hasScore?'has-score':''} ${isNext?'next-up':''}" onclick="${m.onclick}">
+      <div class="tm-badge ${isNext?'next':''}">${isNext?'▶ Next Up':''} ${m.hasScore?'✓ Full Time':''}${mLabel} · ${m.badge}</div>
       <div class="tm-teams">
         <div class="tm-team">
-          <div class="tm-flag">${G[m.g].f[m.a]}</div>
-          <div class="tm-name">${G[m.g].t[m.a]}</div>
+          <div class="tm-flag">${m.f1}</div>
+          <div class="tm-name">${m.t1}</div>
         </div>
         <div class="tm-score-box">
-          <div class="tm-score">${hasScore?sa:'–'}</div>
+          <div class="tm-score">${m.hasScore?m.s1:'–'}</div>
           <div class="tm-dash">:</div>
-          <div class="tm-score">${hasScore?sb:'–'}</div>
+          <div class="tm-score">${m.hasScore?m.s2:'–'}</div>
         </div>
         <div class="tm-team">
-          <div class="tm-flag">${G[m.g].f[m.b]}</div>
-          <div class="tm-name">${G[m.g].t[m.b]}</div>
+          <div class="tm-flag">${m.f2}</div>
+          <div class="tm-name">${m.t2}</div>
         </div>
       </div>
       <div class="tm-meta">${dateLabel} · ${timeLabel}<br>${m.venue}</div>
@@ -5776,7 +5807,10 @@ function clearResult(){
   } else {
     delete ST.bScores[mCtx.id];
   }
-  save();closeModal();renderGroups();renderBracket();renderDashboard();toast('Result cleared','info');
+  save();closeModal();renderGroups();renderBracket();renderDashboard();
+  if(typeof renderKnockoutSchedule==='function') renderKnockoutSchedule();
+  if(typeof renderTodayHero==='function') renderTodayHero();
+  toast('Result cleared','info');
 }
 function saveResult(){
   if(!mCtx)return;
@@ -5813,6 +5847,8 @@ function saveResult(){
   setTimeout(()=>{
     closeModal();
     renderGroups(savedG);renderBracket();renderDashboard();
+    if(typeof renderKnockoutSchedule==='function') renderKnockoutSchedule();
+    if(typeof renderTodayHero==='function') renderTodayHero();
     bracketDirty=true;
     document.getElementById('bracketDot').classList.add('show');
     // Enhancement 4: flash newly qualified rows
@@ -6003,7 +6039,39 @@ function renderBracket(){
   `;
 }
 
-// Knockout schedule list (from imported CSV — all UK kick-off times)
+// Resolve a knockout match number to its bracket id and current teams.
+// R32 uses the literal team names baked into the R32 array; R16+ falls back to
+// whatever the auto-advance has written into ST.bScores (or "TBD" until then).
+function resolveKoMatch(m){
+  if(m>=73 && m<=88){
+    const r=R32.find(x=>x.m===m);
+    if(r) return {id:r.id, t1:r.t1k, t2:r.t2k};
+  }
+  if(m>=89 && m<=96){
+    const id='r16_'+(m-89); const d=ST.bScores[id]||{};
+    return {id, t1:d.team1||'TBD', t2:d.team2||'TBD'};
+  }
+  if(m>=97 && m<=100){
+    const id='qf_'+(m-97); const d=ST.bScores[id]||{};
+    return {id, t1:d.team1||'TBD', t2:d.team2||'TBD'};
+  }
+  if(m===101||m===102){
+    const id='sf_'+(m-101); const d=ST.bScores[id]||{};
+    return {id, t1:d.team1||'TBD', t2:d.team2||'TBD'};
+  }
+  if(m===103){const d=ST.bScores.third_0||{}; return {id:'third_0', t1:d.team1||'TBD', t2:d.team2||'TBD'};}
+  if(m===104){const d=ST.bScores.final_0||{}; return {id:'final_0', t1:d.team1||'TBD', t2:d.team2||'TBD'};}
+  return {id:null, t1:'TBD', t2:'TBD'};
+}
+
+// Click handler for ko-row / today-hero knockout cards → open the bracket score modal
+function openKoMatch(m){
+  const ko=KO_BY_M[m]; if(!ko) return;
+  const r=resolveKoMatch(m); if(!r.id) return;
+  openBracketModal(r.id, r.t1, r.t2, `M${m} · ${ko.round} · ${ko.venue}`);
+}
+
+// Knockout schedule list (clickable rows; shows scores + resolved teams once known)
 function renderKnockoutSchedule(){
   const el=document.getElementById('koSchedule');
   if(!el) return;
@@ -6013,17 +6081,27 @@ function renderKnockoutSchedule(){
   const fmt=iso=>{ const d=new Date(iso+'T00:00:00Z'); return `${wd[d.getUTCDay()]} ${d.getUTCDate()} ${mo[d.getUTCMonth()]}`; };
   const byR={}; KO_SCHEDULE.forEach(k=>{ (byR[k.round]=byR[k.round]||[]).push(k); });
   let html=`<div class="card" style="margin-top:var(--sp-5)">
-    <div class="card-header"><span class="card-title">🗓️ Knockout Schedule</span><span class="pill blue" style="margin-left:auto">All times UK</span></div>`;
+    <div class="card-header"><span class="card-title">🗓️ Knockout Schedule</span><span class="pill blue" style="margin-left:auto">All times UK · Tap to enter score</span></div>`;
   order.forEach(round=>{
     const rows=(byR[round]||[]).slice().sort((a,b)=>(a.date+a.ko).localeCompare(b.date+b.ko));
     if(!rows.length) return;
     html+=`<div class="ko-round-head">${round} <span>${rows.length} match${rows.length!==1?'es':''}</span></div>`;
-    html+=rows.map(k=>`<div class="ko-row">
-      <span class="ko-m">M${k.m}</span>
-      <span class="ko-when"><b>${fmt(k.date)}</b><span class="ko-time">${k.ko} UK</span></span>
-      <span class="ko-fix">${esc(k.fix)}</span>
-      <span class="ko-venue">${esc(k.venue)}<span class="ko-country">${esc(k.country)}</span></span>
-    </div>`).join('');
+    html+=rows.map(k=>{
+      const r=resolveKoMatch(k.m);
+      const sd=(r.id && ST.bScores[r.id]) ? ST.bScores[r.id] : null;
+      const hasScore=sd && sd.s1!==undefined && sd.s2!==undefined;
+      // For R16+, once auto-advance has filled the teams, show the actual matchup;
+      // otherwise fall back to the source-pair hint baked into KO_SCHEDULE.fix.
+      const fixDisplay=(k.round!=='Round of 32' && r.t1!=='TBD' && r.t2!=='TBD')
+        ? `${r.t1} v ${r.t2}` : k.fix;
+      const scoreBadge=hasScore ? ` <span class="ko-score-pill">${sd.s1}–${sd.s2}</span>` : '';
+      return `<div class="ko-row clickable${hasScore?' has-score':''}" onclick="openKoMatch(${k.m})">
+        <span class="ko-m">M${k.m}</span>
+        <span class="ko-when"><b>${fmt(k.date)}</b><span class="ko-time">${k.ko} UK</span></span>
+        <span class="ko-fix">${esc(fixDisplay)}${scoreBadge}</span>
+        <span class="ko-venue">${esc(k.venue)}<span class="ko-country">${esc(k.country)}</span></span>
+      </div>`;
+    }).join('');
   });
   html+=`</div>`;
   el.innerHTML=html;
@@ -8789,6 +8867,9 @@ function wls_advanceWinner(matchId){
       if(document.getElementById('sec-bracket')?.classList.contains('active')){
         if(typeof renderBracket === 'function') renderBracket();
       }
+      // Keep the knockout schedule + upcoming-fixtures hero in sync with new scores
+      if(typeof renderKnockoutSchedule === 'function') renderKnockoutSchedule();
+      if(typeof renderTodayHero === 'function') renderTodayHero();
     }
   }, 1500);
 })();
