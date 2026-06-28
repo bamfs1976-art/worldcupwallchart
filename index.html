@@ -4523,7 +4523,7 @@ input[type=number] { -moz-appearance: textfield; }
     <button class="brs-btn" onclick="scrollBracketTo('final-col',this)">🏆 Final</button>
   </div>
   <div class="bracket-scroll-hint">← Swipe left to see all rounds →</div>
-  <div class="bracket-update-note" id="bracketNote">⚡ Auto-updates from group results — enter group scores to populate R32</div>
+  <div class="bracket-update-note" id="bracketNote">⚡ Official R32 matchups locked in — enter R32 scores to auto-populate R16 onwards</div>
   <div class="bracket-pager" id="bracketPager" aria-hidden="true"></div>
   <div class="bracket-wrap"><div class="bracket-frame" id="bracketFrame"></div></div>
   <div id="koSchedule"></div>
@@ -5200,24 +5200,25 @@ const FX = {
 const FIFA_RANK = {Mexico:15,SouthAfrica:61,'Rep. of Korea':22,Czechia:37,Canada:27,'Bosnia-Herzegovina':67,Qatar:51,Switzerland:17,Brazil:5,Morocco:11,Haiti:84,Scotland:36,USA:14,Paraguay:39,Australia:26,'Türkiye':28,Germany:9,'Curaçao':82,'Ivory Coast':42,Ecuador:23,Netherlands:7,Japan:18,Sweden:25,Tunisia:40,Belgium:8,Egypt:34,'IR Iran':20,'New Zealand':86,Spain:1,'Cape Verde':68,'Saudi Arabia':60,Uruguay:16,France:3,Senegal:19,Iraq:58,Norway:29,Argentina:2,Algeria:35,Austria:24,Jordan:66,Portugal:6,'DR Congo':56,Uzbekistan:50,Colombia:13,England:4,Croatia:10,Ghana:72,Panama:30};
 function rank(name){return FIFA_RANK[name]||FIFA_RANK[name.replace(/ /g,'')]||99;}
 
-// R32 fixture data from spreadsheet
+// R32 fixture data — populated with the official Round of 32 matchups
+// confirmed after the 2026 group stage concluded on 27 June 2026.
 const R32=[
-  {id:'r32_0',t1k:'2A',t2k:'2B',v:'Los Angeles',d:'Jun 28',m:73},
-  {id:'r32_1',t1k:'1E',t2k:'3ABCDF',v:'Boston',d:'Jun 29',m:74},
-  {id:'r32_2',t1k:'1F',t2k:'2C',v:'Monterrey',d:'Jun 30',m:75},
-  {id:'r32_3',t1k:'1C',t2k:'2F',v:'Houston',d:'Jun 29',m:76},
-  {id:'r32_4',t1k:'1I',t2k:'3CDFGH',v:'New York/NJ',d:'Jun 30',m:77},
-  {id:'r32_5',t1k:'2E',t2k:'2I',v:'Dallas',d:'Jun 30',m:78},
-  {id:'r32_6',t1k:'1A',t2k:'3CEFHI',v:'Mexico City',d:'Jul 1',m:79},
-  {id:'r32_7',t1k:'1L',t2k:'3EHIJK',v:'Atlanta',d:'Jul 1',m:80},
-  {id:'r32_8',t1k:'1D',t2k:'3BEFIJ',v:'San Francisco',d:'Jul 2',m:81},
-  {id:'r32_9',t1k:'1G',t2k:'3AEHIJ',v:'Seattle',d:'Jul 1',m:82},
-  {id:'r32_10',t1k:'2K',t2k:'2L',v:'Toronto',d:'Jul 3',m:83},
-  {id:'r32_11',t1k:'1H',t2k:'2J',v:'Los Angeles',d:'Jul 2',m:84},
-  {id:'r32_12',t1k:'1B',t2k:'3EFGIJ',v:'Vancouver',d:'Jul 3',m:85},
-  {id:'r32_13',t1k:'1J',t2k:'2H',v:'Miami',d:'Jul 3',m:86},
-  {id:'r32_14',t1k:'1K',t2k:'3DEIJL',v:'Kansas City',d:'Jul 4',m:87},
-  {id:'r32_15',t1k:'2D',t2k:'2G',v:'Dallas',d:'Jul 3',m:88}
+  {id:'r32_0', t1k:'South Africa',       t2k:'Canada',              v:'Los Angeles',   d:'Jun 28', m:73},
+  {id:'r32_1', t1k:'Germany',            t2k:'Paraguay',            v:'Boston',        d:'Jun 29', m:74},
+  {id:'r32_2', t1k:'Netherlands',        t2k:'Morocco',             v:'Monterrey',     d:'Jun 30', m:75},
+  {id:'r32_3', t1k:'Brazil',             t2k:'Japan',               v:'Houston',       d:'Jun 29', m:76},
+  {id:'r32_4', t1k:'France',             t2k:'Sweden',              v:'New York/NJ',   d:'Jun 30', m:77},
+  {id:'r32_5', t1k:'Ivory Coast',        t2k:'Norway',              v:'Dallas',        d:'Jun 30', m:78},
+  {id:'r32_6', t1k:'Mexico',             t2k:'Ecuador',             v:'Mexico City',   d:'Jul 1',  m:79},
+  {id:'r32_7', t1k:'England',            t2k:'DR Congo',            v:'Atlanta',       d:'Jul 1',  m:80},
+  {id:'r32_8', t1k:'USA',                t2k:'Bosnia-Herzegovina',  v:'San Francisco', d:'Jul 2',  m:81},
+  {id:'r32_9', t1k:'Belgium',            t2k:'Senegal',             v:'Seattle',       d:'Jul 1',  m:82},
+  {id:'r32_10',t1k:'Portugal',           t2k:'Croatia',             v:'Toronto',       d:'Jul 3',  m:83},
+  {id:'r32_11',t1k:'Spain',              t2k:'Austria',             v:'Los Angeles',   d:'Jul 2',  m:84},
+  {id:'r32_12',t1k:'Switzerland',        t2k:'Algeria',             v:'Vancouver',     d:'Jul 3',  m:85},
+  {id:'r32_13',t1k:'Argentina',          t2k:'Cape Verde',          v:'Miami',         d:'Jul 3',  m:86},
+  {id:'r32_14',t1k:'Colombia',           t2k:'Ghana',               v:'Kansas City',   d:'Jul 4',  m:87},
+  {id:'r32_15',t1k:'Australia',          t2k:'Egypt',               v:'Dallas',        d:'Jul 3',  m:88}
 ];
 const R16=[
   {id:'r16_0',v:'Philadelphia',d:'Jul 4',m:89},{id:'r16_1',v:'Houston',d:'Jul 4',m:90},
@@ -5855,6 +5856,8 @@ function resolveTeam(code){
   const gr=allGroupResults();
   const blank='<span class="flag-img" style="width:20px;height:14px;background:var(--surf3);border-radius:2px;display:inline-block" aria-hidden="true"></span>';
   if(!code)return{n:'TBD',f:blank};
+  // Literal team name (e.g. R32 entries pre-populated with official matchups)
+  if(typeof FLAG_CODES!=='undefined' && FLAG_CODES[code]) return{n:code,f:flagHTML(code)};
   if(code.startsWith('1')){const g=code[1];const t=gr[g]?.first;return t?{n:t.name,f:t.f}:{n:`1st ${g}`,f:blank};}
   if(code.startsWith('2')){const g=code[1];const t=gr[g]?.second;return t?{n:t.name,f:t.f}:{n:`2nd ${g}`,f:blank};}
   if(code.startsWith('3'))return{n:'Best 3rd',f:'<span class="flag-img" style="width:20px;height:14px;background:var(--third-c);border-radius:2px;display:inline-block" aria-hidden="true"></span>'};
