@@ -6000,12 +6000,23 @@ function renderBracket(){
     return`<div class="bracket-col ${cls}"><div class="bcol-title">${title}</div><div class="bracket-matches">${html}</div></div>`;
   }
 
-  const lr32=R32.slice(0,8).map(p=>bMatchResolved(p.id,p.t1k,p.t2k,p.v,p.m)).join('');
-  const rr32=R32.slice(8,16).map(p=>bMatchResolved(p.id,p.t1k,p.t2k,p.v,p.m)).join('');
-  const lr16=R16.slice(0,4).map(p=>bFromId(p.id,p.v,p.m)).join('');
-  const rr16=R16.slice(4,8).map(p=>bFromId(p.id,p.v,p.m)).join('');
-  const lqf=QF.slice(0,2).map(p=>bFromId(p.id,p.v,p.m)).join('');
-  const rqf=QF.slice(2,4).map(p=>bFromId(p.id,p.v,p.m)).join('');
+  // Display order = FIFA bracket pairing order, NOT array index order.
+  // Pairs that feed the same R16/QF/SF sit adjacent so the column reads top-to-bottom
+  // as the actual route through the bracket.
+  // Left half  (top of bracket → SF1 → Final): R32 pairs that feed R16_0/_1/_4/_5 → QF_0/_1 → SF_0
+  // Right half (bottom of bracket → SF2 → Final): R32 pairs that feed R16_2/_3/_6/_7 → QF_2/_3 → SF_1
+  const LEFT_R32  = [1, 4, 0, 2, 10, 11, 8, 9];
+  const RIGHT_R32 = [3, 5, 6, 7, 13, 15, 12, 14];
+  const LEFT_R16  = [0, 1, 4, 5];
+  const RIGHT_R16 = [2, 3, 6, 7];
+  const LEFT_QF   = [0, 1];
+  const RIGHT_QF  = [2, 3];
+  const lr32=LEFT_R32.map(i=>{const p=R32[i];return bMatchResolved(p.id,p.t1k,p.t2k,p.v,p.m);}).join('');
+  const rr32=RIGHT_R32.map(i=>{const p=R32[i];return bMatchResolved(p.id,p.t1k,p.t2k,p.v,p.m);}).join('');
+  const lr16=LEFT_R16.map(i=>{const p=R16[i];return bFromId(p.id,p.v,p.m);}).join('');
+  const rr16=RIGHT_R16.map(i=>{const p=R16[i];return bFromId(p.id,p.v,p.m);}).join('');
+  const lqf=LEFT_QF.map(i=>{const p=QF[i];return bFromId(p.id,p.v,p.m);}).join('');
+  const rqf=RIGHT_QF.map(i=>{const p=QF[i];return bFromId(p.id,p.v,p.m);}).join('');
   const lsf=bFromId(SF[0].id,SF[0].v,SF[0].m);
   const rsf=bFromId(SF[1].id,SF[1].v,SF[1].m);
   const final=bFromId('final_0','MetLife NJ',104,true);
@@ -8776,25 +8787,41 @@ function wls_decorateAll(){
 // Standard pairing: r32_0 winner + r32_1 winner -> r16_0 (team1, team2)
 function wls_buildBracketMap(){
   const map = {};
-  // R32 -> R16 (16 R32 matches → 8 R16 matches)
-  for(let i=0; i<16; i+=2){
-    const r16Idx = i/2;
-    map[`r32_${i}`]   = { nextId: `r16_${r16Idx}`, slot: 'team1' };
-    map[`r32_${i+1}`] = { nextId: `r16_${r16Idx}`, slot: 'team2' };
-  }
-  // R16 -> QF
-  for(let i=0; i<8; i+=2){
-    const qfIdx = i/2;
-    map[`r16_${i}`]   = { nextId: `qf_${qfIdx}`, slot: 'team1' };
-    map[`r16_${i+1}`] = { nextId: `qf_${qfIdx}`, slot: 'team2' };
-  }
-  // QF -> SF
+  // R32 -> R16 — explicit FIFA bracket pairings (NOT sequential).
+  //   M89 (r16_0) = M74 (r32_1) v M77 (r32_4)
+  //   M90 (r16_1) = M73 (r32_0) v M75 (r32_2)
+  //   M91 (r16_2) = M76 (r32_3) v M78 (r32_5)
+  //   M92 (r16_3) = M79 (r32_6) v M80 (r32_7)
+  //   M93 (r16_4) = M83 (r32_10) v M84 (r32_11)
+  //   M94 (r16_5) = M81 (r32_8) v M82 (r32_9)
+  //   M95 (r16_6) = M86 (r32_13) v M88 (r32_15)
+  //   M96 (r16_7) = M85 (r32_12) v M87 (r32_14)
+  const R32_TO_R16 = [
+    ['r32_1','r16_0','team1'], ['r32_4','r16_0','team2'],
+    ['r32_0','r16_1','team1'], ['r32_2','r16_1','team2'],
+    ['r32_3','r16_2','team1'], ['r32_5','r16_2','team2'],
+    ['r32_6','r16_3','team1'], ['r32_7','r16_3','team2'],
+    ['r32_10','r16_4','team1'],['r32_11','r16_4','team2'],
+    ['r32_8','r16_5','team1'], ['r32_9','r16_5','team2'],
+    ['r32_13','r16_6','team1'],['r32_15','r16_6','team2'],
+    ['r32_12','r16_7','team1'],['r32_14','r16_7','team2'],
+  ];
+  R32_TO_R16.forEach(([src,next,slot])=>{ map[src] = { nextId: next, slot }; });
+  // R16 -> QF — also non-sequential (M97 ⇐ M89+M90, M98 ⇐ M93+M94, M99 ⇐ M91+M92, M100 ⇐ M95+M96).
+  const R16_TO_QF = [
+    ['r16_0','qf_0','team1'], ['r16_1','qf_0','team2'],
+    ['r16_4','qf_1','team1'], ['r16_5','qf_1','team2'],
+    ['r16_2','qf_2','team1'], ['r16_3','qf_2','team2'],
+    ['r16_6','qf_3','team1'], ['r16_7','qf_3','team2'],
+  ];
+  R16_TO_QF.forEach(([src,next,slot])=>{ map[src] = { nextId: next, slot }; });
+  // QF -> SF — sequential (M97+M98 → M101, M99+M100 → M102).
   for(let i=0; i<4; i+=2){
     const sfIdx = i/2;
     map[`qf_${i}`]   = { nextId: `sf_${sfIdx}`, slot: 'team1' };
     map[`qf_${i+1}`] = { nextId: `sf_${sfIdx}`, slot: 'team2' };
   }
-  // SF -> Final + Third place
+  // SF -> Final (winners) + Third-place play-off (losers)
   map['sf_0'] = { nextId: 'final_0', slot: 'team1', loserNext: 'third_0', loserSlot: 'team1' };
   map['sf_1'] = { nextId: 'final_0', slot: 'team2', loserNext: 'third_0', loserSlot: 'team2' };
   return map;
@@ -8803,10 +8830,10 @@ const WLS_BRACKET_MAP = wls_buildBracketMap();
 
 // Resolve the team names from a knockout match (handles R32 with codes like '1A')
 function wls_resolveKoTeams(matchId){
-  // R32 uses codes from R32 array
+  // R32 uses codes from R32 array — look up by id (not index) so the lookup
+  // survives any future bracket reordering.
   if(matchId.startsWith('r32_')){
-    const idx = parseInt(matchId.slice(4));
-    const r32m = R32[idx];
+    const r32m = R32.find(r => r.id === matchId);
     if(!r32m) return null;
     const t1 = resolveTeam(r32m.t1k);
     const t2 = resolveTeam(r32m.t2k);
