@@ -7670,6 +7670,100 @@ function initSimulator(){
 
 
 // ═══════════════════════════════════════════════════════
+// HYDRATE FROM DISC_DATA — fills Fair Play / Match Log / Group scores
+// on first load using the cards + match stats baked into DISC_DATA.
+// Idempotent: only runs when the target collection is empty, so user
+// edits aren't clobbered on subsequent loads.
+// ═══════════════════════════════════════════════════════
+const DISC_TO_G_TEAM = {
+  'Korea Republic': 'Rep. of Korea',
+  'Bosnia and Herzegovina': 'Bosnia-Herzegovina',
+  "Côte d'Ivoire": 'Ivory Coast',
+  'Cabo Verde': 'Cape Verde',
+  'Congo DR': 'DR Congo',
+};
+const mapDiscTeam = n => DISC_TO_G_TEAM[n] || n;
+
+// Build match-number → fixture lookup for the group stage (M1-M72).
+const MATCH_TO_FIXTURE = (()=>{
+  const m = {};
+  Object.keys(G).forEach(g => {
+    FX[g].forEach(([a,b,num], fi) => { m[num] = {g, fi}; });
+  });
+  return m;
+})();
+
+function hydrateFromDiscipline(){
+  if (typeof DISC_DATA === 'undefined') return;
+  const cards = DISC_DATA.cards || [];
+  const matches = DISC_DATA.matches || [];
+  let touched = false;
+
+  // ── Fair Play ── (FIFA: yellow=-1, indirect red (yellow+yellow)=-3, direct red=-4)
+  if (!Object.keys(ST.fairPlay).length) {
+    const byPlayerMatch = {};
+    cards.forEach(c => {
+      const k = c.match + '|' + c.player + '|' + c.team;
+      (byPlayerMatch[k] = byPlayerMatch[k] || []).push(c);
+    });
+    Object.values(byPlayerMatch).forEach(grp => {
+      const team = mapDiscTeam(grp[0].team); if (!team) return;
+      const hasY = grp.some(c => c.card === 'Yellow');
+      const hasR = grp.some(c => c.card === 'Red');
+      let ded = 0;
+      if (hasY && hasR) ded = 3;         // 2nd-yellow red
+      else if (hasR)    ded = 4;         // direct red
+      else              ded = grp.length;// each yellow = 1
+      ST.fairPlay[team] = (ST.fairPlay[team] || 0) - ded;
+    });
+    if (Object.keys(ST.fairPlay).length) touched = true;
+  }
+
+  // ── Match Log timeline ── (only if user has none; group stage only)
+  if (!Object.keys(ST.timeline).length) {
+    cards.forEach(c => {
+      const team = mapDiscTeam(c.team);
+      const f = MATCH_TO_FIXTURE[c.match]; if (!f) return; // skip knockouts
+      const k = `${f.g}_${f.fi}`;
+      if (!ST.timeline[k]) ST.timeline[k] = [];
+      const min = parseInt(String(c.minute).replace(/[^0-9]/g, '')) || 0;
+      ST.timeline[k].push({
+        min, player: c.player, team,
+        type: c.card === 'Red' ? 'red' : 'yellow'
+      });
+    });
+    Object.keys(ST.timeline).forEach(k => ST.timeline[k].sort((a,b)=>a.min-b.min));
+    if (Object.keys(ST.timeline).length) touched = true;
+  }
+
+  // ── R32 bScores ── per-match: fill any empty cell so future dashboard
+  // uploads with newly-played R32 results get imported automatically.
+  matches.filter(m => m.match >= 73 && m.match <= 88).forEach(m => {
+    const r32 = R32.find(r => r.m === m.match); if (!r32) return;
+    if (typeof m.gh !== 'number' || typeof m.ga !== 'number') return;
+    const existing = ST.bScores[r32.id];
+    if (existing && existing.s1 !== undefined) return; // user already has it
+    ST.bScores[r32.id] = { s1: m.gh, s2: m.ga, team1: r32.t1k, team2: r32.t2k };
+    touched = true;
+  });
+
+  // Same per-match top-up for group scores so new corrections in DISC_DATA
+  // can flow through without clobbering anything the user has manually set.
+  matches.forEach(m => {
+    const f = MATCH_TO_FIXTURE[m.match]; if (!f) return;
+    const k = `${f.g}_${f.fi}`;
+    if (ST.scores[k] !== undefined) return; // user already has it
+    if (typeof m.gh === 'number' && typeof m.ga === 'number') {
+      ST.scores[k] = [m.gh, m.ga];
+      touched = true;
+    }
+  });
+
+  if (touched) save();
+}
+hydrateFromDiscipline();
+
+// ═══════════════════════════════════════════════════════
 // ═══════════════════════════════════════════════════════
 // INIT
 // ═══════════════════════════════════════════════════════
@@ -8881,6 +8975,16 @@ function wls_advanceWinner(matchId){
 // after any save. Cleaner: hook into closeModal/saveResult by listening
 // for the modal saved class addition.
 (function setupAutoAdvance(){
+  // One-shot: walk any pre-existing knockout scores (restored from
+  // localStorage or hydrated from DISC_DATA) so their winners are advanced
+  // into the next round before the first poll snapshot is taken.
+  Object.keys(ST.bScores || {}).forEach(id => {
+    if (WLS_BRACKET_MAP[id]) wls_advanceWinner(id);
+  });
+  // Re-render the bracket + schedule so the freshly-advanced cells show up.
+  if (typeof renderBracket === 'function') renderBracket();
+  if (typeof renderKnockoutSchedule === 'function') renderKnockoutSchedule();
+
   let lastSnapshot = JSON.stringify(ST.bScores || {});
   setInterval(() => {
     const cur = JSON.stringify(ST.bScores || {});
