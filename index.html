@@ -5016,6 +5016,15 @@ input[type=number] { -moz-appearance: textfield; }
       <span class="score-dash">—</span>
       <input class="big-inp" type="number" id="mS2" min="0" max="30" placeholder="0" aria-label="Away score" oninput="updateModalContext()">
     </div>
+    <!-- Penalty shootout (knockout only; appears when regulation score is level) -->
+    <div class="penalty-row" id="penaltyRow" style="display:none">
+      <div class="qs-label" style="margin-top:var(--sp-3)">⚪ Penalty Shootout — required (knockouts can't end level)</div>
+      <div class="score-inputs">
+        <input class="big-inp" type="number" id="mP1" min="0" max="20" placeholder="Pens" aria-label="Home penalties">
+        <span class="score-dash">—</span>
+        <input class="big-inp" type="number" id="mP2" min="0" max="20" placeholder="Pens" aria-label="Away penalties">
+      </div>
+    </div>
     <!-- Enhancement 10: match note -->
     <div class="note-emoji-row" id="noteEmojis">
       <button class="note-emoji" onclick="addNoteEmoji('🤯')" title="Incredible">🤯</button>
@@ -5561,10 +5570,11 @@ function renderTodayHero(){
     const r=resolveKoMatch(k.m);
     const sd=(r.id && ST.bScores[r.id]) ? ST.bScores[r.id] : null;
     const hasScore=sd && sd.s1!==undefined && sd.s2!==undefined;
+    const penSuffix = hasScore && sd.s1===sd.s2 && sd.p1!==undefined && sd.p2!==undefined ? ` (${sd.p1}-${sd.p2} p)` : '';
     upcoming.push({
       type:'ko', msUtc, dt:`${k.date} ${k.ko}`, venue:k.venue, num:k.m,
       t1:r.t1, t2:r.t2, f1:getFlag(r.t1), f2:getFlag(r.t2),
-      s1:hasScore?sd.s1:'', s2:hasScore?sd.s2:'', hasScore,
+      s1:hasScore?sd.s1:'', s2:hasScore?sd.s2:'', hasScore, penSuffix,
       badge:roundShort[k.round]||k.round, onclick:`openKoMatch(${k.m})`
     });
   });
@@ -5591,7 +5601,7 @@ function renderTodayHero(){
     const timeLabel=fmtLocalFromMs(m.msUtc);
     const mLabel='M'+m.num;
     return `<div class="today-match-card ${m.hasScore?'has-score':''} ${isNext?'next-up':''}" onclick="${m.onclick}">
-      <div class="tm-badge ${isNext?'next':''}">${isNext?'▶ Next Up':''} ${m.hasScore?'✓ Full Time':''}${mLabel} · ${m.badge}</div>
+      <div class="tm-badge ${isNext?'next':''}">${isNext?'▶ Next Up':''} ${m.hasScore?'✓ Full Time':''}${mLabel} · ${m.badge}${m.penSuffix||''}</div>
       <div class="tm-teams">
         <div class="tm-team">
           <div class="tm-flag">${m.f1}</div>
@@ -5775,6 +5785,9 @@ function openModal(g,fi){
   document.getElementById('modalTitle').textContent=hasExisting?'Edit Result':'Enter Result';
   document.getElementById('mS1').value=sc?sc[0]:'';
   document.getElementById('mS2').value=sc?sc[1]:'';
+  document.getElementById('mP1').value='';
+  document.getElementById('mP2').value='';
+  document.getElementById('penaltyRow').style.display='none'; // group matches can draw
   document.getElementById('matchNote').value=ST.notes[k]||'';
   document.getElementById('modalInner').classList.remove('saved');
   // Reset quick score highlights
@@ -5793,8 +5806,11 @@ function openBracketModal(id,t1,t2,meta){
   const d=ST.bScores[id]||{};
   document.getElementById('mS1').value=d.s1!==undefined?d.s1:'';
   document.getElementById('mS2').value=d.s2!==undefined?d.s2:'';
+  document.getElementById('mP1').value=d.p1!==undefined?d.p1:'';
+  document.getElementById('mP2').value=d.p2!==undefined?d.p2:'';
   document.getElementById('modalInner').classList.remove('saved');
   document.getElementById('scoreModal').classList.add('open');
+  updateModalContext(); // show/hide penalty section based on the loaded score
   setTimeout(()=>document.getElementById('mS1').focus(),80);
 }
 function closeModal(){document.getElementById('scoreModal').classList.remove('open');mCtx=null;}
@@ -5826,8 +5842,19 @@ function saveResult(){
     ST.scores[k]=[v1,v2];
     if(noteVal)ST.notes[k]=noteVal;else delete ST.notes[k];
   } else {
+    // Knockout: if regulation ended level, penalties are required (and must not also draw)
+    let p1, p2;
+    if(v1===v2){
+      const p1v=document.getElementById('mP1').value;
+      const p2v=document.getElementById('mP2').value;
+      if(p1v===''||p2v===''){toast('Knockouts can\'t draw — enter penalty scores','error');return;}
+      p1=parseInt(p1v); p2=parseInt(p2v);
+      if(p1===p2){toast('Penalty shootout must have a winner','error');return;}
+    }
     lastAction={type:'bscore',key:mCtx.id,prevVal:ST.bScores[mCtx.id]};
-    ST.bScores[mCtx.id]={s1:v1,s2:v2,team1:mCtx.t1,team2:mCtx.t2};
+    const entry={s1:v1,s2:v2,team1:mCtx.t1,team2:mCtx.t2};
+    if(p1!==undefined){entry.p1=p1;entry.p2=p2;}
+    ST.bScores[mCtx.id]=entry;
   }
   save();
 
@@ -5932,22 +5959,36 @@ function getFlag(name){
   return FLAG_MAP[name]||FLAG_MAP[Object.keys(FLAG_MAP).find(k=>k.toLowerCase()===name.toLowerCase())]||flagHTML(name);
 }
 
+// Compute win/lose flags taking penalty shootouts into account.
+function bracketResult(d){
+  const s1=d.s1!==undefined?d.s1:'', s2=d.s2!==undefined?d.s2:'';
+  const hasReg = s1!=='' && s2!=='';
+  const hasPen = d.p1!==undefined && d.p2!==undefined;
+  let w1=false, w2=false;
+  if(hasReg){
+    if(s1>s2) w1=true;
+    else if(s2>s1) w2=true;
+    else if(hasPen && d.p1!==d.p2){ w1 = d.p1 > d.p2; w2 = !w1; }
+  }
+  const penSuffix = hasReg && s1===s2 && hasPen ? ` (${d.p1}–${d.p2} p)` : '';
+  return { s1, s2, w1, w2, penSuffix };
+}
+
 function bMatch(id,t1n,t2n,meta,num,isFinal=false){
   const d=ST.bScores[id]||{};
-  const s1=d.s1!==undefined?d.s1:'', s2=d.s2!==undefined?d.s2:'';
-  const w1=s1!==''&&s2!==''&&s1>s2, w2=s1!==''&&s2!==''&&s2>s1;
+  const r=bracketResult(d);
   const e1=t1n.replace(/'/g,"\\'"),e2=t2n.replace(/'/g,"\\'");
   const fc=isFinal?'final-match':'';
   const f1=getFlag(t1n), f2=getFlag(t2n);
   return`<div class="b-match ${fc}" onclick="openBracketModal('${id}','${e1}','${e2}','${meta}')">
-    <div class="b-match-num">M${num} · ${meta}${KO_BY_M[num]?` · ${KO_BY_M[num].ko} UK`:''}</div>
-    <div class="b-team ${w1?'win':''} ${w2&&!w1?'lose':''}">
+    <div class="b-match-num">M${num} · ${meta}${KO_BY_M[num]?` · ${KO_BY_M[num].ko} UK`:''}${r.penSuffix}</div>
+    <div class="b-team ${r.w1?'win':''} ${r.w2?'lose':''}">
       <div class="b-tname"><span style="font-size:.85rem">${f1}</span><span>${t1n}</span></div>
-      <span class="b-score">${s1!==''?s1:''}</span>
+      <span class="b-score">${r.s1!==''?r.s1:''}</span>
     </div>
-    <div class="b-team ${w2?'win':''} ${w1&&!w2?'lose':''}">
+    <div class="b-team ${r.w2?'win':''} ${r.w1?'lose':''}">
       <div class="b-tname"><span style="font-size:.85rem">${f2}</span><span>${t2n}</span></div>
-      <span class="b-score">${s2!==''?s2:''}</span>
+      <span class="b-score">${r.s2!==''?r.s2:''}</span>
     </div>
   </div>`;
 }
@@ -5955,18 +5996,17 @@ function bMatch(id,t1n,t2n,meta,num,isFinal=false){
 function bMatchResolved(id,t1k,t2k,meta,num){
   const t1=resolveTeam(t1k), t2=resolveTeam(t2k);
   const d=ST.bScores[id]||{};
-  const s1=d.s1!==undefined?d.s1:'', s2=d.s2!==undefined?d.s2:'';
-  const w1=s1!==''&&s2!==''&&s1>s2, w2=s1!==''&&s2!==''&&s2>s1;
+  const r=bracketResult(d);
   const e1=t1.n.replace(/'/g,"\\'"),e2=t2.n.replace(/'/g,"\\'");
   return`<div class="b-match" onclick="openBracketModal('${id}','${e1}','${e2}','${meta}')">
-    <div class="b-match-num">M${num} · ${meta}${KO_BY_M[num]?` · ${KO_BY_M[num].ko} UK`:''}</div>
-    <div class="b-team ${w1?'win':''} ${w2&&!w1?'lose':''}">
+    <div class="b-match-num">M${num} · ${meta}${KO_BY_M[num]?` · ${KO_BY_M[num].ko} UK`:''}${r.penSuffix}</div>
+    <div class="b-team ${r.w1?'win':''} ${r.w2?'lose':''}">
       <div class="b-tname"><span style="font-size:.85rem">${t1.f}</span><span>${t1.n}</span></div>
-      <span class="b-score">${s1!==''?s1:''}</span>
+      <span class="b-score">${r.s1!==''?r.s1:''}</span>
     </div>
-    <div class="b-team ${w2?'win':''} ${w1&&!w2?'lose':''}">
+    <div class="b-team ${r.w2?'win':''} ${r.w1?'lose':''}">
       <div class="b-tname"><span style="font-size:.85rem">${t2.f}</span><span>${t2.n}</span></div>
-      <span class="b-score">${s2!==''?s2:''}</span>
+      <span class="b-score">${r.s2!==''?r.s2:''}</span>
     </div>
   </div>`;
 }
@@ -6105,7 +6145,8 @@ function renderKnockoutSchedule(){
       // otherwise fall back to the source-pair hint baked into KO_SCHEDULE.fix.
       const fixDisplay=(k.round!=='Round of 32' && r.t1!=='TBD' && r.t2!=='TBD')
         ? `${r.t1} v ${r.t2}` : k.fix;
-      const scoreBadge=hasScore ? ` <span class="ko-score-pill">${sd.s1}–${sd.s2}</span>` : '';
+      const penSuffix = hasScore && sd.s1===sd.s2 && sd.p1!==undefined && sd.p2!==undefined ? ` (${sd.p1}–${sd.p2} p)` : '';
+      const scoreBadge=hasScore ? ` <span class="ko-score-pill">${sd.s1}–${sd.s2}${penSuffix}</span>` : '';
       return `<div class="ko-row clickable${hasScore?' has-score':''}" onclick="openKoMatch(${k.m})">
         <span class="ko-m">M${k.m}</span>
         <span class="ko-when"><b>${fmt(k.date)}</b><span class="ko-time">${k.ko} UK</span></span>
@@ -7191,7 +7232,16 @@ function undoLastResult(){
 // ENHANCEMENT 7 — Modal context (what this result means)
 // ═══════════════════════════════════════════════════════
 function updateModalContext(){
-  if(!mCtx||mCtx.type!=='group')return;
+  if(!mCtx)return;
+  // Penalty shootout UI — show only on knockout matches when the regulation score is level (both filled + equal)
+  const penRow=document.getElementById('penaltyRow');
+  if(penRow){
+    const s1=document.getElementById('mS1').value;
+    const s2=document.getElementById('mS2').value;
+    const levelDraw = s1!=='' && s2!=='' && parseInt(s1)===parseInt(s2);
+    penRow.style.display = (mCtx.type==='bracket' && levelDraw) ? '' : 'none';
+  }
+  if(mCtx.type!=='group')return;
   const ctxEl=document.getElementById('modalContext');
   const ctxText=document.getElementById('modalContextText');
   if(!ctxEl||!ctxText)return;
@@ -8942,11 +8992,19 @@ function wls_resolveKoTeams(matchId){
 function wls_advanceWinner(matchId){
   const d = ST.bScores[matchId];
   if(!d || d.s1 === undefined || d.s2 === undefined) return;
-  if(d.s1 === d.s2) return; // No winner yet (would need PK in real life — leave to user)
+  // Decide winner: regulation result, or penalty shootout if level
+  let winsByT1;
+  if(d.s1 !== d.s2){
+    winsByT1 = d.s1 > d.s2;
+  } else if(d.p1 !== undefined && d.p2 !== undefined && d.p1 !== d.p2){
+    winsByT1 = d.p1 > d.p2;
+  } else {
+    return; // draw with no shootout entered yet
+  }
   const teams = wls_resolveKoTeams(matchId);
   if(!teams) return;
-  const winner = d.s1 > d.s2 ? teams.t1 : teams.t2;
-  const loser  = d.s1 > d.s2 ? teams.t2 : teams.t1;
+  const winner = winsByT1 ? teams.t1 : teams.t2;
+  const loser  = winsByT1 ? teams.t2 : teams.t1;
   if(winner === 'TBD') return;
   const next = WLS_BRACKET_MAP[matchId];
   if(!next) return;
