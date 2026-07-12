@@ -6280,15 +6280,53 @@ function renderScorers(){
 // ═══════════════════════════════════════════════════════
 // TIMELINE
 // ═══════════════════════════════════════════════════════
+function getTimelineContext(k){
+  if (k && k.startsWith('ko_')) {
+    const m = parseInt(k.slice(3));
+    const koRow = (typeof KO_BY_M !== 'undefined') ? KO_BY_M[m] : null;
+    if (!koRow) return null;
+    const dmatch = (typeof DISC_DATA !== 'undefined' ? (DISC_DATA.matches || []) : []).find(x => x.match === m);
+    const koid = koIdForMatch(m);
+    const sd = koid ? (ST.bScores[koid] || {}) : {};
+    let t1 = sd.team1 || (dmatch ? mapDiscTeam(dmatch.home) : null);
+    let t2 = sd.team2 || (dmatch ? mapDiscTeam(dmatch.away) : null);
+    if (!t1 || !t2) {
+      const parts = (koRow.fix || '').split(' v ');
+      t1 = t1 || parts[0] || 'TBD';
+      t2 = t2 || parts[1] || 'TBD';
+    }
+    return {
+      isKO: true, k, matchNum: m,
+      teams: [t1, t2], leftLabel: t1, rightLabel: t2,
+      score: (typeof sd.s1 === 'number' && typeof sd.s2 === 'number') ? [sd.s1, sd.s2] : null,
+      pens:  (typeof sd.p1 === 'number' && typeof sd.p2 === 'number') ? [sd.p1, sd.p2] : null,
+      dateStr: koRow.date, venue: koRow.venue, round: koRow.round
+    };
+  }
+  const parts = (k || '').split('_');
+  if (parts.length !== 2) return null;
+  const g = parts[0], fi = parseInt(parts[1]);
+  if (!G[g] || !FX[g] || !FX[g][fi]) return null;
+  const [a, b, num, dt, venue] = FX[g][fi];
+  return {
+    isKO: false, k, matchNum: num, g, fi,
+    teams: [G[g].t[a], G[g].t[b]],
+    leftLabel: `${G[g].f[a]} ${G[g].t[a]}`,
+    rightLabel: `${G[g].t[b]} ${G[g].f[b]}`,
+    score: ST.scores[k] !== undefined ? ST.scores[k] : null,
+    pens: null,
+    dateStr: dt.slice(0, 10), venue, round: 'Group ' + g
+  };
+}
 function renderTimelineList(){
   const el=document.getElementById('timelineList');
-  let h='';
+  let h='<div style="font-family:\'Bebas Neue\',sans-serif;color:var(--gold);font-size:var(--tx-sm);letter-spacing:2px;padding:var(--sp-2) var(--sp-1) var(--sp-1)">GROUP STAGE</div>';
   Object.keys(G).forEach(g=>{
     FX[g].forEach(([a,b,num,dt,venue],fi)=>{
       const k=`${g}_${fi}`;
       const hs=ST.scores[k]!==undefined;
       const ev=(ST.timeline[k]||[]).length;
-      h+=`<div class="match-select-card ${activeTimeline===k?'active':''}" onclick="selTimeline('${k}','${g}',${fi})">
+      h+=`<div class="match-select-card ${activeTimeline===k?'active':''}" onclick="selTimeline('${k}')">
         <div style="display:flex;align-items:center;justify-content:space-between;gap:var(--sp-2)">
           <div style="font-family:'Barlow Condensed',sans-serif;font-size:var(--tx-sm);font-weight:700">${G[g].f[a]} ${G[g].t[a]} vs ${G[g].f[b]} ${G[g].t[b]}</div>
           ${hs?`<span class="pill gold" style="font-size:var(--tx-xs);padding:1px 8px">${ST.scores[k][0]}–${ST.scores[k][1]}</span>`:''}
@@ -6297,16 +6335,44 @@ function renderTimelineList(){
       </div>`;
     });
   });
+  const koPlayed = (typeof KO_SCHEDULE !== 'undefined' ? KO_SCHEDULE : []).filter(r => {
+    const id = koIdForMatch(r.m); if (!id) return false;
+    const d = ST.bScores[id] || {};
+    return typeof d.s1 === 'number' && typeof d.s2 === 'number';
+  }).sort((x,y) => x.m - y.m);
+  if (koPlayed.length) {
+    h += '<div style="font-family:\'Bebas Neue\',sans-serif;color:var(--gold);font-size:var(--tx-sm);letter-spacing:2px;padding:var(--sp-3) var(--sp-1) var(--sp-1);margin-top:var(--sp-3);border-top:1px solid var(--bdr)">KNOCKOUT STAGE</div>';
+    koPlayed.forEach(r => {
+      const k = `ko_${r.m}`;
+      const id = koIdForMatch(r.m); const d = ST.bScores[id] || {};
+      const dmatch = (typeof DISC_DATA !== 'undefined' ? (DISC_DATA.matches || []) : []).find(x => x.match === r.m);
+      const t1 = d.team1 || (dmatch ? mapDiscTeam(dmatch.home) : 'TBD');
+      const t2 = d.team2 || (dmatch ? mapDiscTeam(dmatch.away) : 'TBD');
+      const ev = (ST.timeline[k]||[]).length;
+      const sc = `${d.s1}–${d.s2}`;
+      const pens = (typeof d.p1 === 'number' && typeof d.p2 === 'number') ? ` (${d.p1}-${d.p2} pens)` : '';
+      h += `<div class="match-select-card ${activeTimeline===k?'active':''}" onclick="selTimeline('${k}')">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:var(--sp-2)">
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:var(--tx-sm);font-weight:700">${t1} vs ${t2}</div>
+          <span class="pill gold" style="font-size:var(--tx-xs);padding:1px 8px">${sc}${pens}</span>
+        </div>
+        <div style="font-size:var(--tx-xs);color:var(--tx3);margin-top:2px;font-family:'Barlow Condensed',sans-serif">M${r.m} · ${r.round} · ${r.date} · ${r.venue}${ev?` · ${ev} events`:''}</div>
+      </div>`;
+    });
+  }
   el.innerHTML=h;
 }
-function selTimeline(k,g,fi){activeTimeline=k;renderTimelineList();renderTimelinePanel(k,g,fi);}
-function renderTimelinePanel(k,g,fi){
-  const[a,b,num,dt,venue]=FX[g][fi];
-  const sc=ST.scores[k];const evs=ST.timeline[k]||[];
-  const panel=document.getElementById('timelinePanel');
-  let h=`<div class="tl-header">
-    <div class="tl-scoreline">${sc?sc[0]:'?'} — ${sc?sc[1]:'?'}</div>
-    <div class="tl-teams"><span>${G[g].f[a]} ${G[g].t[a]}</span><span style="font-size:var(--tx-xs)">${dt.slice(0,10)} · ${venue}</span><span>${G[g].t[b]} ${G[g].f[b]}</span></div>
+function selTimeline(k){activeTimeline=k;renderTimelineList();renderTimelinePanel(k);}
+function renderTimelinePanel(k){
+  const ctx = getTimelineContext(k);
+  const panel = document.getElementById('timelinePanel');
+  if (!ctx) { panel.innerHTML = ''; return; }
+  const sc = ctx.score;
+  const evs = ST.timeline[k] || [];
+  const pensDisplay = ctx.pens ? ` <span style="color:var(--tx3);font-size:var(--tx-xs)">(pens ${ctx.pens[0]}-${ctx.pens[1]})</span>` : '';
+  let h = `<div class="tl-header">
+    <div class="tl-scoreline">${sc?sc[0]:'?'} — ${sc?sc[1]:'?'}${pensDisplay}</div>
+    <div class="tl-teams"><span>${ctx.leftLabel}</span><span style="font-size:var(--tx-xs)">${ctx.dateStr} · ${ctx.venue}</span><span>${ctx.rightLabel}</span></div>
   </div><div class="tl-body">`;
   if(evs.length===0)h+=`<div class="empty-state" style="padding:var(--sp-8) 0"><div class="empty-icon">📋</div><div class="empty-title">No Events Yet</div><div class="empty-sub">Add goals, cards and subs using the form below</div></div>`;
   else{
@@ -6315,22 +6381,23 @@ function renderTimelinePanel(k,g,fi){
       h+=`<div class="tl-item"><span class="tl-min">${ev.min}'</span><div class="tl-dot ${ev.type}"></div><div class="tl-content"><div class="tl-player">${ico} ${ev.player}</div><div class="tl-type">${ev.team} · ${ev.type}</div></div><button onclick="remEvent('${k}',${i})" style="background:none;border:none;color:var(--tx3);cursor:pointer;font-size:var(--tx-sm);margin-left:auto;opacity:0.5;min-width:32px;min-height:32px" aria-label="Remove event">✕</button></div>`;
     });
   }
+  const [t1, t2] = ctx.teams;
   h+=`</div><div class="add-event-form">
     <input class="inp sm" id="evMin" type="number" placeholder="Min" min="1" max="120" style="width:60px;height:36px" aria-label="Minute">
     <input class="inp sm" id="evPlayer" placeholder="Player name" style="flex:1;min-width:70px;height:36px" aria-label="Player name">
     <select class="inp sm" id="evTeam" style="flex:1;min-width:80px;height:36px" aria-label="Team">
-      <option value="${G[g].t[a]}">${G[g].f[a]} ${G[g].t[a]}</option>
-      <option value="${G[g].t[b]}">${G[g].f[b]} ${G[g].t[b]}</option>
+      <option value="${t1}">${ctx.leftLabel}</option>
+      <option value="${t2}">${ctx.rightLabel}</option>
     </select>
     <select class="inp sm" id="evType" style="width:100px;height:36px" aria-label="Event type">
       <option value="goal">⚽ Goal</option><option value="assist">🅰️ Assist</option>
       <option value="yellow">🟨 Yellow</option><option value="red">🟥 Red</option><option value="sub">🔄 Sub</option>
     </select>
-    <button class="btn sm" onclick="addEvent('${k}','${g}',${fi})">+ Add</button>
+    <button class="btn sm" onclick="addEvent('${k}')">+ Add</button>
   </div>`;
   panel.innerHTML=h;
 }
-function addEvent(k,g,fi){
+function addEvent(k){
   const min=parseInt(document.getElementById('evMin').value);
   const player=document.getElementById('evPlayer').value.trim();
   const team=document.getElementById('evTeam').value;
@@ -6338,9 +6405,9 @@ function addEvent(k,g,fi){
   if(!min||!player){toast('Enter minute and player name','error');return;}
   if(!ST.timeline[k])ST.timeline[k]=[];
   ST.timeline[k].push({min,player,team,type});save();
-  renderTimelinePanel(k,g,fi);renderTimelineList();toast(`${player} ${min}'`,'success');
+  renderTimelinePanel(k);renderTimelineList();toast(`${player} ${min}'`,'success');
 }
-function remEvent(k,i){ST.timeline[k].splice(i,1);save();const[g,fi]=k.split('_');renderTimelinePanel(k,g,parseInt(fi));renderTimelineList();}
+function remEvent(k,i){ST.timeline[k].splice(i,1);save();renderTimelinePanel(k);renderTimelineList();}
 
 // ═══════════════════════════════════════════════════════
 // AI PREDICTIONS
@@ -7818,11 +7885,12 @@ function hydrateFromDiscipline(){
     if (Object.keys(ST.fairPlay).length) touched = true;
   }
 
-  // ── Match Log timeline ── (only if user has none; group stage only)
-  if (!Object.keys(ST.timeline).length) {
+  // ── Match Log timeline: group stage ── (only if no group-stage entries yet)
+  const hasGroupEntries = Object.keys(ST.timeline).some(k => !k.startsWith('ko_'));
+  if (!hasGroupEntries) {
     cards.forEach(c => {
       const team = mapDiscTeam(c.team);
-      const f = MATCH_TO_FIXTURE[c.match]; if (!f) return; // skip knockouts
+      const f = MATCH_TO_FIXTURE[c.match]; if (!f) return; // skip knockouts here
       const k = `${f.g}_${f.fi}`;
       if (!ST.timeline[k]) ST.timeline[k] = [];
       const min = parseInt(String(c.minute).replace(/[^0-9]/g, '')) || 0;
@@ -7831,9 +7899,30 @@ function hydrateFromDiscipline(){
         type: c.card === 'Red' ? 'red' : 'yellow'
       });
     });
-    Object.keys(ST.timeline).forEach(k => ST.timeline[k].sort((a,b)=>a.min-b.min));
-    if (Object.keys(ST.timeline).length) touched = true;
+    Object.keys(ST.timeline).forEach(k => {
+      if (!k.startsWith('ko_')) ST.timeline[k].sort((a,b)=>a.min-b.min);
+    });
+    if (Object.keys(ST.timeline).some(k => !k.startsWith('ko_'))) touched = true;
   }
+
+  // ── Match Log timeline: knockout stage ── (per-match top-up; each match seeds
+  // once, so new rounds land as DISC_DATA is refreshed without clobbering later
+  // user edits).
+  const koCardsByMatch = {};
+  cards.forEach(c => {
+    if (c.match < 73 || c.match > 104) return;
+    (koCardsByMatch[c.match] = koCardsByMatch[c.match] || []).push(c);
+  });
+  Object.keys(koCardsByMatch).forEach(mStr => {
+    const m = parseInt(mStr);
+    const k = `ko_${m}`;
+    if (ST.timeline[k]) return; // already seeded or user-populated
+    ST.timeline[k] = koCardsByMatch[m].map(c => {
+      const min = parseInt(String(c.minute).replace(/[^0-9]/g, '')) || 0;
+      return { min, player: c.player, team: mapDiscTeam(c.team), type: c.card === 'Red' ? 'red' : 'yellow' };
+    }).sort((a,b)=>a.min-b.min);
+    touched = true;
+  });
 
   // ── R32 bScores ── seed regulation + penalty results for whatever's played.
   // R16/QF/SF/Final scores are hydrated later inside setupAutoAdvance so each
