@@ -1,0 +1,28 @@
+name: Fill card shirt numbers
+
+on:
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  numbers:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fill missing card numbers from ESPN rosters
+        run: python3 build_numbers.py
+
+      - name: Commit if changed
+        run: |
+          if git diff --quiet index.html; then
+            echo "No number changes."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git commit -m "Fill missing card shirt numbers from ESPN rosters"
+          git push
