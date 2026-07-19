@@ -1,0 +1,30 @@
+name: Refresh goal data
+
+on:
+  schedule:
+    - cron: '30 */6 * * *'   # every 6 hours during the tournament window
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Rebuild GOAL_DATA from the FIFA timeline API
+        run: python3 build_goals.py
+
+      - name: Commit if changed
+        run: |
+          if git diff --quiet index.html; then
+            echo "No goal-data changes."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git commit -m "Auto-refresh GOAL_DATA from FIFA timeline API"
+          git push
